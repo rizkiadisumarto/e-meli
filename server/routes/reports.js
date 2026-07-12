@@ -113,14 +113,24 @@ router.get('/dues-summary', authenticateToken, (req, res) => {
   try {
     const currentMonth = new Date().getMonth() + 1;
     const currentYear = new Date().getFullYear();
-    
+
     const totalActive = queryGet('SELECT COUNT(*) as total FROM members WHERE status = ?', ['active']);
     const paid = queryGet('SELECT COUNT(*) as total FROM dues_payments WHERE month = ? AND year = ? AND status = ?', [currentMonth, currentYear, 'paid']);
-    
+    const paidAmount = queryGet('SELECT COALESCE(SUM(amount), 0) as total FROM dues_payments WHERE month = ? AND year = ? AND status = ?', [currentMonth, currentYear, 'paid']);
+    const duesSettings = queryGet('SELECT amount FROM dues_settings ORDER BY effective_date DESC LIMIT 1');
+    const amountPerPerson = duesSettings ? duesSettings.amount : 0;
+
+    const totalMembers = totalActive.total || 0;
+    const paidCount = paid.total || 0;
+    const unpaidCount = Math.max(0, totalMembers - paidCount);
+
     res.json({
-      total_members: totalActive.total,
-      paid: paid.total,
-      unpaid: totalActive.total - paid.total,
+      total_members: totalMembers,
+      paid: paidCount,
+      unpaid: unpaidCount,
+      paid_amount: paidAmount.total || 0,
+      amount_per_person: amountPerPerson,
+      potential_total: totalMembers * amountPerPerson,
       month: currentMonth,
       year: currentYear
     });

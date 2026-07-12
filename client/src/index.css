@@ -41,6 +41,113 @@
   --transition-normal: 0.3s ease;
 }
 
+/* Light Theme */
+.light-theme {
+  --bg-main: #F0F2F5;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F8F9FA;
+  --border-color: #E2E8F0;
+
+  --primary: #059669;
+  --primary-hover: #047857;
+  --primary-light: rgba(5, 150, 105, 0.1);
+
+  --secondary: #2563EB;
+  --secondary-hover: #1D4ED8;
+
+  --danger: #DC2626;
+  --danger-hover: #B91C1C;
+  --danger-light: rgba(220, 38, 38, 0.1);
+
+  --warning: #D97706;
+  --warning-light: rgba(217, 119, 6, 0.1);
+
+  --text-main: #1F2937;
+  --text-muted: #6B7280;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+  --shadow-glow: 0 0 15px rgba(5, 150, 105, 0.2);
+
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.08);
+}
+
+.light-theme body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+}
+
+.light-theme .sidebar {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-right-color: rgba(0, 0, 0, 0.08);
+}
+
+.light-theme .sidebar-brand h2 {
+  background: linear-gradient(to right, #1F2937, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.light-theme .nav-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.light-theme .nav-item.active {
+  background-color: var(--primary-light);
+}
+
+.light-theme .glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.light-theme .table th {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.light-theme .table tbody tr:hover {
+  background-color: var(--bg-card-hover);
+}
+
+.light-theme .form-input,
+.light-theme .form-select,
+.light-theme .form-textarea {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+.light-theme .search-bar input {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
+.light-theme .modal-content {
+  background-color: var(--bg-card);
+}
+
+.light-theme .modal-header,
+.light-theme .modal-footer {
+  border-color: var(--border-color);
+}
+
+.light-theme .badge-neutral {
+  background-color: var(--border-color);
+  color: var(--text-muted);
+}
+
+.light-theme ::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+.light-theme .btn-outline {
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+
 /* Reset & Base Styles */
 * {
   margin: 0;

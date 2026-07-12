@@ -82,6 +82,11 @@ router.put('/:id', authenticateToken, requireAdmin, (req, res) => {
 // DELETE /api/members/:id
 router.delete('/:id', authenticateToken, requireAdmin, (req, res) => {
   try {
+    // Remove participant records for this member
+    queryRun('DELETE FROM event_participants WHERE member_id = ?', [req.params.id]);
+    // Remove dues payments for this member
+    queryRun('DELETE FROM dues_payments WHERE member_id = ?', [req.params.id]);
+    // Delete the member
     queryRun('DELETE FROM members WHERE id = ?', [req.params.id]);
     res.json({ message: 'Anggota berhasil dihapus' });
   } catch (err) {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Lock, User, LogIn } from 'lucide-react';
+import { Lock, User, LogIn, Eye, EyeOff } from 'lucide-react';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -9,6 +9,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -67,13 +68,17 @@ const LoginPage = () => {
           <div className="form-group relative-input">
             <Lock size={18} className="input-icon" />
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               className="form-input with-icon"
+              style={{paddingRight:'2.5rem'}}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} style={{position:'absolute',right:'0.75rem',top:'50%',transform:'translateY(-50%)',background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',padding:'0.25rem',display:'flex',zIndex:1}}>
+              {showPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
+            </button>
           </div>
 
           <button 

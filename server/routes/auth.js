@@ -79,4 +79,26 @@ router.get('/me', authenticateToken, (req, res) => {
   }
 });
 
+// PUT /api/auth/change-password (any logged-in user)
+router.put('/change-password', authenticateToken, (req, res) => {
+  try {
+    const { current_password, new_password } = req.body;
+    if (!current_password || !new_password) {
+      return res.status(400).json({ error: 'Password lama dan baru harus diisi' });
+    }
+
+    const user = queryGet('SELECT * FROM users WHERE id = ?', [req.user.id]);
+    const valid = bcrypt.compareSync(current_password, user.password);
+    if (!valid) {
+      return res.status(401).json({ error: 'Password lama salah' });
+    }
+
+    const hashed = bcrypt.hashSync(new_password, 10);
+    queryRun('UPDATE users SET password = ? WHERE id = ?', [hashed, req.user.id]);
+    res.json({ message: 'Password berhasil diubah' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

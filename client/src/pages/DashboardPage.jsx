@@ -38,7 +38,6 @@ const DashboardPage = () => {
   const [summary, setSummary] = useState(null);
   const [monthlyData, setMonthlyData] = useState([]);
   const [recentTransactions, setRecentTransactions] = useState([]);
-  const [duesSummary, setDuesSummary] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,17 +46,15 @@ const DashboardPage = () => {
         const token = localStorage.getItem('token');
         const headers = { 'Authorization': `Bearer ${token}` };
 
-        const [summaryRes, monthlyRes, recentRes, duesRes] = await Promise.all([
+        const [summaryRes, monthlyRes, recentRes] = await Promise.all([
           fetch('/api/reports/summary', { headers }),
           fetch('/api/reports/monthly', { headers }),
-          fetch('/api/reports/recent-transactions?limit=5', { headers }),
-          fetch('/api/reports/dues-summary', { headers })
+          fetch('/api/reports/recent-transactions?limit=5', { headers })
         ]);
 
         if (summaryRes.ok) setSummary(await summaryRes.json());
         if (monthlyRes.ok) setMonthlyData(await monthlyRes.json());
         if (recentRes.ok) setRecentTransactions(await recentRes.json());
-        if (duesRes.ok) setDuesSummary(await duesRes.json());
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
@@ -182,41 +179,6 @@ const DashboardPage = () => {
         {/* Side Panels */}
         <div className="flex flex-col gap-6">
           
-          {/* Dues Summary Widget */}
-          <div className="glass-card dues-widget">
-            <div className="card-header">
-              <h3>Iuran Bulan Ini</h3>
-            </div>
-            <div className="dues-stats mt-4">
-              <div className="dues-progress-circle">
-                <svg viewBox="0 0 36 36" className="circular-chart primary">
-                  <path className="circle-bg"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                  <path className="circle"
-                    strokeDasharray={`${(duesSummary?.paid / duesSummary?.total_members) * 100 || 0}, 100`}
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                  <text x="18" y="20.35" className="percentage">
-                    {Math.round((duesSummary?.paid / duesSummary?.total_members) * 100 || 0)}%
-                  </text>
-                </svg>
-              </div>
-              <div className="dues-details">
-                <div className="dues-item">
-                  <span className="dot bg-primary"></span>
-                  <span className="text-muted text-sm">Sudah Bayar</span>
-                  <span className="font-bold">{duesSummary?.paid || 0}</span>
-                </div>
-                <div className="dues-item">
-                  <span className="dot bg-danger"></span>
-                  <span className="text-muted text-sm">Belum Bayar</span>
-                  <span className="font-bold">{duesSummary?.unpaid || 0}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Recent Transactions Widget */}
           <div className="glass-card recent-widget flex-1">
             <div className="card-header">

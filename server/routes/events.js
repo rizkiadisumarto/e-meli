@@ -42,7 +42,13 @@ router.get('/', authenticateToken, (req, res) => {
     
     // Enrich with participant count & financial summary
     const enriched = events.map(event => {
-      const participants = queryGet('SELECT COUNT(*) as total, SUM(CASE WHEN attendance = ? THEN 1 ELSE 0 END) as present FROM event_participants WHERE event_id = ?', ['present', event.id]);
+      const participants = queryGet(`
+        SELECT COUNT(*) as total, 
+          SUM(CASE WHEN ep.attendance = 'present' THEN 1 ELSE 0 END) as present 
+        FROM event_participants ep 
+        INNER JOIN members m ON ep.member_id = m.id 
+        WHERE ep.event_id = ?
+      `, [event.id]);
       const income = queryGet('SELECT COALESCE(SUM(t.amount),0) as total FROM event_transactions et JOIN transactions t ON et.transaction_id = t.id WHERE et.event_id = ? AND t.type = ?', [event.id, 'income']);
       const expense = queryGet('SELECT COALESCE(SUM(t.amount),0) as total FROM event_transactions et JOIN transactions t ON et.transaction_id = t.id WHERE et.event_id = ? AND t.type = ?', [event.id, 'expense']);
       
@@ -69,7 +75,13 @@ router.get('/:id', authenticateToken, (req, res) => {
     if (!event) return res.status(404).json({ error: 'Event tidak ditemukan' });
     
     // Financial summary
-    const participants = queryGet('SELECT COUNT(*) as total, SUM(CASE WHEN attendance = ? THEN 1 ELSE 0 END) as present FROM event_participants WHERE event_id = ?', ['present', event.id]);
+    const participants = queryGet(`
+      SELECT COUNT(*) as total, 
+        SUM(CASE WHEN ep.attendance = 'present' THEN 1 ELSE 0 END) as present 
+      FROM event_participants ep 
+      INNER JOIN members m ON ep.member_id = m.id 
+      WHERE ep.event_id = ?
+    `, [event.id]);
     const income = queryGet('SELECT COALESCE(SUM(t.amount),0) as total FROM event_transactions et JOIN transactions t ON et.transaction_id = t.id WHERE et.event_id = ? AND t.type = ?', [event.id, 'income']);
     const expense = queryGet('SELECT COALESCE(SUM(t.amount),0) as total FROM event_transactions et JOIN transactions t ON et.transaction_id = t.id WHERE et.event_id = ? AND t.type = ?', [event.id, 'expense']);
     const budgetTotal = queryGet('SELECT COALESCE(SUM(planned_amount),0) as planned, COALESCE(SUM(actual_amount),0) as actual FROM event_budget WHERE event_id = ?', [event.id]);
@@ -426,9 +438,11 @@ router.get('/:id/summary', authenticateToken, (req, res) => {
     
     const participants = queryGet(`
       SELECT COUNT(*) as total, 
-        SUM(CASE WHEN attendance = 'present' THEN 1 ELSE 0 END) as present,
-        SUM(amount_paid) as total_paid
-      FROM event_participants WHERE event_id = ?
+        SUM(CASE WHEN ep.attendance = 'present' THEN 1 ELSE 0 END) as present,
+        SUM(ep.amount_paid) as total_paid
+      FROM event_participants ep 
+      INNER JOIN members m ON ep.member_id = m.id 
+      WHERE ep.event_id = ?
     `, [req.params.id]);
     
     const income = queryGet('SELECT COALESCE(SUM(t.amount),0) as total FROM event_transactions et JOIN transactions t ON et.transaction_id = t.id WHERE et.event_id = ? AND t.type = ?', [req.params.id, 'income']);
