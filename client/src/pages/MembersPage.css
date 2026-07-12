@@ -1,0 +1,17 @@
+/* MembersPage specific styles (most styles are inherited from index.css global tokens) */
+.page-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.shadow-glow {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+.shadow-glow:hover {
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+}
+
+.text-main {
+  color: var(--text-main);
+}

@@ -1,0 +1,130 @@
+const express = require('express');
+const { queryAll, queryGet, queryRun } = require('../db/database');
+const { authenticateToken, requireAdmin } = require('../middleware/auth');
+
+const router = express.Router();
+
+// GET /api/settings
+router.get('/', authenticateToken, (req, res) => {
+  try {
+    const rows = queryAll('SELECT * FROM settings');
+    const settings = {};
+    rows.forEach(row => { settings[row.key] = row.value; });
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT /api/settings
+router.put('/', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    const updates = req.body;
+    
+    for (const [key, value] of Object.entries(updates)) {
+        try {
+            queryRun('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', [key, value]);
+        } catch(e) {
+            console.error('Error updating setting', key, e);
+        }
+    }
+    
+    res.json({ message: 'Pengaturan berhasil disimpan' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/settings/categories
+router.get('/categories', authenticateToken, (req, res) => {
+  try {
+    const categories = queryAll('SELECT * FROM categories ORDER BY type, name');
+    res.json(categories);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/settings/categories
+router.post('/categories', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    const { name, type } = req.body;
+    if (!name || !type) return res.status(400).json({ error: 'Nama dan tipe harus diisi' });
+    
+    const result = queryRun('INSERT INTO categories (name, type) VALUES (?, ?)', [name, type]);
+    const category = queryGet('SELECT * FROM categories WHERE id = ?', [result.lastInsertRowid]);
+    res.status(201).json(category);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT /api/settings/categories/:id
+router.put('/categories/:id', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    const { name, type } = req.body;
+    if (!name || !type) return res.status(400).json({ error: 'Nama dan tipe harus diisi' });
+
+    queryRun('UPDATE categories SET name = ?, type = ? WHERE id = ?', [name, type, req.params.id]);
+    const category = queryGet('SELECT * FROM categories WHERE id = ?', [req.params.id]);
+    res.json(category);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/settings/categories/:id
+router.delete('/categories/:id', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    queryRun('DELETE FROM categories WHERE id = ?', [req.params.id]);
+    res.json({ message: 'Kategori berhasil dihapus' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/settings/users
+router.get('/users', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    const users = queryAll('SELECT id, username, full_name, role, created_at FROM users ORDER BY created_at');
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT /api/settings/users/:id
+router.put('/users/:id', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    const { full_name, role, password } = req.body;
+    if (!full_name || !role) return res.status(400).json({ error: 'Nama lengkap dan role harus diisi' });
+
+    if (password) {
+      const bcrypt = require('bcryptjs');
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      queryRun('UPDATE users SET full_name = ?, role = ?, password = ? WHERE id = ?', [full_name, role, hashedPassword, req.params.id]);
+    } else {
+      queryRun('UPDATE users SET full_name = ?, role = ? WHERE id = ?', [full_name, role, req.params.id]);
+    }
+
+    const user = queryGet('SELECT id, username, full_name, role, created_at FROM users WHERE id = ?', [req.params.id]);
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/settings/users/:id
+router.delete('/users/:id', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    if (Number(req.params.id) === req.user.id) {
+      return res.status(400).json({ error: 'Tidak bisa menghapus akun sendiri' });
+    }
+    queryRun('DELETE FROM users WHERE id = ?', [req.params.id]);
+    res.json({ message: 'User berhasil dihapus' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+module.exports = router;

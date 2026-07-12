@@ -1,0 +1,125 @@
+const express = require('express');
+const { queryAll, queryGet, queryRun } = require('../db/database');
+const { authenticateToken, requireAdmin } = require('../middleware/auth');
+
+const router = express.Router();
+
+// GET /api/transactions
+router.get('/', authenticateToken, (req, res) => {
+  try {
+    const { type, category_id, start_date, end_date, search, limit = 50, offset = 0 } = req.query;
+    
+    let query = `
+      SELECT t.*, c.name as category_name, m.name as member_name, u.full_name as created_by_name
+      FROM transactions t
+      LEFT JOIN categories c ON t.category_id = c.id
+      LEFT JOIN members m ON t.member_id = m.id
+      LEFT JOIN users u ON t.created_by = u.id
+      WHERE 1=1
+    `;
+    const params = [];
+
+    if (type) { query += ' AND t.type = ?'; params.push(type); }
+    if (category_id) { query += ' AND t.category_id = ?'; params.push(category_id); }
+    if (start_date) { query += ' AND t.date >= ?'; params.push(start_date); }
+    if (end_date) { query += ' AND t.date <= ?'; params.push(end_date); }
+    if (search) { query += ' AND (t.description LIKE ? OR m.name LIKE ?)'; params.push(`%${search}%`, `%${search}%`); }
+
+    query += ' ORDER BY t.date DESC, t.id DESC LIMIT ? OFFSET ?';
+    params.push(Number(limit), Number(offset));
+
+    const transactions = queryAll(query, params);
+    
+    // Get total count
+    let countQuery = 'SELECT COUNT(*) as total FROM transactions t LEFT JOIN members m ON t.member_id = m.id WHERE 1=1';
+    const countParams = [];
+    if (type) { countQuery += ' AND t.type = ?'; countParams.push(type); }
+    if (category_id) { countQuery += ' AND t.category_id = ?'; countParams.push(category_id); }
+    if (start_date) { countQuery += ' AND t.date >= ?'; countParams.push(start_date); }
+    if (end_date) { countQuery += ' AND t.date <= ?'; countParams.push(end_date); }
+    if (search) { countQuery += ' AND (t.description LIKE ? OR m.name LIKE ?)'; countParams.push(`%${search}%`, `%${search}%`); }
+    
+    const countResult = queryGet(countQuery, countParams);
+
+    res.json({ transactions, total: countResult ? countResult.total : 0 });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/transactions/:id
+router.get('/:id', authenticateToken, (req, res) => {
+  try {
+    const transaction = queryGet(`
+      SELECT t.*, c.name as category_name, m.name as member_name
+      FROM transactions t
+      LEFT JOIN categories c ON t.category_id = c.id
+      LEFT JOIN members m ON t.member_id = m.id
+      WHERE t.id = ?
+    `, [req.params.id]);
+    
+    if (!transaction) return res.status(404).json({ error: 'Transaksi tidak ditemukan' });
+    res.json(transaction);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/transactions
+router.post('/', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    const { type, category_id, amount, description, date, member_id } = req.body;
+    if (!type || !amount || !date) {
+      return res.status(400).json({ error: 'Type, amount, dan date harus diisi' });
+    }
+
+    const result = queryRun(
+      'INSERT INTO transactions (type, category_id, amount, description, date, member_id, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [type, category_id || null, amount, description || '', date, member_id || null, req.user.id]
+    );
+
+    const transaction = queryGet('SELECT * FROM transactions WHERE id = ?', [result.lastInsertRowid]);
+    res.status(201).json(transaction);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT /api/transactions/:id
+router.put('/:id', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    const { type, category_id, amount, description, date, member_id } = req.body;
+    
+    queryRun(
+      'UPDATE transactions SET type=?, category_id=?, amount=?, description=?, date=?, member_id=? WHERE id=?',
+      [type, category_id || null, amount, description || '', date, member_id || null, req.params.id]
+    );
+
+    const transaction = queryGet('SELECT * FROM transactions WHERE id = ?', [req.params.id]);
+    res.json(transaction);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/transactions/:id
+router.delete('/:id', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    queryRun('DELETE FROM transactions WHERE id = ?', [req.params.id]);
+    res.json({ message: 'Transaksi berhasil dihapus' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/transactions/categories/all
+router.get('/categories/all', authenticateToken, (req, res) => {
+  try {
+    const categories = queryAll('SELECT * FROM categories ORDER BY type, name');
+    res.json(categories);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+module.exports = router;

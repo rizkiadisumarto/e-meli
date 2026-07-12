@@ -1,0 +1,43 @@
+.events-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.event-card:hover .event-title {
+  color: var(--primary);
+}
+
+.event-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  transition: color var(--transition-fast);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.border-glass {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mr-1 {
+  margin-right: 0.25rem;
+}
