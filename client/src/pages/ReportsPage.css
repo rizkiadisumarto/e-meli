@@ -1,0 +1,53 @@
+.reports-page {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .reports-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start !important;
+  }
+
+  .reports-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .reports-controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .reports-controls select,
+  .reports-controls button {
+    width: 100%;
+  }
+
+  .monthly-summary {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .chart-container-mobile {
+    height: 250px !important;
+  }
+
+  .reports-table th,
+  .reports-table td {
+    padding: 0.4rem 0.3rem;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .monthly-summary {
+    grid-template-columns: 1fr !important;
+  }
+
+  .reports-table th,
+  .reports-table td {
+    padding: 0.35rem 0.25rem;
+    font-size: 0.65rem;
+  }
+}

@@ -33,7 +33,7 @@ router.post('/login', (req, res) => {
 
     res.json({
       token,
-      user: { id: user.id, username: user.username, full_name: user.full_name, role: user.role }
+      user: { id: user.id, username: user.username, full_name: user.full_name, role: user.role, phone: user.phone }
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -43,7 +43,7 @@ router.post('/login', (req, res) => {
 // POST /api/auth/register
 router.post('/register', (req, res) => {
   try {
-    const { username, password, full_name, role } = req.body;
+    const { username, password, full_name, role, phone } = req.body;
     if (!username || !password || !full_name) {
       return res.status(400).json({ error: 'Semua field harus diisi' });
     }
@@ -55,13 +55,13 @@ router.post('/register', (req, res) => {
 
     const hashedPassword = bcrypt.hashSync(password, 10);
     const result = queryRun(
-      'INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)',
-      [username, hashedPassword, full_name, role || 'viewer']
+      'INSERT INTO users (username, password, full_name, role, phone) VALUES (?, ?, ?, ?, ?)',
+      [username, hashedPassword, full_name, role || 'viewer', phone || null]
     );
 
     res.status(201).json({
       id: result.lastInsertRowid,
-      username, full_name, role: role || 'viewer'
+      username, full_name, role: role || 'viewer', phone: phone || null
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -71,7 +71,7 @@ router.post('/register', (req, res) => {
 // GET /api/auth/me
 router.get('/me', authenticateToken, (req, res) => {
   try {
-    const user = queryGet('SELECT id, username, full_name, role, created_at FROM users WHERE id = ?', [req.user.id]);
+    const user = queryGet('SELECT id, username, full_name, role, phone, created_at FROM users WHERE id = ?', [req.user.id]);
     if (!user) return res.status(404).json({ error: 'User tidak ditemukan' });
     res.json(user);
   } catch (err) {

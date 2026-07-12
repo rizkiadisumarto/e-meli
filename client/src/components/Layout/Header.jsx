@@ -97,9 +97,14 @@ const Header = ({ title = "Dashboard" }) => {
             <div style={{
               position:'absolute', top:'100%', right:0, marginTop:'0.5rem',
               background:'var(--bg-card)', border:'1px solid var(--border-color)',
-              borderRadius:'12px', padding:'0.5rem', minWidth:'200px',
+              borderRadius:'12px', padding:'0.75rem', minWidth:'220px',
               boxShadow:'var(--shadow-lg)', zIndex:200
             }}>
+              {user?.phone && (
+                <div style={{padding:'0.5rem 0.75rem',fontSize:'0.8rem',color:'var(--text-muted)',borderBottom:'1px solid var(--border-color)',marginBottom:'0.5rem'}}>
+                  No. HP: <span style={{color:'var(--text-main)',fontWeight:500}}>{user.phone}</span>
+                </div>
+              )}
               <button
                 onClick={() => { setShowPasswordModal(true); setShowUserMenu(false); }}
                 style={{

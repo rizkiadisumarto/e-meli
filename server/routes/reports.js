@@ -8,16 +8,19 @@ const router = express.Router();
 router.get('/summary', authenticateToken, (req, res) => {
   try {
     const { start_date, end_date } = req.query;
-    
+
     let dateFilter = '';
     const params = [];
     if (start_date) { dateFilter += ' AND date >= ?'; params.push(start_date); }
     if (end_date) { dateFilter += ' AND date <= ?'; params.push(end_date); }
 
-    const income = queryGet(`SELECT COALESCE(SUM(amount),0) as total FROM transactions WHERE type = 'income'${dateFilter}`, params);
-    const expense = queryGet(`SELECT COALESCE(SUM(amount),0) as total FROM transactions WHERE type = 'expense'${dateFilter}`, params);
+    // Exclude transactions linked to events (event transactions are separate from general cash)
+    const excludeEventTx = ' AND id NOT IN (SELECT transaction_id FROM event_transactions WHERE transaction_id IS NOT NULL)';
+
+    const income = queryGet(`SELECT COALESCE(SUM(amount),0) as total FROM transactions WHERE type = 'income'${excludeEventTx}${dateFilter}`, params);
+    const expense = queryGet(`SELECT COALESCE(SUM(amount),0) as total FROM transactions WHERE type = 'expense'${excludeEventTx}${dateFilter}`, params);
     const totalMembers = queryGet('SELECT COUNT(*) as total FROM members WHERE status = ?', ['active']);
-    const totalTransactions = queryGet(`SELECT COUNT(*) as total FROM transactions WHERE 1=1${dateFilter}`, params);
+    const totalTransactions = queryGet(`SELECT COUNT(*) as total FROM transactions WHERE 1=1${excludeEventTx}${dateFilter}`, params);
 
     res.json({
       total_income: income.total,
@@ -44,6 +47,7 @@ router.get('/monthly', authenticateToken, (req, res) => {
         SUM(amount) as total
       FROM transactions 
       WHERE strftime('%Y', date) = ?
+        AND id NOT IN (SELECT transaction_id FROM event_transactions WHERE transaction_id IS NOT NULL)
       GROUP BY month, type
       ORDER BY month
     `, [String(targetYear)]);
@@ -75,7 +79,7 @@ router.get('/by-category', authenticateToken, (req, res) => {
       SELECT c.name, c.type, SUM(t.amount) as total 
       FROM transactions t 
       JOIN categories c ON t.category_id = c.id 
-      WHERE 1=1
+      WHERE t.id NOT IN (SELECT transaction_id FROM event_transactions WHERE transaction_id IS NOT NULL)
     `;
     const params = [];
     if (type) { query += ' AND t.type = ?'; params.push(type); }
@@ -99,6 +103,7 @@ router.get('/recent-transactions', authenticateToken, (req, res) => {
       FROM transactions t
       LEFT JOIN categories c ON t.category_id = c.id
       LEFT JOIN members m ON t.member_id = m.id
+      WHERE t.id NOT IN (SELECT transaction_id FROM event_transactions WHERE transaction_id IS NOT NULL)
       ORDER BY t.date DESC, t.id DESC
       LIMIT ?
     `, [Number(limit)]);

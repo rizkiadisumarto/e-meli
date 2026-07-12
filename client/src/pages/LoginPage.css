@@ -148,3 +148,47 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Light theme overrides */
+.light-theme .login-container {
+  background-color: var(--bg-main);
+}
+
+.light-theme .login-card {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.light-theme .login-header h2 {
+  background: linear-gradient(to right, #1F2937, var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.light-theme .with-icon {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+.light-theme .with-icon:focus {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.light-theme .input-icon {
+  color: var(--text-muted);
+}
+
+.light-theme .login-footer {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+.light-theme .login-error {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.light-theme .loader {
+  border-color: rgba(0, 0, 0, 0.2);
+  border-top-color: var(--primary);
+}

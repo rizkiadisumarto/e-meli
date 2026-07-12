@@ -43,7 +43,7 @@ const LoginPage = () => {
             <span style={{fontSize:'40px',lineHeight:1}}>🇮🇩</span>
           </div>
           <h2>Selamat Datang</h2>
-          <p className="text-muted">Masuk Ke Sistem Kas Gang Melimewah</p>
+          <p className="text-muted">Masuk Ke Sistem E-Meli</p>
         </div>
 
         {error && (

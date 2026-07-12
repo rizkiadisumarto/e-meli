@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Save, Plus, Trash2, Edit2, X, Settings as SettingsIcon } from 'lucide-react';
+import { Save, Plus, Trash2, Edit2, X, Settings as SettingsIcon, Eye, EyeOff } from 'lucide-react';
 
 const SettingsPage = () => {
   const { isAdmin } = useAuth();
@@ -9,7 +9,7 @@ const SettingsPage = () => {
   const [users, setUsers] = useState([]);
   
   const [newCat, setNewCat] = useState({ name: '', type: 'income' });
-  const [newUser, setNewUser] = useState({ username: '', password: '', full_name: '', role: 'user' });
+  const [newUser, setNewUser] = useState({ username: '', password: '', full_name: '', role: 'user', phone: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -17,7 +17,8 @@ const SettingsPage = () => {
   const [editingCat, setEditingCat] = useState(null);
   const [editCatForm, setEditCatForm] = useState({ name: '', type: 'income' });
   const [editingUser, setEditingUser] = useState(null);
-  const [editUserForm, setEditUserForm] = useState({ full_name: '', role: 'user', password: '' });
+  const [editUserForm, setEditUserForm] = useState({ full_name: '', role: 'user', password: '', phone: '' });
+  const [showEditPw, setShowEditPw] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -128,7 +129,7 @@ const SettingsPage = () => {
         body: JSON.stringify(newUser)
       });
       if (res.ok) {
-        setNewUser({ username: '', password: '', full_name: '', role: 'user' });
+        setNewUser({ username: '', password: '', full_name: '', role: 'user', phone: '' });
         fetchData();
       } else {
         const err = await res.json();
@@ -141,13 +142,13 @@ const SettingsPage = () => {
 
   const startEditUser = (user) => {
     setEditingUser(user.id);
-    setEditUserForm({ full_name: user.full_name, role: user.role, password: '' });
+    setEditUserForm({ full_name: user.full_name, role: user.role, password: '', phone: user.phone || '' });
   };
 
   const saveEditUser = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const body = { full_name: editUserForm.full_name, role: editUserForm.role };
+      const body = { full_name: editUserForm.full_name, role: editUserForm.role, phone: editUserForm.phone };
       if (editUserForm.password) body.password = editUserForm.password;
       const res = await fetch(`/api/settings/users/${id}`, {
         method: 'PUT',
@@ -306,12 +307,16 @@ const SettingsPage = () => {
               <option value="admin">Administrator</option>
             </select>
           </div>
+          <div className="form-group mb-0 flex-1">
+            <label className="form-label">No. Handphone</label>
+            <input type="tel" className="form-input" value={newUser.phone} onChange={e => setNewUser({...newUser, phone: e.target.value})} placeholder="08xxxxxxxxxx" />
+          </div>
           <button type="submit" className="btn btn-primary h-11"><Plus size={18}/> Tambah</button>
         </form>
         
         <div className="table-container">
           <table className="table">
-            <thead><tr><th>Nama Lengkap</th><th>Username</th><th>Peran (Role)</th><th>Password Baru</th><th className="text-center">Aksi</th></tr></thead>
+            <thead><tr><th>Nama Lengkap</th><th>Username</th><th>No. HP</th><th>Peran (Role)</th><th>Password Baru</th><th className="text-center">Aksi</th></tr></thead>
             <tbody>
               {users.map(u => (
                 <tr key={u.id}>
@@ -323,6 +328,11 @@ const SettingsPage = () => {
                   <td>{u.username}</td>
                   <td>
                     {editingUser === u.id ? (
+                      <input type="tel" className="form-input" style={{padding:'0.25rem 0.5rem'}} placeholder="08xxxxxxxxxx" value={editUserForm.phone} onChange={e => setEditUserForm({...editUserForm, phone: e.target.value})} />
+                    ) : u.phone || <span className="text-muted text-sm">-</span>}
+                  </td>
+                  <td>
+                    {editingUser === u.id ? (
                       <select className="form-select" style={{padding:'0.25rem 0.5rem'}} value={editUserForm.role} onChange={e => setEditUserForm({...editUserForm, role: e.target.value})}>
                         <option value="viewer">User</option>
                         <option value="admin">Administrator</option>
@@ -331,7 +341,12 @@ const SettingsPage = () => {
                   </td>
                   <td>
                     {editingUser === u.id ? (
-                      <input type="password" className="form-input" style={{padding:'0.25rem 0.5rem'}} placeholder="Kosongkan jika tidak diubah" value={editUserForm.password} onChange={e => setEditUserForm({...editUserForm, password: e.target.value})} />
+                      <div style={{position:'relative'}}>
+                        <input type={showEditPw ? 'text' : 'password'} className="form-input" style={{padding:'0.25rem 0.5rem',paddingRight:'2rem'}} placeholder="Kosongkan jika tidak diubah" value={editUserForm.password} onChange={e => setEditUserForm({...editUserForm, password: e.target.value})} />
+                        <button type="button" onClick={() => setShowEditPw(!showEditPw)} style={{position:'absolute',right:'0.4rem',top:'50%',transform:'translateY(-50%)',background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',padding:'0.2rem',display:'flex'}}>
+                          {showEditPw ? <EyeOff size={14}/> : <Eye size={14}/>}
+                        </button>
+                      </div>
                     ) : <span className="text-muted text-sm">-</span>}
                   </td>
                   <td className="text-center">

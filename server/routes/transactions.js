@@ -1,8 +1,29 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
 const { queryAll, queryGet, queryRun } = require('../db/database');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
+
+// Multer config for proof image uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, `proof-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+  }
+});
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = /jpeg|jpg|png|webp/;
+    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
+    const mime = allowed.test(file.mimetype);
+    cb(null, ext && mime);
+  }
+});
 
 // GET /api/transactions
 router.get('/', authenticateToken, (req, res) => {
@@ -15,7 +36,7 @@ router.get('/', authenticateToken, (req, res) => {
       LEFT JOIN categories c ON t.category_id = c.id
       LEFT JOIN members m ON t.member_id = m.id
       LEFT JOIN users u ON t.created_by = u.id
-      WHERE 1=1
+      WHERE t.id NOT IN (SELECT transaction_id FROM event_transactions WHERE transaction_id IS NOT NULL)
     `;
     const params = [];
 
@@ -31,7 +52,7 @@ router.get('/', authenticateToken, (req, res) => {
     const transactions = queryAll(query, params);
     
     // Get total count
-    let countQuery = 'SELECT COUNT(*) as total FROM transactions t LEFT JOIN members m ON t.member_id = m.id WHERE 1=1';
+    let countQuery = `SELECT COUNT(*) as total FROM transactions t LEFT JOIN members m ON t.member_id = m.id WHERE t.id NOT IN (SELECT transaction_id FROM event_transactions WHERE transaction_id IS NOT NULL)`;
     const countParams = [];
     if (type) { countQuery += ' AND t.type = ?'; countParams.push(type); }
     if (category_id) { countQuery += ' AND t.category_id = ?'; countParams.push(category_id); }
@@ -66,16 +87,17 @@ router.get('/:id', authenticateToken, (req, res) => {
 });
 
 // POST /api/transactions
-router.post('/', authenticateToken, requireAdmin, (req, res) => {
+router.post('/', authenticateToken, requireAdmin, upload.single('proof_image'), (req, res) => {
   try {
     const { type, category_id, amount, description, date, member_id } = req.body;
+    const proof_image = req.file ? `/uploads/${req.file.filename}` : null;
     if (!type || !amount || !date) {
       return res.status(400).json({ error: 'Type, amount, dan date harus diisi' });
     }
 
     const result = queryRun(
-      'INSERT INTO transactions (type, category_id, amount, description, date, member_id, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [type, category_id || null, amount, description || '', date, member_id || null, req.user.id]
+      'INSERT INTO transactions (type, category_id, amount, description, date, member_id, created_by, proof_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [type, category_id || null, amount, description || '', date, member_id || null, req.user.id, proof_image]
     );
 
     const transaction = queryGet('SELECT * FROM transactions WHERE id = ?', [result.lastInsertRowid]);

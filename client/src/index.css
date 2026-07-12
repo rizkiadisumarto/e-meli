@@ -563,6 +563,15 @@ h1, h2, h3, h4, h5, h6 {
   animation: fade-in 0.3s ease-in-out;
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
 /* Utilities */
 .text-right { text-align: right; }
 .text-center { text-align: center; }
@@ -591,6 +600,10 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Mobile responsive additions */
 @media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+  }
+
   .glass-card {
     padding: 1rem;
     border-radius: 12px;
@@ -602,8 +615,8 @@ h1, h2, h3, h4, h5, h6 {
 
   .table th,
   .table td {
-    padding: 0.75rem 0.5rem;
-    font-size: 0.8rem;
+    padding: 0.6rem 0.4rem;
+    font-size: 0.75rem;
   }
 
   .modal-content {
@@ -622,4 +635,136 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0.35rem 0.75rem;
     font-size: 0.8rem;
   }
+
+  .btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+    gap: 0.35rem;
+  }
+
+  h1 { font-size: 1.25rem; }
+  h2 { font-size: 1.1rem; }
+  h3 { font-size: 0.9rem; }
+
+  .page-header {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start !important;
+  }
+
+  .page-header .flex {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 0.75rem;
+  }
+
+  .form-label {
+    font-size: 0.8rem;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .flex.flex-col.gap-4,
+  .flex.gap-4 {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .flex.gap-2 {
+    gap: 0.35rem;
+  }
+
+  .grid.gap-4,
+  .grid.gap-6 {
+    gap: 0.75rem;
+  }
+
+  .mb-6 {
+    margin-bottom: 1rem;
+  }
+
+  .text-xl {
+    font-size: 1rem;
+  }
+
+  .text-2xl {
+    font-size: 1.25rem;
+  }
+
+  .table-container {
+    border-radius: 8px;
+  }
+
+  .truncate {
+    max-width: 120px;
+  }
+}
+
+/* Tablet responsive (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+
+  .glass-card {
+    padding: 1.25rem;
+  }
+
+  .grid.gap-6 {
+    gap: 1rem;
+  }
+
+  .page-header .flex {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+/* Large laptop (1024px - 1440px) */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+}
+
+/* Extra small mobile (< 400px) */
+@media (max-width: 400px) {
+  .main-content {
+    padding: 0.75rem;
+  }
+
+  .glass-card {
+    padding: 0.75rem;
+    border-radius: 10px;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.5rem 0.3rem;
+    font-size: 0.7rem;
+  }
+
+  .btn {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .modal-body {
+    padding: 0.75rem;
+  }
+
+  h1 { font-size: 1.1rem; }
+  h2 { font-size: 1rem; }
 }

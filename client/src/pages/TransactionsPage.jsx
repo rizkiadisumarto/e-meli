@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Plus, ArrowDownToLine, ArrowUpFromLine, Search, Edit2, Trash2, X } from 'lucide-react';
+import { formatNumberInput, parseNumberInput } from '../utils/format';
 
 const TransactionsPage = () => {
   const { isAdmin } = useAuth();
@@ -23,6 +24,8 @@ const TransactionsPage = () => {
     member_id: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [proofFile, setProofFile] = useState(null);
+  const [showProofModal, setShowProofModal] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -83,6 +86,7 @@ const TransactionsPage = () => {
       date: new Date().toISOString().split('T')[0],
       member_id: ''
     });
+    setProofFile(null);
     setShowModal(true);
   };
 
@@ -121,23 +125,25 @@ const TransactionsPage = () => {
       const token = localStorage.getItem('token');
       const url = editingTx ? `/api/transactions/${editingTx.id}` : '/api/transactions';
       const method = editingTx ? 'PUT' : 'POST';
+
+      const formDataSubmit = new FormData();
+      formDataSubmit.append('type', formData.type);
+      formDataSubmit.append('category_id', formData.category_id || '');
+      formDataSubmit.append('amount', parseNumberInput(formData.amount));
+      formDataSubmit.append('description', formData.description || '');
+      formDataSubmit.append('date', formData.date);
+      formDataSubmit.append('member_id', formData.member_id || '');
+      if (proofFile) formDataSubmit.append('proof_image', proofFile);
       
       const res = await fetch(url, {
         method,
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          ...formData,
-          amount: Number(formData.amount),
-          category_id: formData.category_id ? Number(formData.category_id) : null,
-          member_id: formData.member_id ? Number(formData.member_id) : null
-        })
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formDataSubmit
       });
       
       if (res.ok) {
         setShowModal(false);
+        setProofFile(null);
         fetchData();
       } else {
         const err = await res.json();
@@ -212,12 +218,13 @@ const TransactionsPage = () => {
                 <th>Kategori / Keterangan</th>
                 <th>Dari / Kepada</th>
                 <th className="text-right">Nominal</th>
+                <th className="text-center">Bukti</th>
                 {isAdmin && <th className="text-center">Aksi</th>}
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={isAdmin ? 6 : 5} className="text-center py-8">Loading...</td></tr>
+                <tr><td colSpan={isAdmin ? 7 : 6} className="text-center py-8">Loading...</td></tr>
               ) : filteredTransactions.length > 0 ? (
                 filteredTransactions.map(tx => (
                   <tr key={tx.id} className="hover:bg-card-hover transition-colors">
@@ -235,6 +242,13 @@ const TransactionsPage = () => {
                     <td className="text-muted">{tx.member_name || '-'}</td>
                     <td className={`text-right font-bold ${tx.type === 'income' ? 'text-primary' : 'text-danger'}`}>
                       {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount)}
+                    </td>
+                    <td className="text-center">
+                      {tx.proof_image ? (
+                        <button className="btn btn-ghost btn-sm" style={{color:'var(--secondary)',padding:'0.2rem 0.5rem'}} onClick={() => setShowProofModal(tx.proof_image)}>
+                          Lihat
+                        </button>
+                      ) : <span className="text-muted text-xs">-</span>}
                     </td>
                     {isAdmin && (
                       <td className="text-center">
@@ -279,7 +293,7 @@ const TransactionsPage = () => {
                   </div>
                   <div className="form-group mb-0">
                     <label className="form-label">Nominal (Rp) <span className="text-danger">*</span></label>
-                    <input type="number" min="0" className="form-input" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} required placeholder="Contoh: 50000" />
+                    <input type="text" inputMode="numeric" className="form-input" value={formData.amount} onChange={e => setFormData({...formData, amount: formatNumberInput(e.target.value)})} required placeholder="Contoh: 50.000" />
                   </div>
                 </div>
 
@@ -307,6 +321,23 @@ const TransactionsPage = () => {
                   <label className="form-label">Keterangan Tambahan</label>
                   <textarea className="form-textarea" rows="2" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} placeholder="Contoh: Pembelian alat kebersihan"></textarea>
                 </div>
+
+                <div className="form-group mb-0">
+                  <label className="form-label">Foto Bukti Transaksi (opsional)</label>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    className="form-input"
+                    style={{padding:'0.5rem'}}
+                    onChange={e => setProofFile(e.target.files[0] || null)}
+                  />
+                  {proofFile && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <img src={URL.createObjectURL(proofFile)} alt="Preview" style={{width:'60px',height:'60px',objectFit:'cover',borderRadius:'8px',border:'1px solid var(--border-color)'}} />
+                      <span className="text-xs text-muted">{proofFile.name}</span>
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-outline" onClick={() => setShowModal(false)}>Batal</button>
@@ -315,6 +346,21 @@ const TransactionsPage = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Proof Image Preview Modal */}
+      {showProofModal && (
+        <div className="modal-overlay" onClick={() => setShowProofModal(null)}>
+          <div className="modal-content" style={{maxWidth:'600px'}} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="text-lg font-bold">Bukti Transaksi</h3>
+              <button className="btn-icon" onClick={() => setShowProofModal(null)}><X size={20}/></button>
+            </div>
+            <div className="modal-body" style={{padding:'1rem',textAlign:'center'}}>
+              <img src={showProofModal} alt="Bukti Transaksi" style={{maxWidth:'100%',maxHeight:'70vh',borderRadius:'8px',border:'1px solid var(--border-color)'}} />
+            </div>
           </div>
         </div>
       )}

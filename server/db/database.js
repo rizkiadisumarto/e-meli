@@ -32,6 +32,13 @@ function initializeDb() {
         // Column already exists, ignore
       }
 
+      // Migration: add phone column to users if not exists
+      try {
+        db.run('ALTER TABLE users ADD COLUMN phone TEXT');
+      } catch (e) {
+        // Column already exists, ignore
+      }
+
       saveDb();
       
       console.log('✅ Database initialized successfully');

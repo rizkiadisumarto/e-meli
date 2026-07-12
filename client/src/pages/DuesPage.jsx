@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Settings, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
+import { formatNumberInput, parseNumberInput } from '../utils/format';
 import './DuesPage.css';
 
 const DuesPage = () => {
@@ -16,8 +17,9 @@ const DuesPage = () => {
   const [selectedYear, setSelectedYear] = useState(currentYear);
   
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [settingsForm, setSettingsForm] = useState({ amount: 0, effective_date: new Date().toISOString().split('T')[0] });
+  const [settingsForm, setSettingsForm] = useState({ amount: '', effective_date: new Date().toISOString().split('T')[0] });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     fetchDuesData();
@@ -42,7 +44,7 @@ const DuesPage = () => {
       if (setRes.ok) {
         const data = await setRes.json();
         setSettings(data);
-        setSettingsForm({ amount: data.amount || 0, effective_date: new Date().toISOString().split('T')[0] });
+        setSettingsForm({ amount: formatNumberInput(data.amount || 0), effective_date: new Date().toISOString().split('T')[0] });
       }
 
     } catch (error) {
@@ -86,13 +88,14 @@ const DuesPage = () => {
 
   const generateDues = async () => {
     if (!isAdmin) return;
-    if (!window.confirm(`Generate tagihan untuk bulan ${selectedMonth}/${selectedYear}?`)) return;
-    
+    if (!window.confirm(`Generate tagihan untuk bulan ${monthNames[selectedMonth]} ${selectedYear}?`)) return;
+
+    setGenerating(true);
     try {
       const token = localStorage.getItem('token');
       const res = await fetch('/api/dues/generate', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
@@ -101,17 +104,19 @@ const DuesPage = () => {
           year: selectedYear
         })
       });
-      
+
+      const data = await res.json();
       if (res.ok) {
-        const data = await res.json();
         alert(data.message);
         fetchDuesData();
       } else {
-        const err = await res.json();
-        alert(err.error || 'Terjadi kesalahan');
+        alert(data.error || 'Terjadi kesalahan');
       }
     } catch (error) {
       console.error('Error generating dues:', error);
+      alert('Gagal menghubungi server');
+    } finally {
+      setGenerating(false);
     }
   };
 
@@ -128,7 +133,7 @@ const DuesPage = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          amount: Number(settingsForm.amount),
+          amount: parseNumberInput(settingsForm.amount),
           effective_date: settingsForm.effective_date
         })
       });
@@ -161,8 +166,8 @@ const DuesPage = () => {
             <button className="btn btn-outline" onClick={() => setShowSettingsModal(true)}>
               <Settings size={18} /> Pengaturan Iuran
             </button>
-            <button className="btn btn-primary shadow-glow" onClick={generateDues}>
-              <RefreshCw size={18} /> Generate Tagihan
+            <button className="btn btn-primary shadow-glow" onClick={generateDues} disabled={generating}>
+              <RefreshCw size={18} className={generating ? 'animate-spin' : ''} /> {generating ? 'Memproses...' : 'Generate Tagihan'}
             </button>
           </div>
         )}
@@ -224,7 +229,7 @@ const DuesPage = () => {
                     </td>
                     {isAdmin && (
                       <td className="text-center">
-                        <button 
+                        <button
                           className={`btn ${p.status === 'paid' ? 'btn-danger' : 'btn-primary'} text-xs py-1 px-3`}
                           onClick={() => togglePaymentStatus(p.member_id, p.status)}
                         >
@@ -235,7 +240,10 @@ const DuesPage = () => {
                   </tr>
                 ))
               ) : (
-                <tr><td colSpan={isAdmin ? 6 : 5} className="text-center py-8 text-muted">Data anggota belum tersedia.</td></tr>
+                <tr><td colSpan={isAdmin ? 6 : 5} className="text-center py-8 text-muted">
+                  <p>Belum ada data iuran untuk periode ini.</p>
+                  {isAdmin && <p className="text-xs mt-2">Klik "Generate Tagihan" untuk membuat tagihan baru.</p>}
+                </td></tr>
               )}
             </tbody>
           </table>
@@ -257,7 +265,7 @@ const DuesPage = () => {
                 </div>
                 <div className="form-group mb-0">
                   <label className="form-label">Nominal Iuran Baru (Rp) <span className="text-danger">*</span></label>
-                  <input type="number" min="0" className="form-input" value={settingsForm.amount} onChange={e => setSettingsForm({...settingsForm, amount: e.target.value})} required />
+                  <input type="text" inputMode="numeric" className="form-input" value={settingsForm.amount} onChange={e => setSettingsForm({...settingsForm, amount: formatNumberInput(e.target.value)})} required placeholder="Contoh: 50.000" />
                 </div>
                 <div className="form-group mb-0">
                   <label className="form-label">Tanggal Efektif <span className="text-danger">*</span></label>

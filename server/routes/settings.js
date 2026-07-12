@@ -86,7 +86,7 @@ router.delete('/categories/:id', authenticateToken, requireAdmin, (req, res) => 
 // GET /api/settings/users
 router.get('/users', authenticateToken, requireAdmin, (req, res) => {
   try {
-    const users = queryAll('SELECT id, username, full_name, role, created_at FROM users ORDER BY created_at');
+    const users = queryAll('SELECT id, username, full_name, role, phone, created_at FROM users ORDER BY created_at');
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -96,18 +96,18 @@ router.get('/users', authenticateToken, requireAdmin, (req, res) => {
 // PUT /api/settings/users/:id
 router.put('/users/:id', authenticateToken, requireAdmin, (req, res) => {
   try {
-    const { full_name, role, password } = req.body;
+    const { full_name, role, password, phone } = req.body;
     if (!full_name || !role) return res.status(400).json({ error: 'Nama lengkap dan role harus diisi' });
 
     if (password) {
       const bcrypt = require('bcryptjs');
       const hashedPassword = bcrypt.hashSync(password, 10);
-      queryRun('UPDATE users SET full_name = ?, role = ?, password = ? WHERE id = ?', [full_name, role, hashedPassword, req.params.id]);
+      queryRun('UPDATE users SET full_name = ?, role = ?, password = ?, phone = ? WHERE id = ?', [full_name, role, hashedPassword, phone || null, req.params.id]);
     } else {
-      queryRun('UPDATE users SET full_name = ?, role = ? WHERE id = ?', [full_name, role, req.params.id]);
+      queryRun('UPDATE users SET full_name = ?, role = ?, phone = ? WHERE id = ?', [full_name, role, phone || null, req.params.id]);
     }
 
-    const user = queryGet('SELECT id, username, full_name, role, created_at FROM users WHERE id = ?', [req.params.id]);
+    const user = queryGet('SELECT id, username, full_name, role, phone, created_at FROM users WHERE id = ?', [req.params.id]);
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });

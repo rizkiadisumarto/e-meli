@@ -41,3 +41,23 @@
 .mr-1 {
   margin-right: 0.25rem;
 }
+
+@media (max-width: 768px) {
+  .event-title {
+    font-size: 1rem;
+    padding-right: 0 !important;
+  }
+
+  .event-card .event-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .event-card .event-meta {
+    gap: 0.35rem;
+  }
+
+  .event-meta span {
+    font-size: 0.75rem;
+  }
+}

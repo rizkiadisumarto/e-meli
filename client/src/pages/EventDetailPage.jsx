@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { formatNumberInput, parseNumberInput } from '../utils/format';
 import { 
   ArrowLeft, MapPin, Calendar as CalendarIcon, Users, ArrowDownToLine, 
   ArrowUpFromLine, Wallet, TrendingUp, BarChart3, Clock, CheckSquare, 
-  ListOrdered, Receipt, FileText, Plus, Edit2, Trash2, X, Save
+  ListOrdered, Receipt, FileText, Plus, Edit2, Trash2, X, Save, Printer
 } from 'lucide-react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
@@ -105,14 +106,15 @@ const EventDetailPage = () => {
       name: event.name || '', start_date: event.start_date || '', end_date: event.end_date || '',
       location_name: event.location_name || '', location_address: event.location_address || '',
       location_lat: event.location_lat, location_lng: event.location_lng,
-      target_per_person: event.target_per_person || 0, status: event.status || 'draft',
+      target_per_person: formatNumberInput(event.target_per_person || 0), status: event.status || 'draft',
       description: event.description || '', notes: event.notes || ''
     });
     setShowEventModal(true);
   };
 
   const saveEvent = async () => {
-    const res = await fetch(`/api/events/${id}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(eventForm) });
+    const submitData = { ...eventForm, target_per_person: parseNumberInput(eventForm.target_per_person) };
+    const res = await fetch(`/api/events/${id}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(submitData) });
     if (res.ok) { setShowEventModal(false); fetchEventData(); }
   };
 
@@ -120,6 +122,177 @@ const EventDetailPage = () => {
     if (!window.confirm('Hapus event ini? Semua data terkait akan dihapus.')) return;
     const res = await fetch(`/api/events/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token()}` } });
     if (res.ok) navigate('/events');
+  };
+
+  const handlePrintEvent = () => {
+    const monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    const html = `
+      <!DOCTYPE html>
+      <html><head><meta charset="utf-8"><title>Laporan Event - ${event.name}</title>
+      <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; padding: 25px; color: #333; }
+        .org { text-align: center; font-size: 11px; color: #666; margin-bottom: 3px; }
+        h1 { text-align: center; font-size: 16px; margin-bottom: 2px; }
+        h2 { text-align: center; color: #555; font-size: 12px; margin-bottom: 15px; }
+        .info { font-size: 10px; color: #555; margin-bottom: 10px; line-height: 1.8; }
+        .info b { color: #333; }
+        .summary { display: flex; gap: 10px; margin-bottom: 15px; }
+        .sc { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 5px; text-align: center; }
+        .sc .l { font-size: 9px; color: #666; text-transform: uppercase; }
+        .sc .v { font-size: 13px; font-weight: bold; margin-top: 2px; }
+        .green { color: #059669; }
+        .red { color: #DC2626; }
+        .title { font-size: 11px; font-weight: bold; margin: 12px 0 6px; padding-bottom: 4px; border-bottom: 2px solid #333; }
+        table { width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 15px; }
+        th { background: #eee; padding: 5px 6px; border: 1px solid #ccc; font-size: 9px; text-transform: uppercase; }
+        td { padding: 4px 6px; border: 1px solid #ddd; }
+        .tr { text-align: right; }
+        .tc { text-align: center; }
+        .section { margin-bottom: 20px; }
+        .footer { margin-top: 15px; font-size: 9px; color: #999; text-align: center; border-top: 1px solid #ddd; padding-top: 8px; }
+        @media print { body { padding: 15px; } }
+      </style></head><body>
+      <div class="org">E-Meli - Sistem Manajemen Keuangan Komunitas</div>
+      <h1>LAPORAN EVENT</h1>
+      <h2>${event.name}</h2>
+      <div class="info">
+        <b>Lokasi:</b> ${event.location_name || '-'} ${event.location_address ? '- ' + event.location_address : ''}<br/>
+        <b>Tanggal:</b> ${formatDate(event.start_date)} ${event.end_date ? '- ' + formatDate(event.end_date) : ''}<br/>
+        <b>Status:</b> ${event.status === 'completed' ? 'SELESAI' : event.status === 'ongoing' ? 'BERLANGSUNG' : 'DRAFT'}<br/>
+        <b>Target Iuran:</b> ${formatCurrency(event.target_per_person)} / orang<br/>
+        ${event.notes ? '<b>Catatan:</b> ' + event.notes : ''}
+      </div>
+      <div class="summary">
+        <div class="sc"><div class="l">Kehadiran</div><div class="v">${summary?.attendance?.present || 0} / ${summary?.attendance?.total || 0}</div></div>
+        <div class="sc"><div class="l">Pemasukan</div><div class="v green">${formatCurrency(summary?.income)}</div></div>
+        <div class="sc"><div class="l">Pengeluaran</div><div class="v red">${formatCurrency(summary?.expense)}</div></div>
+        <div class="sc"><div class="l">Saldo</div><div class="v">${formatCurrency(summary?.balance)}</div></div>
+      </div>
+
+      ${participants.length > 0 ? `
+      <div class="section">
+        <div class="title">Daftar Peserta (${participants.length} orang)</div>
+        <table>
+          <thead><tr><th>No</th><th>Nama</th><th class="tc">Absensi</th><th class="tr">Target</th><th class="tr">Terbayar</th><th class="tc">Status</th></tr></thead>
+          <tbody>
+            ${participants.map((p, i) => `
+              <tr>
+                <td class="tc">${i + 1}</td>
+                <td>${p.name}</td>
+                <td class="tc">${p.attendance === 'present' ? 'Hadir' : 'Absen'}</td>
+                <td class="tr">${formatCurrency(p.target)}</td>
+                <td class="tr">${formatCurrency(p.amount_paid)}</td>
+                <td class="tc">${p.status === 'paid' ? 'LUNAS' : p.status === 'partial' ? 'SEBAGIAN' : 'BELUM'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>` : ''}
+
+      ${rundown.length > 0 ? `
+      <div class="section">
+        <div class="title">Rundown Kegiatan</div>
+        <table>
+          <thead><tr><th>Waktu</th><th>Kegiatan</th><th>PIC</th><th class="tc">Status</th></tr></thead>
+          <tbody>
+            ${rundown.map(r => `
+              <tr>
+                <td>${r.time || '-'}</td>
+                <td>${r.activity}</td>
+                <td>${r.pic || '-'}</td>
+                <td class="tc">${r.status === 'done' ? 'SELESAI' : 'BELUM'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>` : ''}
+
+      ${tasks.length > 0 ? `
+      <div class="section">
+        <div class="title">Checklist Tugas</div>
+        <table>
+          <thead><tr><th>Tugas</th><th>PIC</th><th class="tc">Status</th></tr></thead>
+          <tbody>
+            ${tasks.map(t => `
+              <tr>
+                <td>${t.task}</td>
+                <td>${t.pic || '-'}</td>
+                <td class="tc">${t.status === 'done' ? 'SELESAI' : 'BELUM'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>` : ''}
+
+      ${budget.items?.length > 0 ? `
+      <div class="section">
+        <div class="title">Rencana Anggaran Biaya (RAB)</div>
+        <table>
+          <thead><tr><th>Item</th><th class="tc">Qty</th><th class="tr">Harga</th><th class="tr">Rencana</th><th class="tr">Realisasi</th></tr></thead>
+          <tbody>
+            ${budget.items.map(b => `
+              <tr>
+                <td>${b.item}</td>
+                <td class="tc">${b.qty}</td>
+                <td class="tr">${formatCurrency(b.unit_price)}</td>
+                <td class="tr">${formatCurrency(b.planned_amount)}</td>
+                <td class="tr">${formatCurrency(b.actual_amount)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+          <tfoot>
+            <tr style="font-weight:bold;background:#f5f5f5">
+              <td colspan="3" class="tr">Total</td>
+              <td class="tr">${formatCurrency(budget.totals?.planned)}</td>
+              <td class="tr green">${formatCurrency(budget.totals?.actual)}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>` : ''}
+
+      ${transactions.length > 0 ? `
+      <div class="section">
+        <div class="title">Riwayat Transaksi</div>
+        <table>
+          <thead><tr><th>Tanggal</th><th>Keterangan</th><th class="tr">Nominal</th></tr></thead>
+          <tbody>
+            ${transactions.map(tx => `
+              <tr>
+                <td>${formatDate(tx.date)}</td>
+                <td>${tx.category_name || ''} ${tx.description ? '- ' + tx.description : ''} ${tx.member_name ? '(' + tx.member_name + ')' : ''}</td>
+                <td class="tr ${tx.type === 'income' ? 'green' : 'red'}">${tx.type === 'income' ? '+' : '-'}${formatCurrency(tx.amount)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>` : ''}
+
+      <div class="footer">Laporan ini dicetak secara otomatis oleh sistem E-Meli | ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+      </body></html>
+    `;
+
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    iframe.onload = () => {
+      setTimeout(() => {
+        iframe.contentWindow.print();
+        setTimeout(() => document.body.removeChild(iframe), 1000);
+      }, 300);
+    };
   };
 
   // --- Participants ---
@@ -141,7 +314,8 @@ const EventDetailPage = () => {
   };
 
   const saveEditParticipant = async () => {
-    await fetch(`/api/events/${id}/participants/${editParticipant.id}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(participantForm) });
+    const submitData = { ...participantForm, amount_paid: parseNumberInput(participantForm.amount_paid) };
+    await fetch(`/api/events/${id}/participants/${editParticipant.id}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(submitData) });
     setEditParticipant(null);
     fetchEventData();
   };
@@ -183,12 +357,13 @@ const EventDetailPage = () => {
   };
 
   // --- Budget ---
-  const openAddBudget = () => { setEditBudget(null); setBudgetForm({ item: '', qty: 1, unit_price: 0, actual_amount: 0 }); setShowBudgetModal(true); };
-  const openEditBudget = (b) => { setEditBudget(b); setBudgetForm({ item: b.item || '', qty: b.qty || 1, unit_price: b.unit_price || 0, actual_amount: b.actual_amount || 0 }); setShowBudgetModal(true); };
+  const openAddBudget = () => { setEditBudget(null); setBudgetForm({ item: '', qty: 1, unit_price: '', actual_amount: '' }); setShowBudgetModal(true); };
+  const openEditBudget = (b) => { setEditBudget(b); setBudgetForm({ item: b.item || '', qty: b.qty || 1, unit_price: formatNumberInput(b.unit_price || 0), actual_amount: formatNumberInput(b.actual_amount || 0) }); setShowBudgetModal(true); };
   const saveBudget = async () => {
     const url = editBudget ? `/api/events/${id}/budget/${editBudget.id}` : `/api/events/${id}/budget`;
     const method = editBudget ? 'PUT' : 'POST';
-    await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(budgetForm) });
+    const submitData = { ...budgetForm, unit_price: parseNumberInput(budgetForm.unit_price), actual_amount: parseNumberInput(budgetForm.actual_amount) };
+    await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(submitData) });
     setShowBudgetModal(false); fetchEventData();
   };
   const deleteBudget = async (budgetId) => {
@@ -202,7 +377,7 @@ const EventDetailPage = () => {
     const formData = new FormData();
     formData.append('type', txForm.type);
     formData.append('category_id', txForm.category_id);
-    formData.append('amount', txForm.amount);
+    formData.append('amount', parseNumberInput(txForm.amount));
     formData.append('description', txForm.description);
     formData.append('date', txForm.date);
     formData.append('member_id', txForm.member_id);
@@ -246,6 +421,7 @@ const EventDetailPage = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button className="btn btn-outline" onClick={handlePrintEvent}><Printer size={16}/> Cetak</button>
             {isAdmin && (
               <>
                 <button className="btn btn-outline" onClick={openEditEvent}><Edit2 size={16}/> Edit</button>
@@ -412,7 +588,7 @@ const EventDetailPage = () => {
                   <td className="text-right">{formatCurrency(p.target)}</td>
                   <td className="text-right">
                     {editParticipant?.id === p.id ? (
-                      <input type="number" className="form-input" style={{padding:'0.2rem 0.4rem',width:'100px',textAlign:'right'}} value={participantForm.amount_paid} onChange={e => setParticipantForm({...participantForm, amount_paid: Number(e.target.value)})} />
+                      <input type="text" inputMode="numeric" className="form-input" style={{padding:'0.2rem 0.4rem',width:'100px',textAlign:'right'}} value={participantForm.amount_paid} onChange={e => setParticipantForm({...participantForm, amount_paid: formatNumberInput(e.target.value)})} />
                     ) : formatCurrency(p.amount_paid)}
                   </td>
                   <td className="text-center">
@@ -636,7 +812,7 @@ const EventDetailPage = () => {
               </div>
               <div className="form-group mb-0">
                 <label className="form-label">Target Iuran (Rp)</label>
-                <input type="number" className="form-input" value={eventForm.target_per_person} onChange={e => setEventForm({...eventForm, target_per_person: Number(e.target.value)})} />
+                <input type="text" inputMode="numeric" className="form-input" value={eventForm.target_per_person} onChange={e => setEventForm({...eventForm, target_per_person: formatNumberInput(e.target.value)})} placeholder="Contoh: 50.000" />
               </div>
               <div className="form-group mb-0">
                 <label className="form-label">Status</label>
@@ -783,12 +959,12 @@ const EventDetailPage = () => {
                 </div>
                 <div className="form-group mb-0 flex-1">
                   <label className="form-label">Harga Satuan (Rp)</label>
-                  <input type="number" min="0" className="form-input" value={budgetForm.unit_price} onChange={e => setBudgetForm({...budgetForm, unit_price: Number(e.target.value)})} />
+                  <input type="text" inputMode="numeric" className="form-input" value={budgetForm.unit_price} onChange={e => setBudgetForm({...budgetForm, unit_price: formatNumberInput(e.target.value)})} placeholder="Contoh: 50.000" />
                 </div>
               </div>
               <div className="form-group mb-0">
                 <label className="form-label">Realisasi (Rp)</label>
-                <input type="number" min="0" className="form-input" value={budgetForm.actual_amount} onChange={e => setBudgetForm({...budgetForm, actual_amount: Number(e.target.value)})} />
+                <input type="text" inputMode="numeric" className="form-input" value={budgetForm.actual_amount} onChange={e => setBudgetForm({...budgetForm, actual_amount: formatNumberInput(e.target.value)})} placeholder="Contoh: 50.000" />
               </div>
             </div>
             <div className="modal-footer">
@@ -825,14 +1001,12 @@ const EventDetailPage = () => {
                 <div className="form-group mb-0 flex-1">
                   <label className="form-label">Nominal (Rp)</label>
                   <input
-                    type="number"
-                    min="0"
+                    type="text"
+                    inputMode="numeric"
                     className="form-input"
-                    placeholder="0"
-                    value={txForm.amount || ''}
-                    onFocus={e => { if (e.target.value === '0') e.target.value = ''; }}
-                    onBlur={e => { if (e.target.value === '') e.target.value = '0'; setTxForm({...txForm, amount: 0}); }}
-                    onChange={e => setTxForm({...txForm, amount: e.target.value === '' ? 0 : Number(e.target.value)})}
+                    placeholder="Contoh: 50.000"
+                    value={txForm.amount}
+                    onChange={e => setTxForm({...txForm, amount: formatNumberInput(e.target.value)})}
                   />
                 </div>
                 <div className="form-group mb-0 flex-1">

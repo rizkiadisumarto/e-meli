@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Plus, Calendar, MapPin, Users, TrendingUp, CheckCircle, Clock, X, Edit2, Trash2 } from 'lucide-react';
+import { formatNumberInput, parseNumberInput } from '../utils/format';
 import MapPicker from '../components/UI/MapPicker';
 import './EventsPage.css';
 
@@ -13,7 +14,7 @@ const EMPTY_FORM = {
   location_address: '',
   location_lat: null,
   location_lng: null,
-  target_per_person: 0,
+  target_per_person: '',
   status: 'draft',
   description: '',
   notes: ''
@@ -70,7 +71,7 @@ const EventsPage = () => {
       location_address: event.location_address || '',
       location_lat: event.location_lat,
       location_lng: event.location_lng,
-      target_per_person: event.target_per_person || 0,
+      target_per_person: formatNumberInput(event.target_per_person || 0),
       status: event.status || 'draft',
       description: event.description || '',
       notes: event.notes || ''
@@ -89,10 +90,11 @@ const EventsPage = () => {
       const url = isEdit ? `/api/events/${editingEvent.id}` : '/api/events';
       const method = isEdit ? 'PUT' : 'POST';
 
+      const submitData = { ...formData, target_per_person: parseNumberInput(formData.target_per_person) };
       const res = await fetch(url, {
         method,
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submitData)
       });
       if (res.ok) {
         setShowModal(false);
@@ -236,7 +238,7 @@ const EventsPage = () => {
                 </div>
                 <div className="form-group mb-0">
                   <label className="form-label">Target Iuran per Peserta (Rp)</label>
-                  <input type="number" min="0" className="form-input" value={formData.target_per_person} onChange={e => setFormData({...formData, target_per_person: e.target.value})} />
+                  <input type="text" inputMode="numeric" className="form-input" value={formData.target_per_person} onChange={e => setFormData({...formData, target_per_person: formatNumberInput(e.target.value)})} placeholder="Contoh: 50.000" />
                 </div>
                 <div className="form-group mb-0">
                   <label className="form-label">Status</label>

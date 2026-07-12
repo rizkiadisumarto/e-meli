@@ -41,7 +41,7 @@ const Sidebar = ({ open, onClose }) => {
         <div className="brand-logo">
           <Wallet size={24} className="text-primary" />
         </div>
-        <h2>Kas Meli</h2>
+        <h2>E-Meli</h2>
       </div>
 
       <nav className="sidebar-nav">
