@@ -1,41 +1,43 @@
 -- ========== USERS ==========
 CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
   full_name TEXT NOT NULL,
   role TEXT DEFAULT 'viewer',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  phone TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ========== MEMBERS ==========
 CREATE TABLE IF NOT EXISTS members (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   address TEXT,
   phone TEXT,
   status TEXT DEFAULT 'active',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ========== CATEGORIES ==========
 CREATE TABLE IF NOT EXISTS categories (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   type TEXT NOT NULL
 );
 
 -- ========== TRANSACTIONS ==========
 CREATE TABLE IF NOT EXISTS transactions (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   type TEXT NOT NULL,
   category_id INTEGER,
   amount REAL NOT NULL,
   description TEXT,
   date DATE NOT NULL,
   member_id INTEGER,
+  proof_image TEXT,
   created_by INTEGER,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (category_id) REFERENCES categories(id),
   FOREIGN KEY (member_id) REFERENCES members(id),
   FOREIGN KEY (created_by) REFERENCES users(id)
@@ -43,15 +45,15 @@ CREATE TABLE IF NOT EXISTS transactions (
 
 -- ========== DUES ==========
 CREATE TABLE IF NOT EXISTS dues_settings (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   amount REAL NOT NULL,
   period TEXT NOT NULL DEFAULT 'monthly',
   effective_date DATE NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS dues_payments (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   member_id INTEGER NOT NULL,
   month INTEGER NOT NULL,
   year INTEGER NOT NULL,
@@ -71,7 +73,7 @@ CREATE TABLE IF NOT EXISTS settings (
 
 -- ========== EVENTS ==========
 CREATE TABLE IF NOT EXISTS events (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT,
   location_name TEXT,
@@ -85,12 +87,12 @@ CREATE TABLE IF NOT EXISTS events (
   notes TEXT,
   bank_info TEXT,
   created_by INTEGER,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (created_by) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS event_participants (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   event_id INTEGER NOT NULL,
   member_id INTEGER NOT NULL,
   attendance TEXT DEFAULT 'absent',
@@ -102,7 +104,7 @@ CREATE TABLE IF NOT EXISTS event_participants (
 );
 
 CREATE TABLE IF NOT EXISTS event_rundown (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   event_id INTEGER NOT NULL,
   time TEXT,
   activity TEXT NOT NULL,
@@ -114,7 +116,7 @@ CREATE TABLE IF NOT EXISTS event_rundown (
 );
 
 CREATE TABLE IF NOT EXISTS event_tasks (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   event_id INTEGER NOT NULL,
   task TEXT NOT NULL,
   pic TEXT,
@@ -124,7 +126,7 @@ CREATE TABLE IF NOT EXISTS event_tasks (
 );
 
 CREATE TABLE IF NOT EXISTS event_budget (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   event_id INTEGER NOT NULL,
   item TEXT NOT NULL,
   qty INTEGER DEFAULT 1,
@@ -137,7 +139,7 @@ CREATE TABLE IF NOT EXISTS event_budget (
 );
 
 CREATE TABLE IF NOT EXISTS event_transactions (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   event_id INTEGER NOT NULL,
   transaction_id INTEGER NOT NULL,
   FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
@@ -147,7 +149,7 @@ CREATE TABLE IF NOT EXISTS event_transactions (
 -- ========== SEED DATA ==========
 
 -- Default categories
-INSERT OR IGNORE INTO categories (id, name, type) VALUES
+INSERT INTO categories (id, name, type) VALUES
   (1, 'Iuran Bulanan', 'income'),
   (2, 'Sumbangan', 'income'),
   (3, 'Donasi', 'income'),
@@ -160,16 +162,32 @@ INSERT OR IGNORE INTO categories (id, name, type) VALUES
   (10, 'Kebersihan', 'expense'),
   (11, 'Keamanan', 'expense'),
   (12, 'Sosial', 'expense'),
-  (13, 'Lainnya (Keluar)', 'expense');
+  (13, 'Lainnya (Keluar)', 'expense')
+ON CONFLICT (id) DO NOTHING;
 
 -- Default settings
-INSERT OR IGNORE INTO settings (key, value) VALUES
+INSERT INTO settings (key, value) VALUES
   ('org_name', 'Kas Gang Meli'),
   ('org_address', ''),
   ('org_phone', ''),
-  ('org_description', 'Sistem Manajemen Keuangan Komunitas');
+  ('org_description', 'Sistem Manajemen Keuangan Komunitas')
+ON CONFLICT (key) DO NOTHING;
 
 -- Default admin user (password: admin123)
--- bcrypt hash of 'admin123'
-INSERT OR IGNORE INTO users (id, username, password, full_name, role) VALUES
-  (1, 'admin', '$2a$10$8PzkUjKEyoyWHdswFrqcyuptP0ysFXoiukMvLCW2okYkkCvaoAgXO', 'Administrator', 'admin');
+INSERT INTO users (id, username, password, full_name, role) VALUES
+  (1, 'admin', '$2a$10$8PzkUjKEyoyWHdswFrqcyuptP0ysFXoiukMvLCW2okYkkCvaoAgXO', 'Administrator', 'admin')
+ON CONFLICT (username) DO NOTHING;
+
+-- Reset sequence for auto-increment IDs
+SELECT setval('users_id_seq', COALESCE((SELECT MAX(id) FROM users), 1));
+SELECT setval('members_id_seq', COALESCE((SELECT MAX(id) FROM members), 1));
+SELECT setval('categories_id_seq', COALESCE((SELECT MAX(id) FROM categories), 1));
+SELECT setval('transactions_id_seq', COALESCE((SELECT MAX(id) FROM transactions), 1));
+SELECT setval('dues_settings_id_seq', COALESCE((SELECT MAX(id) FROM dues_settings), 1));
+SELECT setval('dues_payments_id_seq', COALESCE((SELECT MAX(id) FROM dues_payments), 1));
+SELECT setval('events_id_seq', COALESCE((SELECT MAX(id) FROM events), 1));
+SELECT setval('event_participants_id_seq', COALESCE((SELECT MAX(id) FROM event_participants), 1));
+SELECT setval('event_rundown_id_seq', COALESCE((SELECT MAX(id) FROM event_rundown), 1));
+SELECT setval('event_tasks_id_seq', COALESCE((SELECT MAX(id) FROM event_tasks), 1));
+SELECT setval('event_budget_id_seq', COALESCE((SELECT MAX(id) FROM event_budget), 1));
+SELECT setval('event_transactions_id_seq', COALESCE((SELECT MAX(id) FROM event_transactions), 1));

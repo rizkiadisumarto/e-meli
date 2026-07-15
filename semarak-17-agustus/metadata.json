@@ -1,0 +1,6 @@
+{
+  "name": "Semarak 17 Agustus",
+  "description": "Portal interaktif perayaan Hari Kemerdekaan RI 17 Agustus dengan countdown, pelacakan lomba, generator poster bertenaga AI, dan chatbot sejarah.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

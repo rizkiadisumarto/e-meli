@@ -23,7 +23,7 @@ router.put('/', authenticateToken, requireAdmin, (req, res) => {
     
     for (const [key, value] of Object.entries(updates)) {
         try {
-            queryRun('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', [key, value]);
+            queryRun('INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value', [key, value]);
         } catch(e) {
             console.error('Error updating setting', key, e);
         }

@@ -181,7 +181,7 @@ router.post('/:id/participants', authenticateToken, requireAdminOrCommittee, (re
     // Simulate transaction by running all inserts
     for (const memberId of member_ids) {
         try {
-            queryRun('INSERT OR IGNORE INTO event_participants (event_id, member_id) VALUES (?, ?)', [req.params.id, memberId]);
+            queryRun('INSERT INTO event_participants (event_id, member_id) VALUES ($1, $2) ON CONFLICT DO NOTHING', [req.params.id, memberId]);
         } catch(e) {
             console.error('Error adding participant', memberId, e);
         }

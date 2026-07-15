@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: kas-gang-meli
+    name: e-meli
     runtime: node
     plan: free
     buildCommand: cd server && npm install && cd ../client && npm install && npm run build
@@ -8,5 +8,7 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: DATABASE_URL
+        sync: false
       - key: JWT_SECRET
         generateValue: true

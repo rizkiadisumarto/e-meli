@@ -41,12 +41,12 @@ router.get('/monthly', authenticateToken, (req, res) => {
     const targetYear = year || new Date().getFullYear();
 
     const monthly = queryAll(`
-      SELECT 
-        CAST(strftime('%m', date) AS INTEGER) as month,
+      SELECT
+        EXTRACT(MONTH FROM date)::integer as month,
         type,
         SUM(amount) as total
-      FROM transactions 
-      WHERE strftime('%Y', date) = ?
+      FROM transactions
+      WHERE EXTRACT(YEAR FROM date) = $1
         AND id NOT IN (SELECT transaction_id FROM event_transactions WHERE transaction_id IS NOT NULL)
       GROUP BY month, type
       ORDER BY month

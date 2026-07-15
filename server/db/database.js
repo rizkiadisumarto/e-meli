@@ -1,97 +1,60 @@
-const initSqlJs = require('sql.js');
+const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
 
-const DB_PATH = path.join(__dirname, 'kas.db');
 const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
 
-let db = null;
-let dbReady = null;
+let pool = null;
 
-function initializeDb() {
-  if (dbReady) return dbReady;
-  
-  dbReady = initSqlJs().then(SQL => {
-    try {
-      // Load existing database if it exists
-      if (fs.existsSync(DB_PATH)) {
-        const fileBuffer = fs.readFileSync(DB_PATH);
-        db = new SQL.Database(fileBuffer);
-      } else {
-        db = new SQL.Database();
-      }
-      
-      // Run schema
-      const schema = fs.readFileSync(SCHEMA_PATH, 'utf-8');
-      db.run(schema);
+// Convert SQLite-style ? placeholders to PostgreSQL $1, $2, etc.
+function convertParams(sql, params = []) {
+  let idx = 0;
+  const converted = sql.replace(/\?/g, () => `$${++idx}`);
+  return { sql: converted, params };
+}
 
-      // Migration: add proof_image column to transactions if not exists
-      try {
-        db.run('ALTER TABLE transactions ADD COLUMN proof_image TEXT');
-      } catch (e) {
-        // Column already exists, ignore
-      }
+async function initializeDb() {
+  if (pool) return pool;
 
-      // Migration: add phone column to users if not exists
-      try {
-        db.run('ALTER TABLE users ADD COLUMN phone TEXT');
-      } catch (e) {
-        // Column already exists, ignore
-      }
-
-      saveDb();
-      
-      console.log('✅ Database initialized successfully');
-      return db;
-    } catch (err) {
-      console.error('❌ Database initialization error:', err.message);
-      throw err;
-    }
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   });
-  
-  return dbReady;
+
+  const schema = fs.readFileSync(SCHEMA_PATH, 'utf-8');
+  await pool.query(schema);
+  console.log('✅ Database PostgreSQL initialized successfully');
+  return pool;
 }
 
-function getDb() {
-  if (!db) throw new Error('Database not initialized. Call initializeDb() first.');
-  return db;
-}
-
-function saveDb() {
-  if (!db) return;
-  const data = db.export();
-  const buffer = Buffer.from(data);
-  fs.writeFileSync(DB_PATH, buffer);
-}
-
-// Helper to run queries that return results (SELECT)
 function queryAll(sql, params = []) {
   const safeParams = params.map(p => p === undefined ? null : p);
-  const stmt = db.prepare(sql);
-  if (safeParams.length) stmt.bind(safeParams);
-  
-  const results = [];
-  while (stmt.step()) {
-    results.push(stmt.getAsObject());
-  }
-  stmt.free();
-  return results;
+  const { sql: pgSql, params: pgParams } = convertParams(sql, safeParams);
+  return pool.query(pgSql, pgParams).then(r => r.rows);
 }
 
-// Helper to get a single row
 function queryGet(sql, params = []) {
-  const results = queryAll(sql, params);
-  return results.length > 0 ? results[0] : null;
+  const safeParams = params.map(p => p === undefined ? null : p);
+  const { sql: pgSql, params: pgParams } = convertParams(sql, safeParams);
+  return pool.query(pgSql, pgParams).then(r => r.rows[0] || null);
 }
 
-// Helper to run INSERT/UPDATE/DELETE and return changes info
-function queryRun(sql, params = []) {
+async function queryRun(sql, params = []) {
   const safeParams = params.map(p => p === undefined ? null : p);
-  db.run(sql, safeParams);
-  const lastId = db.exec("SELECT last_insert_rowid() as id")[0]?.values[0]?.[0] || 0;
-  const changes = db.getRowsModified();
-  saveDb();
-  return { lastInsertRowid: lastId, changes };
+  const { sql: pgSql, params: pgParams } = convertParams(sql, safeParams);
+
+  // For INSERT, add RETURNING id if not already present
+  let finalSql = pgSql;
+  if (pgSql.trim().toUpperCase().startsWith('INSERT') && !pgSql.toUpperCase().includes('RETURNING')) {
+    finalSql = pgSql.replace(/;$/, '') + ' RETURNING id';
+  }
+
+  const result = await pool.query(finalSql, pgParams);
+  const lastId = result.rows[0] ? result.rows[0].id : 0;
+  return { lastInsertRowid: lastId, changes: result.rowCount };
 }
+
+function getDb() { return pool; }
+function saveDb() { /* no-op: PostgreSQL persists automatically */ }
 
 module.exports = { initializeDb, getDb, saveDb, queryAll, queryGet, queryRun };
