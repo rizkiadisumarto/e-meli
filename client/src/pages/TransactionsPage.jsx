@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Plus, ArrowDownToLine, ArrowUpFromLine, Search, Edit2, Trash2, X } from 'lucide-react';
+import { Plus, ArrowDownToLine, ArrowUpFromLine, Search, Edit2, Trash2, X, FileSpreadsheet } from 'lucide-react';
 import { formatNumberInput, parseNumberInput } from '../utils/format';
+import { exportTransactions } from '../utils/exportExcel';
 
 const TransactionsPage = () => {
   const { isAdmin } = useAuth();
@@ -163,16 +164,21 @@ const TransactionsPage = () => {
           <h2>Transaksi Keuangan</h2>
           <p className="text-muted text-sm mt-1">Catatan pemasukan dan pengeluaran kas</p>
         </div>
-        {isAdmin && (
-          <div className="flex gap-2">
-            <button className="btn btn-primary shadow-glow" onClick={() => openAddModal('income')}>
-              <ArrowDownToLine size={18} /> Pemasukan Baru
-            </button>
-            <button className="btn btn-danger shadow-glow" onClick={() => openAddModal('expense')}>
-              <ArrowUpFromLine size={18} /> Pengeluaran Baru
-            </button>
-          </div>
-        )}
+        <div className="flex gap-2">
+          <button className="btn btn-outline" onClick={() => exportTransactions(filteredTransactions.length > 0 ? filteredTransactions : transactions)}>
+            <FileSpreadsheet size={18} /> Export Excel
+          </button>
+          {isAdmin && (
+            <>
+              <button className="btn btn-primary shadow-glow" onClick={() => openAddModal('income')}>
+                <ArrowDownToLine size={18} /> Pemasukan Baru
+              </button>
+              <button className="btn btn-danger shadow-glow" onClick={() => openAddModal('expense')}>
+                <ArrowUpFromLine size={18} /> Pengeluaran Baru
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="glass-card mb-6">

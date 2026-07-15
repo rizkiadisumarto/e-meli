@@ -84,7 +84,7 @@ router.delete('/categories/:id', authenticateToken, requireAdmin, (req, res) => 
 });
 
 // GET /api/settings/users
-router.get('/users', authenticateToken, requireAdmin, (req, res) => {
+router.get('/users', authenticateToken, (req, res) => {
   try {
     const users = queryAll('SELECT id, username, full_name, role, phone, created_at FROM users ORDER BY created_at');
     res.json(users);

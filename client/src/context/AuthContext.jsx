@@ -51,7 +51,9 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     logout,
-    isAdmin: user?.role === 'admin'
+    isAdmin: user?.role === 'admin',
+    isCommittee: user?.role === 'committee',
+    isAdminOrCommittee: user?.role === 'admin' || user?.role === 'committee'
   };
 
   return (

@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   /* Color Palette - Premium Dark Mode */
   --bg-main: #0B0F19;

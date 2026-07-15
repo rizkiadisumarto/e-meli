@@ -21,7 +21,7 @@ const EMPTY_FORM = {
 };
 
 const EventsPage = () => {
-  const { isAdmin } = useAuth();
+  const { isAdminOrCommittee } = useAuth();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -158,7 +158,7 @@ const EventsPage = () => {
           <h2>Kegiatan / Event</h2>
           <p className="text-muted text-sm mt-1">Kelola acara dan kegiatan komunitas</p>
         </div>
-        {isAdmin && (
+        {isAdminOrCommittee && (
           <button className="btn btn-primary shadow-glow" onClick={openCreateModal}>
             <Plus size={18} /> Buat Event Baru
           </button>
@@ -168,14 +168,14 @@ const EventsPage = () => {
       <div className="grid grid-cols-3 gap-6">
         {events.length > 0 ? events.map(event => (
           <Link to={`/events/${event.id}`} key={event.id} className="event-card glass-card" style={{position:'relative'}}>
-            {isAdmin && (
+            {isAdminOrCommittee && (
               <div className="flex gap-1" style={{position:'absolute',top:'1rem',right:'1rem',zIndex:10}}>
                 <button className="btn-icon" style={{background:'var(--bg-card)',borderRadius:'8px'}} onClick={(e) => openEditModal(e, event)} title="Edit Event"><Edit2 size={14}/></button>
                 <button className="btn-icon text-danger" style={{background:'var(--bg-card)',borderRadius:'8px'}} onClick={(e) => handleDelete(e, event.id)} title="Hapus Event"><Trash2 size={14}/></button>
               </div>
             )}
             <div className="event-card-header flex justify-between items-start mb-4">
-              <h3 className="event-title" style={{paddingRight: isAdmin ? '5rem' : 0}}>{event.name}</h3>
+              <h3 className="event-title" style={{paddingRight: isAdminOrCommittee ? '5rem' : 0}}>{event.name}</h3>
               <StatusBadge status={event.status} />
             </div>
             

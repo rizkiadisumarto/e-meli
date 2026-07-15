@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const { queryAll, queryGet, queryRun } = require('../db/database');
-const { authenticateToken, requireAdmin } = require('../middleware/auth');
+const { authenticateToken, requireAdminOrCommittee } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -104,7 +104,7 @@ router.get('/:id', authenticateToken, (req, res) => {
 });
 
 // POST /api/events
-router.post('/', authenticateToken, requireAdmin, (req, res) => {
+router.post('/', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     const { name, description, location_name, location_address, location_lat, location_lng, start_date, end_date, status, target_per_person, notes, bank_info } = req.body;
     if (!name || !start_date) return res.status(400).json({ error: 'Nama dan tanggal mulai harus diisi' });
@@ -122,7 +122,7 @@ router.post('/', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // PUT /api/events/:id
-router.put('/:id', authenticateToken, requireAdmin, (req, res) => {
+router.put('/:id', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     const { name, description, location_name, location_address, location_lat, location_lng, start_date, end_date, status, target_per_person, notes, bank_info } = req.body;
     
@@ -139,7 +139,7 @@ router.put('/:id', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // DELETE /api/events/:id
-router.delete('/:id', authenticateToken, requireAdmin, (req, res) => {
+router.delete('/:id', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     queryRun('DELETE FROM events WHERE id = ?', [req.params.id]);
     res.json({ message: 'Event berhasil dihapus' });
@@ -174,7 +174,7 @@ router.get('/:id/participants', authenticateToken, (req, res) => {
 });
 
 // POST /api/events/:id/participants
-router.post('/:id/participants', authenticateToken, requireAdmin, (req, res) => {
+router.post('/:id/participants', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     const { member_ids } = req.body; // array of member IDs
     
@@ -194,7 +194,7 @@ router.post('/:id/participants', authenticateToken, requireAdmin, (req, res) => 
 });
 
 // PUT /api/events/:id/participants/:participantId
-router.put('/:id/participants/:participantId', authenticateToken, requireAdmin, (req, res) => {
+router.put('/:id/participants/:participantId', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     const { attendance, amount_paid, status } = req.body;
     
@@ -207,7 +207,7 @@ router.put('/:id/participants/:participantId', authenticateToken, requireAdmin, 
 });
 
 // DELETE /api/events/:id/participants/:participantId
-router.delete('/:id/participants/:participantId', authenticateToken, requireAdmin, (req, res) => {
+router.delete('/:id/participants/:participantId', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     queryRun('DELETE FROM event_participants WHERE id = ?', [req.params.participantId]);
     res.json({ message: 'Peserta berhasil dihapus' });
@@ -229,7 +229,7 @@ router.get('/:id/rundown', authenticateToken, (req, res) => {
 });
 
 // POST /api/events/:id/rundown
-router.post('/:id/rundown', authenticateToken, requireAdmin, (req, res) => {
+router.post('/:id/rundown', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     const { time, activity, pic, notes, sort_order } = req.body;
     const result = queryRun(
@@ -245,7 +245,7 @@ router.post('/:id/rundown', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // PUT /api/events/:id/rundown/:itemId
-router.put('/:id/rundown/:itemId', authenticateToken, requireAdmin, (req, res) => {
+router.put('/:id/rundown/:itemId', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     const { time, activity, pic, notes, status, sort_order } = req.body;
     queryRun('UPDATE event_rundown SET time=?, activity=?, pic=?, notes=?, status=?, sort_order=? WHERE id=?',
@@ -259,7 +259,7 @@ router.put('/:id/rundown/:itemId', authenticateToken, requireAdmin, (req, res) =
 });
 
 // DELETE /api/events/:id/rundown/:itemId
-router.delete('/:id/rundown/:itemId', authenticateToken, requireAdmin, (req, res) => {
+router.delete('/:id/rundown/:itemId', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     queryRun('DELETE FROM event_rundown WHERE id = ?', [req.params.itemId]);
     res.json({ message: 'Item rundown berhasil dihapus' });
@@ -281,7 +281,7 @@ router.get('/:id/tasks', authenticateToken, (req, res) => {
 });
 
 // POST /api/events/:id/tasks
-router.post('/:id/tasks', authenticateToken, requireAdmin, (req, res) => {
+router.post('/:id/tasks', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     const { task, pic, sort_order } = req.body;
     const result = queryRun(
@@ -297,7 +297,7 @@ router.post('/:id/tasks', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // PUT /api/events/:id/tasks/:taskId
-router.put('/:id/tasks/:taskId', authenticateToken, requireAdmin, (req, res) => {
+router.put('/:id/tasks/:taskId', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     const { task, pic, status, sort_order } = req.body;
     queryRun('UPDATE event_tasks SET task=?, pic=?, status=?, sort_order=? WHERE id=?',
@@ -311,7 +311,7 @@ router.put('/:id/tasks/:taskId', authenticateToken, requireAdmin, (req, res) => 
 });
 
 // DELETE /api/events/:id/tasks/:taskId
-router.delete('/:id/tasks/:taskId', authenticateToken, requireAdmin, (req, res) => {
+router.delete('/:id/tasks/:taskId', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     queryRun('DELETE FROM event_tasks WHERE id = ?', [req.params.taskId]);
     res.json({ message: 'Tugas berhasil dihapus' });
@@ -334,7 +334,7 @@ router.get('/:id/budget', authenticateToken, (req, res) => {
 });
 
 // POST /api/events/:id/budget
-router.post('/:id/budget', authenticateToken, requireAdmin, (req, res) => {
+router.post('/:id/budget', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     const { item, qty, unit_price, actual_amount, sort_order } = req.body;
     const planned = (qty || 1) * (unit_price || 0);
@@ -351,7 +351,7 @@ router.post('/:id/budget', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // PUT /api/events/:id/budget/:budgetId
-router.put('/:id/budget/:budgetId', authenticateToken, requireAdmin, (req, res) => {
+router.put('/:id/budget/:budgetId', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     const { item, qty, unit_price, actual_amount, status, sort_order } = req.body;
     const planned = (qty || 1) * (unit_price || 0);
@@ -368,7 +368,7 @@ router.put('/:id/budget/:budgetId', authenticateToken, requireAdmin, (req, res) 
 });
 
 // DELETE /api/events/:id/budget/:budgetId
-router.delete('/:id/budget/:budgetId', authenticateToken, requireAdmin, (req, res) => {
+router.delete('/:id/budget/:budgetId', authenticateToken, requireAdminOrCommittee, (req, res) => {
   try {
     queryRun('DELETE FROM event_budget WHERE id = ?', [req.params.budgetId]);
     res.json({ message: 'Item RAB berhasil dihapus' });
@@ -398,7 +398,7 @@ router.get('/:id/transactions', authenticateToken, (req, res) => {
 });
 
 // POST /api/events/:id/transactions - Create a transaction linked to event
-router.post('/:id/transactions', authenticateToken, requireAdmin, upload.single('proof_image'), (req, res) => {
+router.post('/:id/transactions', authenticateToken, requireAdminOrCommittee, upload.single('proof_image'), (req, res) => {
   try {
     const { type, category_id, amount, description, date, member_id } = req.body;
     const proof_image = req.file ? `/uploads/${req.file.filename}` : null;
@@ -425,6 +425,45 @@ router.post('/:id/transactions', authenticateToken, requireAdmin, upload.single(
 
     const transaction = queryGet('SELECT * FROM transactions WHERE id = ?', [txResult.lastInsertRowid]);
     res.status(201).json(transaction);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT /api/events/:id/transactions/:txId - Edit event transaction
+router.put('/:id/transactions/:txId', authenticateToken, requireAdminOrCommittee, (req, res) => {
+  try {
+    const { type, category_id, amount, description, date, member_id } = req.body;
+
+    // Check if transaction belongs to this event
+    const eventTx = queryGet('SELECT * FROM event_transactions WHERE event_id = ? AND transaction_id = ?', [req.params.id, req.params.txId]);
+    if (!eventTx) return res.status(404).json({ error: 'Transaksi tidak ditemukan di event ini' });
+
+    queryRun(
+      'UPDATE transactions SET type = ?, category_id = ?, amount = ?, description = ?, date = ?, member_id = ? WHERE id = ?',
+      [type, category_id || null, amount, description || '', date, member_id || null, req.params.txId]
+    );
+
+    const transaction = queryGet('SELECT * FROM transactions WHERE id = ?', [req.params.txId]);
+    res.json(transaction);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/events/:id/transactions/:txId - Delete event transaction
+router.delete('/:id/transactions/:txId', authenticateToken, requireAdminOrCommittee, (req, res) => {
+  try {
+    // Check if transaction belongs to this event
+    const eventTx = queryGet('SELECT * FROM event_transactions WHERE event_id = ? AND transaction_id = ?', [req.params.id, req.params.txId]);
+    if (!eventTx) return res.status(404).json({ error: 'Transaksi tidak ditemukan di event ini' });
+
+    // Delete event_transactions link first
+    queryRun('DELETE FROM event_transactions WHERE transaction_id = ?', [req.params.txId]);
+    // Delete the transaction
+    queryRun('DELETE FROM transactions WHERE id = ?', [req.params.txId]);
+
+    res.json({ message: 'Transaksi berhasil dihapus' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

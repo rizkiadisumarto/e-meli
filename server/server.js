@@ -47,8 +47,8 @@ app.use((err, req, res, next) => {
 
 // Initialize database then start server
 initializeDb().then(() => {
-    app.listen(PORT, () => {
-      console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Server berjalan di http://0.0.0.0:${PORT}`);
       console.log(`📊 API tersedia di http://localhost:${PORT}/api`);
     });
 }).catch(err => {

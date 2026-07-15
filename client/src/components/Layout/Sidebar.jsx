@@ -9,7 +9,8 @@ import {
   Calendar, 
   BarChart3, 
   Settings,
-  LogOut
+  LogOut,
+  UserCheck
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -23,16 +24,17 @@ const Sidebar = ({ open, onClose }) => {
   }, [pathname]);
 
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} /> },
-    { name: 'Transaksi', path: '/transactions', icon: <Wallet size={20} /> },
-    { name: 'Anggota', path: '/members', icon: <Users size={20} /> },
-    { name: 'Iuran', path: '/dues', icon: <Receipt size={20} /> },
-    { name: 'Kegiatan', path: '/events', icon: <Calendar size={20} /> },
-    { name: 'Laporan', path: '/reports', icon: <BarChart3 size={20} /> },
+    { name: 'Dashboard', path: '/app', icon: <LayoutDashboard size={20} /> },
+    { name: 'Transaksi', path: '/app/transactions', icon: <Wallet size={20} /> },
+    { name: 'Anggota', path: '/app/members', icon: <Users size={20} /> },
+    { name: 'Iuran', path: '/app/dues', icon: <Receipt size={20} /> },
+    { name: 'Kegiatan', path: '/app/events', icon: <Calendar size={20} /> },
+    { name: 'Laporan', path: '/app/reports', icon: <BarChart3 size={20} /> },
+    { name: 'Pengguna', path: '/app/users', icon: <UserCheck size={20} /> },
   ];
 
   if (isAdmin) {
-    navItems.push({ name: 'Pengaturan', path: '/settings', icon: <Settings size={20} /> });
+    navItems.push({ name: 'Pengaturan', path: '/app/settings', icon: <Settings size={20} /> });
   }
 
   return (
@@ -49,7 +51,7 @@ const Sidebar = ({ open, onClose }) => {
           <Link
             key={item.path}
             to={item.path}
-            className={`nav-item ${pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path)) ? 'active' : ''}`}
+            className={`nav-item ${pathname === item.path || (item.path !== '/app' && pathname.startsWith(item.path)) ? 'active' : ''}`}
           >
             {item.icon}
             <span>{item.name}</span>
@@ -58,7 +60,11 @@ const Sidebar = ({ open, onClose }) => {
       </nav>
 
       <div className="sidebar-footer">
-        <button className="nav-item btn-logout" onClick={logout}>
+        <button className="nav-item btn-logout" onClick={() => {
+          if (window.confirm('Apakah anda yakin ingin keluar?')) {
+            logout();
+          }
+        }}>
           <LogOut size={20} />
           <span>Keluar</span>
         </button>

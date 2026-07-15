@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './components/Layout/Layout';
+import { useState, useEffect } from 'react';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -12,13 +13,15 @@ import EventsPage from './pages/EventsPage';
 import EventDetailPage from './pages/EventDetailPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
+import UsersPage from './pages/UsersPage';
+import SemarakPage from './pages/SemarakPage';
 
 const ProtectedRoute = ({ children, requireAdmin }) => {
   const { user, loading, isAdmin } = useAuth();
   
   if (loading) return <div className="flex justify-center items-center h-full">Loading...</div>;
   if (!user) return <Navigate to="/login" replace />;
-  if (requireAdmin && !isAdmin) return <Navigate to="/" replace />;
+  if (requireAdmin && !isAdmin) return <Navigate to="/app" replace />;
   
   return children;
 };
@@ -29,24 +32,29 @@ const AppRoutes = () => {
   if (loading) return <div className="flex justify-center items-center h-screen bg-main">Loading...</div>;
 
   return (
-    <Routes>
-      <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
-      
-      <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        <Route index element={<DashboardPage />} />
-        <Route path="transactions" element={<TransactionsPage />} />
-        <Route path="members" element={<MembersPage />} />
-        <Route path="dues" element={<DuesPage />} />
-        <Route path="events" element={<EventsPage />} />
-        <Route path="events/:id" element={<EventDetailPage />} />
-        <Route path="reports" element={<ReportsPage />} />
-        <Route path="settings" element={
-          <ProtectedRoute requireAdmin={true}>
-            <SettingsPage />
-          </ProtectedRoute>
-        } />
-      </Route>
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/login" element={user ? <Navigate to="/app" replace /> : <LoginPage />} />
+        <Route path="/semarak" element={<SemarakPage />} />
+        <Route path="/" element={<SemarakPage />} />
+
+        <Route path="/app" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+          <Route index element={<DashboardPage />} />
+          <Route path="transactions" element={<TransactionsPage />} />
+          <Route path="members" element={<MembersPage />} />
+          <Route path="dues" element={<DuesPage />} />
+          <Route path="events" element={<EventsPage />} />
+          <Route path="events/:id" element={<EventDetailPage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="users" element={<UsersPage />} />
+          <Route path="settings" element={
+            <ProtectedRoute requireAdmin={true}>
+              <SettingsPage />
+            </ProtectedRoute>
+          } />
+        </Route>
+      </Routes>
+    </>
   );
 };
 

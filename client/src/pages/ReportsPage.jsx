@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { BarChart3, Download, TrendingUp, Calendar, FileText, PieChart, Printer } from 'lucide-react';
+import { BarChart3, Download, TrendingUp, Calendar, FileText, PieChart, Printer, FileSpreadsheet } from 'lucide-react';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 import { Bar, Pie } from 'react-chartjs-2';
+import { exportTransactions, exportMonthlyReport } from '../utils/exportExcel';
+import * as XLSX from 'xlsx';
 import './ReportsPage.css';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
@@ -240,9 +242,27 @@ const ReportsPage = () => {
           <h2>Laporan Keuangan</h2>
           <p className="text-muted text-sm mt-1">Analisis dan ringkasan data kas</p>
         </div>
-        <button className="btn btn-primary" onClick={() => window.print()}>
-          <Download size={18} /> Cetak Laporan
-        </button>
+        <div className="flex gap-2">
+          <button className="btn btn-outline" onClick={() => {
+            const allTx = [];
+            monthlyData.forEach((m, i) => {
+              if (m.income > 0) allTx.push({ Bulan: monthShort[i], Tipe: 'Pemasukan', Nominal: m.income });
+              if (m.expense > 0) allTx.push({ Bulan: monthShort[i], Tipe: 'Pengeluaran', Nominal: m.expense });
+            });
+            if (allTx.length > 0) {
+              const wb = XLSX.utils.book_new();
+              const ws = XLSX.utils.json_to_sheet(allTx);
+              ws['!cols'] = [{ wch: 10 }, { wch: 12 }, { wch: 15 }];
+              XLSX.utils.book_append_sheet(wb, ws, 'Ringkasan Bulanan');
+              XLSX.writeFile(wb, `Laporan_Tahunan_${selectedYear}.xlsx`);
+            }
+          }}>
+            <FileSpreadsheet size={18} /> Export Excel
+          </button>
+          <button className="btn btn-primary" onClick={() => window.print()}>
+            <Download size={18} /> Cetak Laporan
+          </button>
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -307,6 +327,11 @@ const ReportsPage = () => {
             <button className="btn btn-outline btn-sm" style={{flex: '1 1 auto'}} onClick={handlePrintMonthly} disabled={loadingMonthly}>
               <Printer size={14}/> Cetak
             </button>
+            {monthlyTransactions.length > 0 && (
+              <button className="btn btn-outline btn-sm" style={{flex: '1 1 auto'}} onClick={() => exportMonthlyReport(monthlyTransactions, monthlySummary, monthNames[selectedMonth], selectedYear)}>
+                <FileSpreadsheet size={14}/> Excel
+              </button>
+            )}
           </div>
         </div>
 

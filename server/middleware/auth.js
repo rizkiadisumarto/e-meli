@@ -26,4 +26,12 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-module.exports = { authenticateToken, requireAdmin, JWT_SECRET };
+// Admin or Committee can manage events
+function requireAdminOrCommittee(req, res, next) {
+  if (req.user.role !== 'admin' && req.user.role !== 'committee') {
+    return res.status(403).json({ error: 'Akses ditolak. Hanya admin atau committee yang bisa melakukan ini.' });
+  }
+  next();
+}
+
+module.exports = { authenticateToken, requireAdmin, requireAdminOrCommittee, JWT_SECRET };

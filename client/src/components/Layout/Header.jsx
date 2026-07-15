@@ -89,7 +89,7 @@ const Header = ({ title = "Dashboard" }) => {
             </div>
             <div className="user-info">
               <span className="user-name">{user?.full_name || 'User'}</span>
-              <span className="user-role">{user?.role === 'admin' ? 'Administrator' : 'User'}</span>
+              <span className="user-role">{user?.role === 'admin' ? 'Administrator' : user?.role === 'committee' ? 'Committee' : 'User'}</span>
             </div>
           </div>
 

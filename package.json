@@ -1,0 +1,14 @@
+{
+  "name": "kas-gang-meli",
+  "version": "1.0.0",
+  "description": "Sistem Manajemen Keuangan Komunitas - Kas Gang Meli",
+  "scripts": {
+    "install:all": "cd server && npm install && cd ../client && npm install",
+    "build": "cd client && npm run build",
+    "start": "cd server && node server.js",
+    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\""
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

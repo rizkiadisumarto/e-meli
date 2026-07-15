@@ -19,6 +19,7 @@ const SettingsPage = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [editUserForm, setEditUserForm] = useState({ full_name: '', role: 'user', password: '', phone: '' });
   const [showEditPw, setShowEditPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -298,12 +299,18 @@ const SettingsPage = () => {
           </div>
           <div className="form-group mb-0 flex-1">
             <label className="form-label">Password</label>
-            <input type="password" className="form-input" value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required />
+            <div style={{position:'relative'}}>
+              <input type={showNewPw ? 'text' : 'password'} className="form-input" style={{paddingRight:'2.5rem'}} value={newUser.password} onChange={e => setNewUser({...newUser, password: e.target.value})} required />
+              <button type="button" onClick={() => setShowNewPw(!showNewPw)} style={{position:'absolute',right:'0.75rem',top:'50%',transform:'translateY(-50%)',background:'none',border:'none',color:'var(--text-muted)',cursor:'pointer',padding:'0.25rem',display:'flex'}}>
+                {showNewPw ? <EyeOff size={16}/> : <Eye size={16}/>}
+              </button>
+            </div>
           </div>
           <div className="form-group mb-0 flex-1">
             <label className="form-label">Peran (Role)</label>
             <select className="form-select" value={newUser.role} onChange={e => setNewUser({...newUser, role: e.target.value})}>
               <option value="viewer">User (Hanya Lihat)</option>
+              <option value="committee">Committee (Kelola Kegiatan)</option>
               <option value="admin">Administrator</option>
             </select>
           </div>
@@ -335,9 +342,10 @@ const SettingsPage = () => {
                     {editingUser === u.id ? (
                       <select className="form-select" style={{padding:'0.25rem 0.5rem'}} value={editUserForm.role} onChange={e => setEditUserForm({...editUserForm, role: e.target.value})}>
                         <option value="viewer">User</option>
+                        <option value="committee">Committee</option>
                         <option value="admin">Administrator</option>
                       </select>
-                    ) : <span className={`badge ${u.role === 'admin' ? 'badge-warning' : 'badge-neutral'}`}>{u.role === 'admin' ? 'Administrator' : 'User'}</span>}
+                    ) : <span className={`badge ${u.role === 'admin' ? 'badge-warning' : u.role === 'committee' ? 'badge-success' : 'badge-neutral'}`}>{u.role === 'admin' ? 'Administrator' : u.role === 'committee' ? 'Committee' : 'User'}</span>}
                   </td>
                   <td>
                     {editingUser === u.id ? (

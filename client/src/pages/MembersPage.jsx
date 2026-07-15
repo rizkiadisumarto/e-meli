@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Plus, Search, Edit2, Trash2, UserCheck, UserX, X } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, UserCheck, UserX, X, FileSpreadsheet } from 'lucide-react';
+import { exportMembers } from '../utils/exportExcel';
 import './MembersPage.css';
 
 const MembersPage = () => {
@@ -106,11 +107,16 @@ const MembersPage = () => {
           <h2>Anggota Kas</h2>
           <p className="text-muted text-sm mt-1">Kelola data warga/anggota yang terdaftar</p>
         </div>
-        {isAdmin && (
-          <button className="btn btn-primary shadow-glow" onClick={openAddModal}>
-            <Plus size={18} /> Tambah Anggota
+        <div className="flex gap-2">
+          <button className="btn btn-outline" onClick={() => exportMembers(filteredMembers.length > 0 ? filteredMembers : members)}>
+            <FileSpreadsheet size={18} /> Export Excel
           </button>
-        )}
+          {isAdmin && (
+            <button className="btn btn-primary shadow-glow" onClick={openAddModal}>
+              <Plus size={18} /> Tambah Anggota
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="glass-card mb-6">

@@ -5,7 +5,7 @@ import { formatNumberInput, parseNumberInput } from '../utils/format';
 import { 
   ArrowLeft, MapPin, Calendar as CalendarIcon, Users, ArrowDownToLine, 
   ArrowUpFromLine, Wallet, TrendingUp, BarChart3, Clock, CheckSquare, 
-  ListOrdered, Receipt, FileText, Plus, Edit2, Trash2, X, Save, Printer
+  ListOrdered, Receipt, FileText, Plus, Edit2, Trash2, X, Save, Printer, FileSpreadsheet
 } from 'lucide-react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
@@ -13,6 +13,7 @@ import MapPicker from '../components/UI/MapPicker';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { exportEventData } from '../utils/exportExcel';
 import './EventDetailPage.css';
 
 // Fix Leaflet default marker icon
@@ -28,7 +29,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const EventDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isAdmin } = useAuth();
+  const { isAdminOrCommittee } = useAuth();
   
   const [event, setEvent] = useState(null);
   const [participants, setParticipants] = useState([]);
@@ -58,7 +59,8 @@ const EventDetailPage = () => {
   const [editBudget, setEditBudget] = useState(null);
   const [budgetForm, setBudgetForm] = useState({ item: '', qty: 1, unit_price: 0, actual_amount: 0 });
   const [showTxModal, setShowTxModal] = useState(false);
-  const [txForm, setTxForm] = useState({ type: 'expense', category_id: '', amount: 0, description: '', date: new Date().toISOString().split('T')[0], member_id: '' });
+  const [editingTx, setEditingTx] = useState(null);
+  const [txForm, setTxForm] = useState({ type: 'expense', category_id: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], member_id: '' });
   const [txProofFile, setTxProofFile] = useState(null);
   const [showProofModal, setShowProofModal] = useState(null);
 
@@ -374,23 +376,65 @@ const EventDetailPage = () => {
 
   // --- Transactions ---
   const saveTransaction = async () => {
-    const formData = new FormData();
-    formData.append('type', txForm.type);
-    formData.append('category_id', txForm.category_id);
-    formData.append('amount', parseNumberInput(txForm.amount));
-    formData.append('description', txForm.description);
-    formData.append('date', txForm.date);
-    formData.append('member_id', txForm.member_id);
-    if (txProofFile) formData.append('proof_image', txProofFile);
+    const formDataSubmit = new FormData();
+    formDataSubmit.append('type', txForm.type);
+    formDataSubmit.append('category_id', txForm.category_id);
+    formDataSubmit.append('amount', parseNumberInput(txForm.amount));
+    formDataSubmit.append('description', txForm.description);
+    formDataSubmit.append('date', txForm.date);
+    formDataSubmit.append('member_id', txForm.member_id);
+    if (txProofFile) formDataSubmit.append('proof_image', txProofFile);
 
-    await fetch(`/api/events/${id}/transactions`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token()}` },
-      body: formData
-    });
+    if (editingTx) {
+      // Edit existing transaction
+      await fetch(`/api/events/${id}/transactions/${editingTx.id}`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token()}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: txForm.type,
+          category_id: txForm.category_id,
+          amount: parseNumberInput(txForm.amount),
+          description: txForm.description,
+          date: txForm.date,
+          member_id: txForm.member_id
+        })
+      });
+    } else {
+      // Create new transaction
+      await fetch(`/api/events/${id}/transactions`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token()}` },
+        body: formDataSubmit
+      });
+    }
+
     setShowTxModal(false);
+    setEditingTx(null);
     setTxProofFile(null);
-    setTxForm({ type: 'expense', category_id: '', amount: 0, description: '', date: new Date().toISOString().split('T')[0], member_id: '' });
+    setTxForm({ type: 'expense', category_id: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], member_id: '' });
+    fetchEventData();
+  };
+
+  const openEditTx = (tx) => {
+    setEditingTx(tx);
+    setTxForm({
+      type: tx.type,
+      category_id: tx.category_id || '',
+      amount: formatNumberInput(tx.amount),
+      description: tx.description || '',
+      date: tx.date,
+      member_id: tx.member_id || ''
+    });
+    setTxProofFile(null);
+    setShowTxModal(true);
+  };
+
+  const handleDeleteTx = async (txId) => {
+    if (!window.confirm('Hapus transaksi ini?')) return;
+    await fetch(`/api/events/${id}/transactions/${txId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token()}` }
+    });
     fetchEventData();
   };
 
@@ -422,7 +466,8 @@ const EventDetailPage = () => {
           </div>
           <div className="flex items-center gap-2">
             <button className="btn btn-outline" onClick={handlePrintEvent}><Printer size={16}/> Cetak</button>
-            {isAdmin && (
+            <button className="btn btn-outline" onClick={() => exportEventData(event, participants, transactions, budget, event.name)}><FileSpreadsheet size={16}/> Excel</button>
+            {isAdminOrCommittee && (
               <>
                 <button className="btn btn-outline" onClick={openEditEvent}><Edit2 size={16}/> Edit</button>
                 <button className="btn btn-danger" onClick={deleteEvent}><Trash2 size={16}/> Hapus</button>
@@ -559,7 +604,7 @@ const EventDetailPage = () => {
           <h3 className="text-sm font-semibold text-muted flex items-center gap-2 uppercase">
             <Users size={16} className="text-primary"/> Peserta ({participants.length})
           </h3>
-          {isAdmin && <button className="btn btn-primary btn-sm" onClick={openAddParticipants}><Plus size={14}/> Tambah</button>}
+          {isAdminOrCommittee && <button className="btn btn-primary btn-sm" onClick={openAddParticipants}><Plus size={14}/> Tambah</button>}
         </div>
         <div className="table-container">
           <table className="table">
@@ -570,7 +615,7 @@ const EventDetailPage = () => {
                 <th className="text-right">Target</th>
                 <th className="text-right">Terbayar</th>
                 <th className="text-center">Status</th>
-                {isAdmin && <th className="text-center">Aksi</th>}
+                {isAdminOrCommittee && <th className="text-center">Aksi</th>}
               </tr>
             </thead>
             <tbody>
@@ -602,7 +647,7 @@ const EventDetailPage = () => {
                       {p.status === 'paid' ? 'LUNAS' : p.status === 'partial' ? 'SEBAGIAN' : 'BELUM'}
                     </span>}
                   </td>
-                  {isAdmin && (
+                  {isAdminOrCommittee && (
                     <td className="text-center">
                       {editParticipant?.id === p.id ? (
                         <>
@@ -619,7 +664,7 @@ const EventDetailPage = () => {
                   )}
                 </tr>
               )) : (
-                <tr><td colSpan={isAdmin ? 6 : 5} className="text-center py-4 text-muted">Belum ada peserta.</td></tr>
+                <tr><td colSpan={isAdminOrCommittee ? 6 : 5} className="text-center py-4 text-muted">Belum ada peserta.</td></tr>
               )}
             </tbody>
           </table>
@@ -633,11 +678,11 @@ const EventDetailPage = () => {
             <h3 className="text-sm font-semibold text-muted flex items-center gap-2 uppercase">
               <Clock size={16} className="text-primary"/> Rundown
             </h3>
-            {isAdmin && <button className="btn btn-primary btn-sm" onClick={openAddRundown}><Plus size={14}/> Tambah</button>}
+            {isAdminOrCommittee && <button className="btn btn-primary btn-sm" onClick={openAddRundown}><Plus size={14}/> Tambah</button>}
           </div>
           <div className="table-container">
             <table className="table text-sm">
-              <thead><tr><th>Waktu</th><th>Kegiatan</th><th>PIC</th><th className="text-center">Status</th>{isAdmin && <th className="text-center">Aksi</th>}</tr></thead>
+              <thead><tr><th>Waktu</th><th>Kegiatan</th><th>PIC</th><th className="text-center">Status</th>{isAdminOrCommittee && <th className="text-center">Aksi</th>}</tr></thead>
               <tbody>
                 {rundown.length > 0 ? rundown.map(r => (
                   <tr key={r.id}>
@@ -645,7 +690,7 @@ const EventDetailPage = () => {
                     <td>{editRundown?.id === r.id ? <input type="text" className="form-input" style={{padding:'0.2rem'}} value={rundownForm.activity} onChange={e => setRundownForm({...rundownForm, activity: e.target.value})} /> : r.activity}</td>
                     <td>{editRundown?.id === r.id ? <input type="text" className="form-input" style={{padding:'0.2rem'}} value={rundownForm.pic} onChange={e => setRundownForm({...rundownForm, pic: e.target.value})} /> : r.pic}</td>
                     <td className="text-center"><span className={`badge ${r.status === 'done' ? 'badge-success' : 'badge-neutral'}`}>{r.status === 'done' ? 'SELESAI' : 'BELUM'}</span></td>
-                    {isAdmin && <td className="text-center">
+                    {isAdminOrCommittee && <td className="text-center">
                       {editRundown?.id === r.id ? (
                         <><button className="btn-icon text-primary" onClick={saveRundown}><Save size={14}/></button><button className="btn-icon text-muted" onClick={() => setEditRundown(null)}><X size={14}/></button></>
                       ) : (
@@ -653,7 +698,7 @@ const EventDetailPage = () => {
                       )}
                     </td>}
                   </tr>
-                )) : <tr><td colSpan={isAdmin ? 5 : 4} className="text-center py-4 text-muted">Belum ada rundown.</td></tr>}
+                )) : <tr><td colSpan={isAdminOrCommittee ? 5 : 4} className="text-center py-4 text-muted">Belum ada rundown.</td></tr>}
               </tbody>
             </table>
           </div>
@@ -664,18 +709,18 @@ const EventDetailPage = () => {
             <h3 className="text-sm font-semibold text-muted flex items-center gap-2 uppercase">
               <CheckSquare size={16} className="text-secondary"/> Checklist Tugas
             </h3>
-            {isAdmin && <button className="btn btn-primary btn-sm" onClick={openAddTask}><Plus size={14}/> Tambah</button>}
+            {isAdminOrCommittee && <button className="btn btn-primary btn-sm" onClick={openAddTask}><Plus size={14}/> Tambah</button>}
           </div>
           <div className="table-container">
             <table className="table text-sm">
-              <thead><tr><th>Tugas</th><th>PIC</th><th className="text-center">Status</th>{isAdmin && <th className="text-center">Aksi</th>}</tr></thead>
+              <thead><tr><th>Tugas</th><th>PIC</th><th className="text-center">Status</th>{isAdminOrCommittee && <th className="text-center">Aksi</th>}</tr></thead>
               <tbody>
                 {tasks.length > 0 ? tasks.map(t => (
                   <tr key={t.id}>
                     <td>{editTask?.id === t.id ? <input type="text" className="form-input" style={{padding:'0.2rem'}} value={taskForm.task} onChange={e => setTaskForm({...taskForm, task: e.target.value})} /> : t.task}</td>
                     <td>{editTask?.id === t.id ? <input type="text" className="form-input" style={{padding:'0.2rem'}} value={taskForm.pic} onChange={e => setTaskForm({...taskForm, pic: e.target.value})} /> : t.pic}</td>
                     <td className="text-center"><span className={`badge ${t.status === 'done' ? 'badge-success' : 'badge-neutral'}`}>{t.status === 'done' ? 'SELESAI' : 'BELUM'}</span></td>
-                    {isAdmin && <td className="text-center">
+                    {isAdminOrCommittee && <td className="text-center">
                       {editTask?.id === t.id ? (
                         <><button className="btn-icon text-primary" onClick={saveTask}><Save size={14}/></button><button className="btn-icon text-muted" onClick={() => setEditTask(null)}><X size={14}/></button></>
                       ) : (
@@ -683,7 +728,7 @@ const EventDetailPage = () => {
                       )}
                     </td>}
                   </tr>
-                )) : <tr><td colSpan={isAdmin ? 4 : 3} className="text-center py-4 text-muted">Belum ada tugas.</td></tr>}
+                )) : <tr><td colSpan={isAdminOrCommittee ? 4 : 3} className="text-center py-4 text-muted">Belum ada tugas.</td></tr>}
               </tbody>
             </table>
           </div>
@@ -696,7 +741,7 @@ const EventDetailPage = () => {
           <h3 className="text-sm font-semibold text-muted flex items-center gap-2 uppercase">
             <ListOrdered size={16} className="text-warning"/> RAB (Rencana Anggaran Biaya)
           </h3>
-          {isAdmin && <button className="btn btn-primary btn-sm" onClick={openAddBudget}><Plus size={14}/> Tambah Item</button>}
+          {isAdminOrCommittee && <button className="btn btn-primary btn-sm" onClick={openAddBudget}><Plus size={14}/> Tambah Item</button>}
         </div>
         <div className="table-container">
           <table className="table">
@@ -708,7 +753,7 @@ const EventDetailPage = () => {
                 <th className="text-right">Rencana</th>
                 <th className="text-right">Realisasi</th>
                 <th className="text-center" style={{width: '100px'}}>Status</th>
-                {isAdmin && <th className="text-center">Aksi</th>}
+                {isAdminOrCommittee && <th className="text-center">Aksi</th>}
               </tr>
             </thead>
             <tbody>
@@ -724,12 +769,12 @@ const EventDetailPage = () => {
                       <div className={`h-1.5 rounded-full ${b.actual_amount > b.planned_amount ? 'bg-danger' : 'bg-primary'}`} style={{ width: `${Math.min(100, (b.actual_amount / b.planned_amount) * 100 || 0)}%` }}></div>
                     </div>
                   </td>
-                  {isAdmin && <td className="text-center">
+                  {isAdminOrCommittee && <td className="text-center">
                     <button className="btn-icon" onClick={() => openEditBudget(b)}><Edit2 size={14}/></button>
                     <button className="btn-icon text-danger" onClick={() => deleteBudget(b.id)}><Trash2 size={14}/></button>
                   </td>}
                 </tr>
-              )) : <tr><td colSpan={isAdmin ? 7 : 6} className="text-center py-4 text-muted">Belum ada RAB.</td></tr>}
+              )) : <tr><td colSpan={isAdminOrCommittee ? 7 : 6} className="text-center py-4 text-muted">Belum ada RAB.</td></tr>}
             </tbody>
             {budget.items?.length > 0 && (
               <tfoot>
@@ -738,7 +783,7 @@ const EventDetailPage = () => {
                   <td className="text-right">{formatCurrency(budget.totals?.planned)}</td>
                   <td className="text-right text-primary">{formatCurrency(budget.totals?.actual)}</td>
                   <td></td>
-                  {isAdmin && <td></td>}
+                  {isAdminOrCommittee && <td></td>}
                 </tr>
               </tfoot>
             )}
@@ -752,12 +797,12 @@ const EventDetailPage = () => {
           <h3 className="text-sm font-semibold text-muted flex items-center gap-2 uppercase">
             <Receipt size={16} className="text-secondary"/> Riwayat Transaksi Event
           </h3>
-          {isAdmin && <button className="btn btn-primary btn-sm" onClick={() => { setTxForm({ type: 'expense', category_id: '', amount: 0, description: '', date: new Date().toISOString().split('T')[0], member_id: '' }); setTxProofFile(null); setShowTxModal(true); }}><Plus size={14}/> Tambah</button>}
+          {isAdminOrCommittee && <button className="btn btn-primary btn-sm" onClick={() => { setEditingTx(null); setTxForm({ type: 'expense', category_id: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], member_id: '' }); setTxProofFile(null); setShowTxModal(true); }}><Plus size={14}/> Tambah</button>}
         </div>
         <div className="table-container">
           <table className="table text-sm">
             <thead>
-              <tr><th>Tanggal</th><th>Keterangan</th><th className="text-right">Nominal</th><th className="text-center">Bukti</th></tr>
+              <tr><th>Tanggal</th><th>Keterangan</th><th className="text-right">Nominal</th><th className="text-center">Bukti</th>{isAdminOrCommittee && <th className="text-center">Aksi</th>}</tr>
             </thead>
             <tbody>
               {transactions.length > 0 ? transactions.map(tx => (
@@ -778,8 +823,14 @@ const EventDetailPage = () => {
                       </button>
                     ) : <span className="text-muted text-xs">-</span>}
                   </td>
+                  {isAdminOrCommittee && (
+                    <td className="text-center">
+                      <button className="btn-icon" onClick={() => openEditTx(tx)} title="Edit"><Edit2 size={14}/></button>
+                      <button className="btn-icon text-danger" onClick={() => handleDeleteTx(tx.id)} title="Hapus"><Trash2 size={14}/></button>
+                    </td>
+                  )}
                 </tr>
-              )) : <tr><td colSpan="4" className="text-center py-4 text-muted">Belum ada riwayat transaksi.</td></tr>}
+              )) : <tr><td colSpan={isAdminOrCommittee ? 5 : 4} className="text-center py-4 text-muted">Belum ada riwayat transaksi.</td></tr>}
             </tbody>
           </table>
         </div>
@@ -980,7 +1031,7 @@ const EventDetailPage = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-              <h3 className="text-lg font-bold">Tambah Transaksi Event</h3>
+              <h3 className="text-lg font-bold">{editingTx ? 'Edit Transaksi Event' : 'Tambah Transaksi Event'}</h3>
               <button className="btn-icon" onClick={() => setShowTxModal(false)}><X size={20}/></button>
             </div>
             <div className="modal-body flex flex-col gap-4">
