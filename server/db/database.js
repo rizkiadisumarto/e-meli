@@ -33,7 +33,13 @@ async function initializeDb() {
   } else {
     // SQLite (Local Development)
     isPostgres = false;
-    const Database = require('better-sqlite3');
+    let Database;
+    try {
+      Database = require('better-sqlite3');
+    } catch (e) {
+      console.error('better-sqlite3 not available. Use PostgreSQL for production.');
+      process.exit(1);
+    }
     const DB_PATH = path.join(__dirname, 'kas.db');
 
     db = new Database(DB_PATH);
