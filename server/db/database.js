@@ -37,7 +37,11 @@ async function initializeDb() {
     try {
       Database = require('better-sqlite3');
     } catch (e) {
-      console.error('better-sqlite3 not available. Use PostgreSQL for production.');
+      console.error('');
+      console.error('❌ better-sqlite3 tidak terinstall.');
+      console.error('   Jalankan: npm install better-sqlite3');
+      console.error('   Atau set environment variable DATABASE_URL untuk PostgreSQL');
+      console.error('');
       process.exit(1);
     }
     const DB_PATH = path.join(__dirname, 'kas.db');

@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "postinstall": "echo 'Build complete'"
+    "dev:local": "npm install better-sqlite3 && node --watch server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -19,8 +19,5 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.2.0",
     "pg": "^8.22.0"
-  },
-  "optionalDependencies": {
-    "better-sqlite3": "^12.11.1"
   }
 }
