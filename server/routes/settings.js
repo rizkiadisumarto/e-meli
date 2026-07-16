@@ -1,13 +1,13 @@
 const express = require('express');
-const { queryAll, queryGet, queryRun } = require('../db/database');
+const { queryAllAsync, queryGetAsync, queryRunAsync } = require('../db/database');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
 // GET /api/settings
-router.get('/', authenticateToken, (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
-    const rows = queryAll('SELECT * FROM settings');
+    const rows = await queryAllAsync('SELECT * FROM settings');
     const settings = {};
     rows.forEach(row => { settings[row.key] = row.value; });
     res.json(settings);
@@ -17,13 +17,13 @@ router.get('/', authenticateToken, (req, res) => {
 });
 
 // PUT /api/settings
-router.put('/', authenticateToken, requireAdmin, (req, res) => {
+router.put('/', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const updates = req.body;
     
     for (const [key, value] of Object.entries(updates)) {
         try {
-            queryRun('INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value', [key, value]);
+            await queryRunAsync('INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2', [key, value]);
         } catch(e) {
             console.error('Error updating setting', key, e);
         }
@@ -36,9 +36,9 @@ router.put('/', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // GET /api/settings/categories
-router.get('/categories', authenticateToken, (req, res) => {
+router.get('/categories', authenticateToken, async (req, res) => {
   try {
-    const categories = queryAll('SELECT * FROM categories ORDER BY type, name');
+    const categories = await queryAllAsync('SELECT * FROM categories ORDER BY type, name');
     res.json(categories);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -46,13 +46,13 @@ router.get('/categories', authenticateToken, (req, res) => {
 });
 
 // POST /api/settings/categories
-router.post('/categories', authenticateToken, requireAdmin, (req, res) => {
+router.post('/categories', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { name, type } = req.body;
     if (!name || !type) return res.status(400).json({ error: 'Nama dan tipe harus diisi' });
     
-    const result = queryRun('INSERT INTO categories (name, type) VALUES (?, ?)', [name, type]);
-    const category = queryGet('SELECT * FROM categories WHERE id = ?', [result.lastInsertRowid]);
+    const result = await queryRunAsync('INSERT INTO categories (name, type) VALUES ($1, $2) RETURNING id', [name, type]);
+    const category = await queryGetAsync('SELECT * FROM categories WHERE id = $1', [result.lastInsertRowid]);
     res.status(201).json(category);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -60,13 +60,13 @@ router.post('/categories', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // PUT /api/settings/categories/:id
-router.put('/categories/:id', authenticateToken, requireAdmin, (req, res) => {
+router.put('/categories/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { name, type } = req.body;
     if (!name || !type) return res.status(400).json({ error: 'Nama dan tipe harus diisi' });
 
-    queryRun('UPDATE categories SET name = ?, type = ? WHERE id = ?', [name, type, req.params.id]);
-    const category = queryGet('SELECT * FROM categories WHERE id = ?', [req.params.id]);
+    await queryRunAsync('UPDATE categories SET name = $1, type = $2 WHERE id = $3', [name, type, req.params.id]);
+    const category = await queryGetAsync('SELECT * FROM categories WHERE id = $1', [req.params.id]);
     res.json(category);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -74,9 +74,9 @@ router.put('/categories/:id', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // DELETE /api/settings/categories/:id
-router.delete('/categories/:id', authenticateToken, requireAdmin, (req, res) => {
+router.delete('/categories/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    queryRun('DELETE FROM categories WHERE id = ?', [req.params.id]);
+    await queryRunAsync('DELETE FROM categories WHERE id = $1', [req.params.id]);
     res.json({ message: 'Kategori berhasil dihapus' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -84,9 +84,9 @@ router.delete('/categories/:id', authenticateToken, requireAdmin, (req, res) => 
 });
 
 // GET /api/settings/users
-router.get('/users', authenticateToken, (req, res) => {
+router.get('/users', authenticateToken, async (req, res) => {
   try {
-    const users = queryAll('SELECT id, username, full_name, role, phone, created_at FROM users ORDER BY created_at');
+    const users = await queryAllAsync('SELECT id, username, full_name, role, phone, created_at FROM users ORDER BY created_at');
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -94,7 +94,7 @@ router.get('/users', authenticateToken, (req, res) => {
 });
 
 // PUT /api/settings/users/:id
-router.put('/users/:id', authenticateToken, requireAdmin, (req, res) => {
+router.put('/users/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { full_name, role, password, phone } = req.body;
     if (!full_name || !role) return res.status(400).json({ error: 'Nama lengkap dan role harus diisi' });
@@ -102,12 +102,12 @@ router.put('/users/:id', authenticateToken, requireAdmin, (req, res) => {
     if (password) {
       const bcrypt = require('bcryptjs');
       const hashedPassword = bcrypt.hashSync(password, 10);
-      queryRun('UPDATE users SET full_name = ?, role = ?, password = ?, phone = ? WHERE id = ?', [full_name, role, hashedPassword, phone || null, req.params.id]);
+      await queryRunAsync('UPDATE users SET full_name = $1, role = $2, password = $3, phone = $4 WHERE id = $5', [full_name, role, hashedPassword, phone || null, req.params.id]);
     } else {
-      queryRun('UPDATE users SET full_name = ?, role = ?, phone = ? WHERE id = ?', [full_name, role, phone || null, req.params.id]);
+      await queryRunAsync('UPDATE users SET full_name = $1, role = $2, phone = $3 WHERE id = $4', [full_name, role, phone || null, req.params.id]);
     }
 
-    const user = queryGet('SELECT id, username, full_name, role, phone, created_at FROM users WHERE id = ?', [req.params.id]);
+    const user = await queryGetAsync('SELECT id, username, full_name, role, phone, created_at FROM users WHERE id = $1', [req.params.id]);
     res.json(user);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -115,12 +115,12 @@ router.put('/users/:id', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // DELETE /api/settings/users/:id
-router.delete('/users/:id', authenticateToken, requireAdmin, (req, res) => {
+router.delete('/users/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     if (Number(req.params.id) === req.user.id) {
       return res.status(400).json({ error: 'Tidak bisa menghapus akun sendiri' });
     }
-    queryRun('DELETE FROM users WHERE id = ?', [req.params.id]);
+    await queryRunAsync('DELETE FROM users WHERE id = $1', [req.params.id]);
     res.json({ message: 'User berhasil dihapus' });
   } catch (err) {
     res.status(500).json({ error: err.message });

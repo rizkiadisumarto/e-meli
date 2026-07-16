@@ -2,19 +2,20 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { formatNumberInput, parseNumberInput } from '../utils/format';
-import { 
-  ArrowLeft, MapPin, Calendar as CalendarIcon, Users, ArrowDownToLine, 
-  ArrowUpFromLine, Wallet, TrendingUp, BarChart3, Clock, CheckSquare, 
+import {
+  ArrowLeft, MapPin, Calendar as CalendarIcon, Users, ArrowDownToLine,
+  ArrowUpFromLine, Wallet, TrendingUp, BarChart3, Clock, CheckSquare,
   ListOrdered, Receipt, FileText, Plus, Edit2, Trash2, X, Save, Printer, FileSpreadsheet
 } from 'lucide-react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
+import { exportEventData } from '../utils/exportExcel';
 import MapPicker from '../components/UI/MapPicker';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { exportEventData } from '../utils/exportExcel';
 import './EventDetailPage.css';
+import '../components/UI/StatCard.css';
 
 // Fix Leaflet default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
@@ -535,7 +536,7 @@ const EventDetailPage = () => {
           </div>
           <div className="border-l border-glass pl-8">
             <div className="text-xs text-muted mb-1 uppercase">Proyeksi Akhir</div>
-            <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-md text-sm font-bold ${summary?.projection >= 0 ? 'bg-primary-light text-primary' : 'bg-danger-light text-danger'}`}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', padding: '0.25rem 0.75rem', borderRadius: '0.375rem', fontSize: '0.875rem', fontWeight: 700, backgroundColor: (summary?.projection || 0) >= 0 ? 'var(--primary-light, #dbeafe)' : 'var(--danger-light, #fee2e2)', color: (summary?.projection || 0) >= 0 ? 'var(--primary, #2563eb)' : 'var(--danger, #dc2626)' }}>
               {formatCurrency(Math.abs(summary?.projection || 0))}
             </div>
             <div className="text-xs text-muted mt-1">{summary?.projection >= 0 ? 'SURPLUS (AMAN)' : 'DEFISIT (BAHAYA)'}</div>

@@ -1,22 +1,21 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { 
-  LayoutDashboard, 
-  Wallet, 
-  Users, 
-  Receipt, 
-  Calendar, 
-  BarChart3, 
+import {
+  LayoutDashboard,
+  Wallet,
+  Users,
+  Receipt,
+  Calendar,
+  BarChart3,
   Settings,
-  LogOut,
   UserCheck
 } from 'lucide-react';
 import './Sidebar.css';
 
 const Sidebar = ({ open, onClose }) => {
   const { pathname } = useLocation();
-  const { logout, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -58,17 +57,6 @@ const Sidebar = ({ open, onClose }) => {
           </Link>
         ))}
       </nav>
-
-      <div className="sidebar-footer">
-        <button className="nav-item btn-logout" onClick={() => {
-          if (window.confirm('Apakah anda yakin ingin keluar?')) {
-            logout();
-          }
-        }}>
-          <LogOut size={20} />
-          <span>Keluar</span>
-        </button>
-      </div>
     </aside>
   );
 };

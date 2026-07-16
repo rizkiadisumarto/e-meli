@@ -1,0 +1,152 @@
+/* SemarakPage Responsive Styles */
+
+/* Tab navigation */
+.semarak-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+/* Countdown grid */
+.semarak-countdown-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .semarak-countdown-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+  }
+}
+
+/* Hero section responsive */
+@media (max-width: 640px) {
+  .semarak-hero {
+    padding: clamp(1.5rem, 4vw, 2.5rem) 0.75rem !important;
+  }
+}
+
+/* Running text - smaller on mobile */
+@media (max-width: 480px) {
+  .semarak-marquee {
+    font-size: 0.65rem !important;
+  }
+}
+
+/* Tab buttons - wrap on mobile, all visible */
+.semarak-tab-btn {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 9999px;
+  border: none;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .semarak-tab-btn {
+    padding: 0.35rem 0.6rem !important;
+    font-size: 0.62rem !important;
+    gap: 0.2rem !important;
+  }
+}
+
+/* Music player - adjust position on mobile */
+@media (max-width: 480px) {
+  .semarak-music-player {
+    bottom: 0.75rem !important;
+    right: 0.75rem !important;
+  }
+}
+
+/* Coming Soon cards - stack on very small screens */
+@media (max-width: 400px) {
+  .semarak-coming-soon-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Proklamasi text - smaller on mobile */
+@media (max-width: 480px) {
+  .semarak-proklamasi p {
+    font-size: clamp(0.75rem, 2vw, 0.9rem) !important;
+    line-height: 1.6 !important;
+  }
+}
+
+/* Hall of Fame image - responsive */
+@media (max-width: 480px) {
+  .semarak-hall-image {
+    aspect-ratio: 4/3 !important;
+  }
+}
+
+/* Feature cards - single column on mobile */
+@media (max-width: 480px) {
+  .semarak-feature-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Game area - smaller on mobile */
+@media (max-width: 480px) {
+  .semarak-game-area {
+    height: clamp(250px, 45vh, 350px) !important;
+  }
+}
+
+/* Tirakatan rundown - tighter on mobile */
+@media (max-width: 480px) {
+  .semarak-rundown-item {
+    padding: 0.5rem 0.75rem !important;
+    gap: 0.5rem !important;
+  }
+}
+
+/* Safe area for notched phones */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .semarak-footer {
+    padding-bottom: calc(1.25rem + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+/* Tablet styles (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .semarak-countdown-grid {
+    gap: 0.6rem;
+  }
+
+  .semarak-tab-btn {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .semarak-feature-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Large laptop (1025px - 1440px) */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .semarak-countdown-grid {
+    gap: 0.6rem;
+  }
+}
+
+/* Extra large screens (> 1440px) */
+@media (min-width: 1441px) {
+  .semarak-countdown-grid {
+    gap: 0.75rem;
+  }
+}

@@ -167,7 +167,7 @@ const EventsPage = () => {
 
       <div className="grid grid-cols-3 gap-6">
         {events.length > 0 ? events.map(event => (
-          <Link to={`/events/${event.id}`} key={event.id} className="event-card glass-card" style={{position:'relative'}}>
+          <Link to={`/app/events/${event.id}`} key={event.id} className="event-card glass-card" style={{position:'relative'}}>
             {isAdminOrCommittee && (
               <div className="flex gap-1" style={{position:'absolute',top:'1rem',right:'1rem',zIndex:10}}>
                 <button className="btn-icon" style={{background:'var(--bg-card)',borderRadius:'8px'}} onClick={(e) => openEditModal(e, event)} title="Edit Event"><Edit2 size={14}/></button>

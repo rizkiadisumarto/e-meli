@@ -1,22 +1,23 @@
 const express = require('express');
-const { queryAll, queryGet, queryRun } = require('../db/database');
+const { queryAllAsync, queryGetAsync, queryRunAsync } = require('../db/database');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
 // GET /api/members
-router.get('/', authenticateToken, (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
     const { search, status } = req.query;
     
     let query = 'SELECT * FROM members WHERE 1=1';
     const params = [];
+    let paramIdx = 1;
 
-    if (status) { query += ' AND status = ?'; params.push(status); }
-    if (search) { query += ' AND (name LIKE ? OR address LIKE ? OR phone LIKE ?)'; params.push(`%${search}%`, `%${search}%`, `%${search}%`); }
+    if (status) { query += ` AND status = $${paramIdx++}`; params.push(status); }
+    if (search) { query += ` AND (name LIKE $${paramIdx} OR address LIKE $${paramIdx + 1} OR phone LIKE $${paramIdx + 2})`; params.push(`%${search}%`, `%${search}%`, `%${search}%`); }
 
     query += ' ORDER BY name ASC';
-    const members = queryAll(query, params);
+    const members = await queryAllAsync(query, params);
     res.json(members);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -24,17 +25,17 @@ router.get('/', authenticateToken, (req, res) => {
 });
 
 // GET /api/members/:id
-router.get('/:id', authenticateToken, (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
   try {
-    const member = queryGet('SELECT * FROM members WHERE id = ?', [req.params.id]);
+    const member = await queryGetAsync('SELECT * FROM members WHERE id = $1', [req.params.id]);
     if (!member) return res.status(404).json({ error: 'Anggota tidak ditemukan' });
     
     // Get payment history
-    const payments = queryAll(`
+    const payments = await queryAllAsync(`
       SELECT dp.*, ds.amount as setting_amount 
       FROM dues_payments dp 
       LEFT JOIN dues_settings ds ON ds.id = (SELECT id FROM dues_settings ORDER BY effective_date DESC LIMIT 1)
-      WHERE dp.member_id = ? 
+      WHERE dp.member_id = $1 
       ORDER BY dp.year DESC, dp.month DESC
     `, [req.params.id]);
     
@@ -45,17 +46,17 @@ router.get('/:id', authenticateToken, (req, res) => {
 });
 
 // POST /api/members
-router.post('/', authenticateToken, requireAdmin, (req, res) => {
+router.post('/', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { name, address, phone, status } = req.body;
     if (!name) return res.status(400).json({ error: 'Nama harus diisi' });
 
-    const result = queryRun(
-      'INSERT INTO members (name, address, phone, status) VALUES (?, ?, ?, ?)',
+    const result = await queryRunAsync(
+      'INSERT INTO members (name, address, phone, status) VALUES ($1, $2, $3, $4) RETURNING id',
       [name, address || '', phone || '', status || 'active']
     );
 
-    const member = queryGet('SELECT * FROM members WHERE id = ?', [result.lastInsertRowid]);
+    const member = await queryGetAsync('SELECT * FROM members WHERE id = $1', [result.lastInsertRowid]);
     res.status(201).json(member);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -63,16 +64,16 @@ router.post('/', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // PUT /api/members/:id
-router.put('/:id', authenticateToken, requireAdmin, (req, res) => {
+router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { name, address, phone, status } = req.body;
     
-    queryRun(
-      'UPDATE members SET name=?, address=?, phone=?, status=? WHERE id=?',
+    await queryRunAsync(
+      'UPDATE members SET name=$1, address=$2, phone=$3, status=$4 WHERE id=$5',
       [name, address || '', phone || '', status || 'active', req.params.id]
     );
 
-    const member = queryGet('SELECT * FROM members WHERE id = ?', [req.params.id]);
+    const member = await queryGetAsync('SELECT * FROM members WHERE id = $1', [req.params.id]);
     res.json(member);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -80,14 +81,14 @@ router.put('/:id', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // DELETE /api/members/:id
-router.delete('/:id', authenticateToken, requireAdmin, (req, res) => {
+router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     // Remove participant records for this member
-    queryRun('DELETE FROM event_participants WHERE member_id = ?', [req.params.id]);
+    await queryRunAsync('DELETE FROM event_participants WHERE member_id = $1', [req.params.id]);
     // Remove dues payments for this member
-    queryRun('DELETE FROM dues_payments WHERE member_id = ?', [req.params.id]);
+    await queryRunAsync('DELETE FROM dues_payments WHERE member_id = $1', [req.params.id]);
     // Delete the member
-    queryRun('DELETE FROM members WHERE id = ?', [req.params.id]);
+    await queryRunAsync('DELETE FROM members WHERE id = $1', [req.params.id]);
     res.json({ message: 'Anggota berhasil dihapus' });
   } catch (err) {
     res.status(500).json({ error: err.message });

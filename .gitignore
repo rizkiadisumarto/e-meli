@@ -2,8 +2,11 @@ node_modules/
 dist/
 .env
 *.db
+*.db-shm
+*.db-wal
 server/uploads/
 .mimocode/
 hut ri80/
 logo hut ri81.jpeg
+logohutri80.jpg
 start.ps1

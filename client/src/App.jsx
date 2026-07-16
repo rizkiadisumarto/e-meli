@@ -1,7 +1,25 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './components/Layout/Layout';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Component } from 'react';
+
+// Error Boundary
+class ErrorBoundary extends Component {
+  constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+  static getDerivedStateFromError(error) { return { hasError: true, error }; }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '2rem', textAlign: 'center' }}>
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>Terjadi Kesalahan</h2>
+          <p style={{ color: 'var(--text-muted)', marginBottom: '1rem', fontSize: '0.85rem' }}>{this.state.error?.message || 'Halaman mengalami error'}</p>
+          <button onClick={() => { this.setState({ hasError: false }); window.location.href = '/app'; }} style={{ padding: '0.5rem 1.5rem', backgroundColor: 'var(--primary)', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>Kembali ke Dashboard</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -37,6 +55,7 @@ const AppRoutes = () => {
         <Route path="/login" element={user ? <Navigate to="/app" replace /> : <LoginPage />} />
         <Route path="/semarak" element={<SemarakPage />} />
         <Route path="/" element={<SemarakPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
 
         <Route path="/app" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<DashboardPage />} />
@@ -62,7 +81,9 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <ErrorBoundary>
+          <AppRoutes />
+        </ErrorBoundary>
       </AuthProvider>
     </BrowserRouter>
   );

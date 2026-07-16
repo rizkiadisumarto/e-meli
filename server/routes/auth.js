@@ -1,20 +1,20 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { queryAll, queryGet, queryRun } = require('../db/database');
+const { queryAllAsync, queryGetAsync, queryRunAsync } = require('../db/database');
 const { JWT_SECRET, authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
 // POST /api/auth/login
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
       return res.status(400).json({ error: 'Username dan password harus diisi' });
     }
 
-    const user = queryGet('SELECT * FROM users WHERE username = ?', [username]);
+    const user = await queryGetAsync('SELECT * FROM users WHERE username = $1', [username]);
 
     if (!user) {
       return res.status(401).json({ error: 'Username atau password salah' });
@@ -41,21 +41,21 @@ router.post('/login', (req, res) => {
 });
 
 // POST /api/auth/register
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   try {
     const { username, password, full_name, role, phone } = req.body;
     if (!username || !password || !full_name) {
       return res.status(400).json({ error: 'Semua field harus diisi' });
     }
 
-    const existing = queryGet('SELECT id FROM users WHERE username = ?', [username]);
+    const existing = await queryGetAsync('SELECT id FROM users WHERE username = $1', [username]);
     if (existing) {
       return res.status(400).json({ error: 'Username sudah digunakan' });
     }
 
     const hashedPassword = bcrypt.hashSync(password, 10);
-    const result = queryRun(
-      'INSERT INTO users (username, password, full_name, role, phone) VALUES (?, ?, ?, ?, ?)',
+    const result = await queryRunAsync(
+      'INSERT INTO users (username, password, full_name, role, phone) VALUES ($1, $2, $3, $4, $5) RETURNING id',
       [username, hashedPassword, full_name, role || 'viewer', phone || null]
     );
 
@@ -69,9 +69,9 @@ router.post('/register', (req, res) => {
 });
 
 // GET /api/auth/me
-router.get('/me', authenticateToken, (req, res) => {
+router.get('/me', authenticateToken, async (req, res) => {
   try {
-    const user = queryGet('SELECT id, username, full_name, role, phone, created_at FROM users WHERE id = ?', [req.user.id]);
+    const user = await queryGetAsync('SELECT id, username, full_name, role, phone, created_at FROM users WHERE id = $1', [req.user.id]);
     if (!user) return res.status(404).json({ error: 'User tidak ditemukan' });
     res.json(user);
   } catch (err) {
@@ -80,21 +80,21 @@ router.get('/me', authenticateToken, (req, res) => {
 });
 
 // PUT /api/auth/change-password (any logged-in user)
-router.put('/change-password', authenticateToken, (req, res) => {
+router.put('/change-password', authenticateToken, async (req, res) => {
   try {
     const { current_password, new_password } = req.body;
     if (!current_password || !new_password) {
       return res.status(400).json({ error: 'Password lama dan baru harus diisi' });
     }
 
-    const user = queryGet('SELECT * FROM users WHERE id = ?', [req.user.id]);
+    const user = await queryGetAsync('SELECT * FROM users WHERE id = $1', [req.user.id]);
     const valid = bcrypt.compareSync(current_password, user.password);
     if (!valid) {
       return res.status(401).json({ error: 'Password lama salah' });
     }
 
     const hashed = bcrypt.hashSync(new_password, 10);
-    queryRun('UPDATE users SET password = ? WHERE id = ?', [hashed, req.user.id]);
+    await queryRunAsync('UPDATE users SET password = $1 WHERE id = $2', [hashed, req.user.id]);
     res.json({ message: 'Password berhasil diubah' });
   } catch (err) {
     res.status(500).json({ error: err.message });

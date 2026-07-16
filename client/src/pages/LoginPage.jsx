@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Lock, User, LogIn, Eye, EyeOff, X } from 'lucide-react';
+import { Lock, User, LogIn, Eye, EyeOff, X, ArrowLeft } from 'lucide-react';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -39,6 +39,29 @@ const LoginPage = () => {
       </div>
 
       <div className="glass-card login-card animate-fade-in">
+        <Link
+          to="/"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.375rem',
+            color: 'var(--text-muted)',
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            textDecoration: 'none',
+            marginBottom: '1rem',
+            padding: '0.375rem 0.75rem',
+            borderRadius: '8px',
+            transition: 'all 0.2s',
+            backgroundColor: 'rgba(255,255,255,0.05)',
+            border: '1px solid var(--border-color)'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--primary)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+        >
+          <ArrowLeft size={16} />
+          <span>Kembali ke Beranda</span>
+        </Link>
         <div className="login-header">
           <div className="brand-logo-large">
             <span style={{fontSize:'40px',lineHeight:1}}>🇮🇩</span>

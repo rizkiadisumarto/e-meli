@@ -9,6 +9,14 @@ services:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: e-meli-db
+          property: connectionString
       - key: JWT_SECRET
         generateValue: true
+
+databases:
+  - name: e-meli-db
+    plan: free
+    databaseName: emeli
+    user: emeli

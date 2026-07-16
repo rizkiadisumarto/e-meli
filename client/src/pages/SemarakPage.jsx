@@ -2,8 +2,111 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import {
-  Flag, Calendar, Heart, Volume2, Sun, Moon, X, Shield, Crown, PenLine, Users
+  Flag, Calendar, Heart, Volume2, Sun, Moon, X, Shield, Crown, PenLine, Users,
+  Home, Sparkles, Camera, Info, ChevronRight, Wallet, CreditCard, BarChart3,
+  FileText, MapPin, Phone, Mail, Clock, Gamepad2, Star, BookOpen, Coffee
 } from "lucide-react";
+import "./SemarakPage.css";
+
+// ==================== FLOATING ANIMATION COMPONENTS ====================
+function FloatingEmoji({ emoji, delay, duration, left, size }) {
+  return (
+    <div style={{
+      position: "fixed",
+      left: `${left}%`,
+      bottom: "-50px",
+      fontSize: `${size}px`,
+      animation: `floatUp ${duration}s ${delay}s infinite linear`,
+      pointerEvents: "none",
+      zIndex: 0,
+      opacity: 0.6
+    }}>{emoji}</div>
+  );
+}
+
+function ConfettiParticle({ delay, left, color }) {
+  return (
+    <div style={{
+      position: "fixed",
+      left: `${left}%`,
+      top: "-10px",
+      width: "8px",
+      height: "8px",
+      backgroundColor: color,
+      animation: `confettiFall 8s ${delay}s infinite linear`,
+      pointerEvents: "none",
+      zIndex: 0,
+      borderRadius: Math.random() > 0.5 ? "50%" : "0"
+    }} />
+  );
+}
+
+function FloatingElements({ active }) {
+  const emojis = ["🇮🇩", "🦅", "⭐", "🎉", "🎊", "🏅", "❤️", "🔥"];
+  const colors = ["#dc2626", "#d97706", "#2563eb", "#059669", "#7c3aed", "#f43f5e"];
+
+  if (!active) return (
+    <style>{`
+      @keyframes floatUp {
+        0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+        10% { opacity: 0.6; }
+        90% { opacity: 0.6; }
+        100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+      }
+      @keyframes confettiFall {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+      }
+      @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 5px rgba(220,38,38,0.3); }
+        50% { box-shadow: 0 0 20px rgba(220,38,38,0.6); }
+      }
+      @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+      @keyframes bounce-soft {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+      }
+    `}</style>
+  );
+
+  return (
+    <>
+      {emojis.map((e, i) => (
+        <FloatingEmoji key={`e-${i}`} emoji={e} delay={i * 3} duration={25 + Math.random() * 15} left={5 + i * 12} size={20 + Math.random() * 15} />
+      ))}
+      {Array.from({ length: 15 }, (_, i) => (
+        <ConfettiParticle key={`c-${i}`} delay={i * 1} left={Math.random() * 100} color={colors[i % colors.length]} />
+      ))}
+      <style>{`
+        @keyframes floatUp {
+          0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+          10% { opacity: 0.6; }
+          90% { opacity: 0.6; }
+          100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+        @keyframes confettiFall {
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+        @keyframes pulse-glow {
+          0%, 100% { box-shadow: 0 0 5px rgba(220,38,38,0.3); }
+          50% { box-shadow: 0 0 20px rgba(220,38,38,0.6); }
+        }
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        @keyframes bounce-soft {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+      `}</style>
+    </>
+  );
+}
 
 // ==================== WELCOME POPUP (sekali per sesi) ====================
 function WelcomePopup({ onClose }) {
@@ -65,7 +168,7 @@ function useDarkMode() {
 }
 
 // ==================== COUNTDOWN ====================
-function Countdown() {
+function Countdown({ animationsStarted }) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, isOver: false });
 
   useEffect(() => {
@@ -88,7 +191,10 @@ function Countdown() {
 
   return (
     <div style={{ width: "100%", maxWidth: "56rem", margin: "0 auto", padding: "1.25rem 1rem" }}>
-      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+      <motion.div
+        initial={animationsStarted ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={animationsStarted ? { duration: 0.6 } : { duration: 0 }}
         style={{ position: "relative", overflow: "hidden", borderRadius: "1rem", backgroundColor: "var(--sd-bg-card, #fff)", border: "1px solid var(--sd-border, #fee2e2)", padding: "1rem", textAlign: "center", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}>
         <div style={{ position: "absolute", top: 0, left: 0, width: "5rem", height: "5rem", backgroundColor: "rgba(239,68,68,0.05)", borderRadius: "0 0 100% 0", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: 0, right: 0, width: "5rem", height: "5rem", backgroundColor: "rgba(239,68,68,0.05)", borderRadius: "100% 0 0 0", pointerEvents: "none" }} />
@@ -108,7 +214,7 @@ function Countdown() {
             <p style={{ fontSize: "0.875rem", opacity: 0.9 }}>Hari Merdeka Telah Tiba! Sekali Merdeka, Tetap Merdeka!</p>
           </motion.div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "0.5rem", maxWidth: "28rem", margin: "0 auto" }}>
+          <div className="semarak-countdown-grid" style={{ maxWidth: "28rem", margin: "0 auto" }}>
             {blocks.map((b, i) => (
               <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                 <motion.div key={b.value} initial={{ rotateX: -90, opacity: 0 }} animate={{ rotateX: 0, opacity: 1 }} transition={{ type: "spring", stiffness: 100, damping: 10 }}
@@ -132,10 +238,13 @@ function Countdown() {
 }
 
 // ==================== TEKS PROKLAMASI ====================
-function TeksProklamasi() {
+function TeksProklamasi({ animationsStarted }) {
   return (
     <div style={{ width: "100%", maxWidth: "48rem", margin: "0 auto", padding: "0 clamp(0.75rem, 3vw, 1.25rem)" }}>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
+      <motion.div
+        initial={animationsStarted ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={animationsStarted ? { duration: 0.6, delay: 0.2 } : { duration: 0 }}
         style={{ background: "var(--sd-bg-card, #fff)", borderRadius: "clamp(0.75rem, 2vw, 1.25rem)", border: "1px solid var(--sd-border, #e5e5e5)", boxShadow: "0 20px 40px rgba(0,0,0,0.08)", overflow: "hidden" }}>
 
         <div style={{ background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)", padding: "clamp(1rem, 3vw, 1.5rem) clamp(1rem, 3vw, 2rem)", textAlign: "center", position: "relative", overflow: "hidden" }}>
@@ -232,7 +341,7 @@ function MusicPlayer({ startTrigger }) {
   };
 
   return (
-    <div style={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 50 }}>
+    <div className="semarak-music-player" style={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 50 }}>
       <audio ref={audioRef} src="/hari-merdeka.mp3" loop />
       {isExpanded && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -293,7 +402,7 @@ function HallOfFame() {
         </div>
 
         <div style={{ padding: "clamp(1rem, 3vw, 2rem)" }}>
-          <div style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: "0.75rem", overflow: "hidden", backgroundColor: "var(--sd-bg-secondary, #f5f5f5)" }}>
+          <div className="semarak-hall-image" style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: "0.75rem", overflow: "hidden", backgroundColor: "var(--sd-bg-secondary, #f5f5f5)" }}>
             <img
               src={photos[currentIndex]}
               alt={`Hall of Fame ${currentIndex + 1}`}
@@ -366,10 +475,416 @@ function HallOfFame() {
   );
 }
 
+// ==================== TAB: FITUR ====================
+function FiturTab() {
+  const features = [
+    { icon: <BarChart3 size={24} />, title: "Dashboard Real-time", desc: "Pantau kondisi keuangan komunitas secara langsung dalam satu tampilan.", color: "#dc2626" },
+    { icon: <Wallet size={24} />, title: "Kelola Transaksi", desc: "Catat pemasukan dan pengeluaran dengan mudah, lengkap bukti foto.", color: "#d97706" },
+    { icon: <Users size={24} />, title: "Data Anggota", desc: "Kelola data seluruh warga dengan informasi kontak dan status.", color: "#2563eb" },
+    { icon: <CreditCard size={24} />, title: "Iuran Bulanan", desc: "Tracking pembayaran iuran per bulan, siapa sudah bayar dan belum.", color: "#059669" },
+    { icon: <Calendar size={24} />, title: "Manajemen Event", desc: "Atur acara komunitas dari perencanaan, anggaran, hingga pelaporan.", color: "#7c3aed" },
+    { icon: <FileText size={24} />, title: "Laporan Keuangan", desc: "Generate laporan lengkap periode tertentu untuk transparansi.", color: "#0891b2" },
+  ];
+
+  return (
+    <div style={{ padding: "clamp(1rem, 3vw, 2rem) clamp(0.75rem, 3vw, 1.25rem)" }}>
+      <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+        <h2 style={{ fontSize: "clamp(1.125rem, 3vw, 1.5rem)", fontWeight: 900, color: "var(--sd-text)", margin: "0 0 0.375rem" }}>Fitur <span style={{ color: "#dc2626" }}>E-Meli</span></h2>
+        <p style={{ color: "var(--sd-text-muted)", fontSize: "0.8rem", margin: 0 }}>Sistem manajemen keuangan komunitas yang transparan dan modern</p>
+      </div>
+      <div className="semarak-feature-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "0.75rem", maxWidth: "56rem", margin: "0 auto" }}>
+        {features.map((f, i) => (
+          <motion.div key={i} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.08 }}
+            style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "0.75rem", padding: "1.25rem", transition: "all 0.2s" }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
+            <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.5rem", backgroundColor: `${f.color}12`, display: "flex", alignItems: "center", justifyContent: "center", color: f.color, marginBottom: "0.75rem" }}>{f.icon}</div>
+            <h3 style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--sd-text)", margin: "0 0 0.25rem" }}>{f.title}</h3>
+            <p style={{ fontSize: "0.7rem", color: "var(--sd-text-muted)", margin: 0, lineHeight: 1.5 }}>{f.desc}</p>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ==================== TAB: ARSIP (Hall of Fame) ====================
+function ArsipTab() {
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "center", padding: "2rem 1rem 1rem" }}>
+        <img
+          src="/logo-hut-ri80.jpg"
+          alt="Logo HUT RI Ke-80"
+          style={{ width: "clamp(160px, 30vw, 260px)", height: "auto", borderRadius: "16px", filter: "drop-shadow(0 6px 20px rgba(0,0,0,0.3))", animation: "logoSpin 3s ease-in-out infinite" }}
+        />
+      </div>
+      <style>{`
+        @keyframes logoSpin {
+          0% { transform: rotate(0deg) scale(1); }
+          25% { transform: rotate(5deg) scale(1.05); }
+          50% { transform: rotate(0deg) scale(1); }
+          75% { transform: rotate(-5deg) scale(1.05); }
+          100% { transform: rotate(0deg) scale(1); }
+        }
+      `}</style>
+      <HallOfFame />
+    </div>
+  );
+}
+
+// ==================== GAME: TAP MERDEKA ====================
+function GameTab() {
+  const [gameState, setGameState] = useState("idle"); // idle, playing, finished
+  const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [targets, setTargets] = useState([]);
+  const [bestScore, setBestScore] = useState(() => {
+    const saved = localStorage.getItem("tap_merdeka_best");
+    return saved ? parseInt(saved) : 0;
+  });
+  const [combo, setCombo] = useState(0);
+  const [lastHit, setLastHit] = useState(null);
+  const gameRef = useRef(null);
+  const targetIdRef = useRef(0);
+
+  const emojis = [
+    { emoji: "🇮🇩", points: 10, size: 40 },
+    { emoji: "🦅", points: 15, size: 35 },
+    { emoji: "⭐", points: 20, size: 30 },
+    { emoji: "🎉", points: 25, size: 32 },
+    { emoji: "🔥", points: 30, size: 28 },
+    { emoji: "💣", points: -20, size: 35 }, // bomb - lose points
+  ];
+
+  const spawnTarget = () => {
+    const rect = gameRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const type = emojis[Math.floor(Math.random() * emojis.length)];
+    const id = targetIdRef.current++;
+    const x = Math.random() * (rect.width - 60) + 10;
+    const y = Math.random() * (rect.height - 60) + 10;
+    setTargets(prev => [...prev, { id, x, y, ...type, born: Date.now() }]);
+    setTimeout(() => {
+      setTargets(prev => prev.filter(t => t.id !== id));
+    }, 1500);
+  };
+
+  const startGame = () => {
+    setGameState("playing");
+    setScore(0);
+    setTimeLeft(30);
+    setTargets([]);
+    setCombo(0);
+    targetIdRef.current = 0;
+  };
+
+  const endGame = () => {
+    setGameState("finished");
+    setTargets([]);
+    if (score > bestScore) {
+      setBestScore(score);
+      localStorage.setItem("tap_merdeka_best", score);
+    }
+  };
+
+  const hitTarget = (id, points, emoji) => {
+    if (gameState !== "playing") return;
+    setTargets(prev => prev.filter(t => t.id !== id));
+    if (points < 0) {
+      setScore(prev => Math.max(0, prev + points));
+      setCombo(0);
+      setLastHit({ emoji: "💥", points });
+    } else {
+      const newCombo = combo + 1;
+      const bonus = newCombo >= 5 ? 2 : newCombo >= 3 ? 1.5 : 1;
+      const finalPoints = Math.round(points * bonus);
+      setScore(prev => prev + finalPoints);
+      setCombo(newCombo);
+      setLastHit({ emoji: "✨", points: finalPoints });
+    }
+    setTimeout(() => setLastHit(null), 500);
+  };
+
+  // Timer
+  useEffect(() => {
+    if (gameState !== "playing") return;
+    if (timeLeft <= 0) { endGame(); return; }
+    const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    return () => clearInterval(timer);
+  }, [gameState, timeLeft]);
+
+  // Spawn targets
+  useEffect(() => {
+    if (gameState !== "playing") return;
+    const interval = setInterval(() => {
+      const count = timeLeft > 20 ? 2 : timeLeft > 10 ? 3 : 4;
+      for (let i = 0; i < count; i++) setTimeout(spawnTarget, i * 200);
+    }, 800);
+    return () => clearInterval(interval);
+  }, [gameState, timeLeft]);
+
+  return (
+    <div style={{ padding: "clamp(1rem, 3vw, 2rem) clamp(0.75rem, 3vw, 1.25rem)" }}>
+      <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+        <h2 style={{ fontSize: "clamp(1.125rem, 3vw, 1.5rem)", fontWeight: 900, color: "var(--sd-text)", margin: "0 0 0.25rem" }}>Tap <span style={{ color: "#dc2626" }}>Merdeka!</span></h2>
+        <p style={{ color: "var(--sd-text-muted)", fontSize: "0.75rem", margin: 0 }}>Tap emoji sebanyak mungkin dalam 30 detik!</p>
+      </div>
+
+      {/* Score & Timer Bar */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: "500px", margin: "0 auto 0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "0.75rem" }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: "0.6rem", color: "var(--sd-text-muted)", textTransform: "uppercase" }}>Skor</div>
+          <div style={{ fontSize: "1.25rem", fontWeight: 900, color: "#dc2626" }}>{score}</div>
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: "0.6rem", color: "var(--sd-text-muted)", textTransform: "uppercase" }}>Waktu</div>
+          <div style={{ fontSize: "1.25rem", fontWeight: 900, color: timeLeft <= 10 ? "#dc2626" : "var(--sd-text)" }}>{timeLeft}s</div>
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: "0.6rem", color: "var(--sd-text-muted)", textTransform: "uppercase" }}>Combo</div>
+          <div style={{ fontSize: "1.25rem", fontWeight: 900, color: combo >= 5 ? "#d97706" : combo >= 3 ? "#059669" : "var(--sd-text)" }}>{combo}x</div>
+        </div>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontSize: "0.6rem", color: "var(--sd-text-muted)", textTransform: "uppercase" }}>Terbaik</div>
+          <div style={{ fontSize: "1.25rem", fontWeight: 900, color: "#7c3aed" }}>{bestScore}</div>
+        </div>
+      </div>
+
+      {/* Game Area */}
+      <div ref={gameRef} className="semarak-game-area" style={{ position: "relative", width: "100%", maxWidth: "500px", height: "clamp(300px, 50vh, 450px)", margin: "0 auto", backgroundColor: "var(--sd-bg-card)", border: "2px dashed var(--sd-border)", borderRadius: "1rem", overflow: "hidden", touchAction: "none", userSelect: "none" }}>
+        {gameState === "idle" && (
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
+            <div style={{ fontSize: "4rem", animation: "bounce-soft 2s ease-in-out infinite" }}>🇮🇩</div>
+            <p style={{ fontSize: "0.85rem", color: "var(--sd-text-muted)", textAlign: "center", padding: "0 1rem" }}>Tap emoji 🇮🇩🦅⭐🎉🔥 untuk dapat skor!<br/>Hindari bom 💣!</p>
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={startGame}
+              style={{ background: "linear-gradient(135deg, #dc2626, #b91c1c)", color: "#fff", border: "none", borderRadius: "9999px", padding: "0.75rem 2rem", fontSize: "0.9rem", fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(220,38,38,0.4)" }}>
+              MULAI BERMAIN
+            </motion.button>
+          </div>
+        )}
+        {gameState === "finished" && (
+          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "0.75rem" }}>
+            <div style={{ fontSize: "3rem" }}>{score >= 200 ? "🏆" : score >= 100 ? "🎉" : "💪"}</div>
+            <h3 style={{ fontSize: "1.25rem", fontWeight: 900, color: "var(--sd-text)", margin: 0 }}>SELESAI!</h3>
+            <div style={{ fontSize: "2rem", fontWeight: 900, color: "#dc2626" }}>{score} Poin</div>
+            {score >= bestScore && score > 0 && <p style={{ fontSize: "0.75rem", color: "#d97706", fontWeight: 700, margin: 0 }}>🏆 Skor Tertinggi Baru!</p>}
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={startGame}
+              style={{ background: "linear-gradient(135deg, #dc2626, #b91c1c)", color: "#fff", border: "none", borderRadius: "9999px", padding: "0.625rem 1.5rem", fontSize: "0.85rem", fontWeight: 800, cursor: "pointer", boxShadow: "0 4px 12px rgba(220,38,38,0.4)" }}>
+              MAIN LAGI
+            </motion.button>
+          </div>
+        )}
+        {targets.map(target => (
+          <motion.div key={target.id} initial={{ scale: 0, rotate: -180 }} animate={{ scale: 1, rotate: 0 }} exit={{ scale: 0 }}
+            onClick={() => hitTarget(target.id, target.points, target.emoji)}
+            onTouchStart={(e) => { e.preventDefault(); hitTarget(target.id, target.points, target.emoji); }}
+            style={{ position: "absolute", left: target.x, top: target.y, fontSize: `${target.size}px`, cursor: "pointer", zIndex: 10, filter: target.points < 0 ? "drop-shadow(0 0 8px rgba(220,38,38,0.8))" : "drop-shadow(0 2px 4px rgba(0,0,0,0.2))", transition: "transform 0.1s" }}>
+            {target.emoji}
+          </motion.div>
+        ))}
+        {lastHit && (
+          <motion.div initial={{ opacity: 1, y: 0 }} animate={{ opacity: 0, y: -30 }} style={{ position: "absolute", left: "50%", top: "50%", transform: "translateX(-50%)", fontSize: "1.5rem", fontWeight: 900, color: lastHit.points > 0 ? "#059669" : "#dc2626", pointerEvents: "none", zIndex: 20 }}>
+            {lastHit.emoji} {lastHit.points > 0 ? "+" : ""}{lastHit.points}
+          </motion.div>
+        )}
+      </div>
+
+      {/* Legend */}
+      <div style={{ display: "flex", justifyContent: "center", flexWrap: "wrap", gap: "0.75rem", marginTop: "0.75rem", fontSize: "0.7rem", color: "var(--sd-text-muted)" }}>
+        {emojis.map((e, i) => (
+          <span key={i} style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+            <span style={{ fontSize: "1rem" }}>{e.emoji}</span>
+            <span>{e.points > 0 ? `+${e.points}` : e.points}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ==================== TAB: TIRAKATAN ====================
+function TirakatanTab() {
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  useEffect(() => {
+    const target = new Date("August 16, 2026 19:00:00").getTime();
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const diff = target - now;
+      if (diff <= 0) { setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 }); clearInterval(interval); }
+      else setTimeLeft({
+        days: Math.floor(diff / 86400000),
+        hours: Math.floor((diff % 86400000) / 3600000),
+        minutes: Math.floor((diff % 3600000) / 60000),
+        seconds: Math.floor((diff % 60000) / 1000)
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const rundown = [
+    { time: "19:00", activity: "Persiapan & Penerimaan Tamu", icon: "📋" },
+    { time: "19:30", activity: "Pembukaan & Doa Bersama", icon: "🤲" },
+    { time: "20:00", activity: "Tausiyah / Ceramah Agama", icon: "📖" },
+    { time: "20:45", activity: "Tilawah & Sholawat Bersama", icon: "🕌" },
+    { time: "21:30", activity: "Ramah Tamah & Makan Bersama", icon: "🍛" },
+    { time: "22:00", activity: "Doa Penutup & Foto Bersama", icon: "📸" },
+  ];
+
+  return (
+    <div style={{ padding: "clamp(1rem, 3vw, 2rem) clamp(0.75rem, 3vw, 1.25rem)", maxWidth: "56rem", margin: "0 auto" }}>
+      {/* Header */}
+      <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+        <div style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>🌙</div>
+        <h2 style={{ fontSize: "clamp(1.25rem, 4vw, 1.75rem)", fontWeight: 900, color: "var(--sd-text)", margin: "0 0 0.375rem" }}>Malam <span style={{ color: "#dc2626" }}>Tirakatan</span></h2>
+        <p style={{ color: "var(--sd-text-muted)", fontSize: "0.8rem", margin: 0 }}>Malam Sebelum Dirgahayu RI Ke-81</p>
+      </div>
+
+      {/* Countdown to Tirakatan */}
+      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}
+        style={{ background: "linear-gradient(135deg, #1e1b4b, #312e81, #1e1b4b)", borderRadius: "1rem", padding: "1.5rem", textAlign: "center", marginBottom: "1.5rem", color: "#fff", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "-1rem", right: "-1rem", width: "4rem", height: "4rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.05)" }} />
+        <div style={{ position: "absolute", bottom: "-1rem", left: "-1rem", width: "3rem", height: "3rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.05)" }} />
+        <div style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", padding: "0.25rem 0.75rem", borderRadius: "9999px", backgroundColor: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", fontSize: "0.65rem", fontWeight: 600, marginBottom: "1rem" }}>
+          <Moon size={12} /> 16 Agustus 2026 Malam
+        </div>
+        <p style={{ fontSize: "0.8rem", opacity: 0.8, marginBottom: "1rem" }}>Menuju Malam Tirakatan</p>
+        <div className="semarak-countdown-grid" style={{ maxWidth: "28rem", margin: "0 auto" }}>
+          {[{ val: timeLeft.days, label: "Hari" }, { val: timeLeft.hours, label: "Jam" }, { val: timeLeft.minutes, label: "Menit" }, { val: timeLeft.seconds, label: "Detik" }].map((b, i) => (
+            <div key={i}>
+              <div style={{ backgroundColor: "rgba(255,255,255,0.1)", borderRadius: "0.5rem", padding: "0.75rem 0.5rem", backdropFilter: "blur(4px)" }}>
+                <div style={{ fontSize: "clamp(1.25rem, 3vw, 1.75rem)", fontWeight: 900 }}>{String(b.val).padStart(2, "0")}</div>
+              </div>
+              <div style={{ fontSize: "0.6rem", opacity: 0.7, marginTop: "0.25rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>{b.label}</div>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Info Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1rem", marginBottom: "1.5rem" }}>
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "0.75rem", padding: "1.25rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
+            <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.5rem", backgroundColor: "#fbbf2420", display: "flex", alignItems: "center", justifyContent: "center", color: "#f59e0b" }}><Coffee size={18} /></div>
+            <div>
+              <h3 style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--sd-text)", margin: 0 }}>Waktu & Tempat</h3>
+            </div>
+          </div>
+          <div style={{ fontSize: "0.8rem", color: "var(--sd-text-muted)", lineHeight: 1.7 }}>
+            <p style={{ margin: "0 0 0.375rem" }}><strong style={{ color: "var(--sd-text)" }}>Tanggal:</strong> 16 Agustus 2026</p>
+            <p style={{ margin: "0 0 0.375rem" }}><strong style={{ color: "var(--sd-text)" }}>Waktu:</strong> 19:00 - Selesai</p>
+            <p style={{ margin: 0 }}><strong style={{ color: "var(--sd-text)" }}>Lokasi:</strong> Halaman GG. Melimewah</p>
+          </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "0.75rem", padding: "1.25rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
+            <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.5rem", backgroundColor: "#dc262620", display: "flex", alignItems: "center", justifyContent: "center", color: "#dc2626" }}><Star size={18} /></div>
+            <div>
+              <h3 style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--sd-text)", margin: 0 }}>Yang Perlu Dibawa</h3>
+            </div>
+          </div>
+          <div style={{ fontSize: "0.8rem", color: "var(--sd-text-muted)", lineHeight: 1.7 }}>
+            <p style={{ margin: "0 0 0.375rem" }}>✅ Tikar / Kursi lipat</p>
+            <p style={{ margin: "0 0 0.375rem" }}>✅ Sajadah / Mukena</p>
+            <p style={{ margin: "0 0 0.375rem" }}>✅ Air mineral / Makanan ringan</p>
+            <p style={{ margin: 0 }}>✅ Semangat kemerdekaan!</p>
+          </div>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "0.75rem", padding: "1.25rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
+            <div style={{ width: "2.25rem", height: "2.25rem", borderRadius: "0.5rem", backgroundColor: "#05966920", display: "flex", alignItems: "center", justifyContent: "center", color: "#059669" }}><BookOpen size={18} /></div>
+            <div>
+              <h3 style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--sd-text)", margin: 0 }}>Makna Tirakatan</h3>
+            </div>
+          </div>
+          <p style={{ fontSize: "0.8rem", color: "var(--sd-text-muted)", lineHeight: 1.7, margin: 0 }}>
+            Tirakatan adalah tradisi malam menjelang 17 Agustus sebagai wujud rasa syukur dan mengenang jasa para pahlawan.
+          </p>
+        </motion.div>
+      </div>
+
+      {/* Rundown Acara */}
+      <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+        style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "0.75rem", overflow: "hidden" }}>
+        <div style={{ padding: "1rem 1.25rem", borderBottom: "1px solid var(--sd-border)", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <Clock size={16} style={{ color: "#dc2626" }} />
+          <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--sd-text)", margin: 0 }}>Rundown Acara</h3>
+        </div>
+        <div style={{ padding: "0.5rem" }}>
+          {rundown.map((item, i) => (
+            <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 + i * 0.08 }}
+              className="semarak-rundown-item"
+              style={{ display: "flex", alignItems: "center", gap: "1rem", padding: "0.75rem 1rem", borderRadius: "0.5rem", marginBottom: i < rundown.length - 1 ? "0.25rem" : 0, transition: "background 0.2s" }}
+              onMouseEnter={e => e.currentTarget.style.backgroundColor = "var(--sd-bg-secondary, #f5f5f5)"}
+              onMouseLeave={e => e.currentTarget.style.backgroundColor = "transparent"}>
+              <div style={{ width: "2rem", height: "2rem", borderRadius: "50%", backgroundColor: "#dc262615", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", flexShrink: 0 }}>{item.icon}</div>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--sd-text)", margin: 0 }}>{item.activity}</p>
+              </div>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#dc2626", flexShrink: 0 }}>{item.time}</div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ==================== TAB: TENTANG ====================
+function TentangTab() {
+  return (
+    <div style={{ padding: "clamp(1rem, 3vw, 2rem) clamp(0.75rem, 3vw, 1.25rem)", maxWidth: "56rem", margin: "0 auto" }}>
+      <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+        <h2 style={{ fontSize: "clamp(1.125rem, 3vw, 1.5rem)", fontWeight: 900, color: "var(--sd-text)", margin: "0 0 0.375rem" }}>Tentang <span style={{ color: "#dc2626" }}>Kami</span></h2>
+        <p style={{ color: "var(--sd-text-muted)", fontSize: "0.8rem", margin: 0 }}>Mengenal lebih dekat GG. Melimewah</p>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
+        {/* About Card */}
+        <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "0.75rem", padding: "1.5rem", maxWidth: "56rem", margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1rem" }}>
+            <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #dc2626, #b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><Shield size={18} /></div>
+            <div>
+              <h3 style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--sd-text)", margin: 0 }}>GG. Melimewah</h3>
+              <p style={{ fontSize: "0.65rem", color: "var(--sd-text-muted)", margin: 0 }}>Komunitas Warga</p>
+            </div>
+          </div>
+          <p style={{ fontSize: "0.8rem", color: "var(--sd-text-muted)", lineHeight: 1.7, margin: 0 }}>
+            Komunitas warga GG. Melimewah yang selalu menjaga semangat kekeluargaan dan gotong royong.
+            Dengan sistem E-Meli, seluruh transaksi keuangan komunitas menjadi transparan dan dapat diakses oleh semua anggota.
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem", marginTop: "1rem" }}>
+            {["Transparan", "Gotong Royong", "Modern"].map((tag, i) => (
+              <span key={i} style={{ backgroundColor: "var(--sd-badge-bg)", border: "1px solid var(--sd-badge-border)", color: "var(--sd-badge-text)", fontSize: "0.6rem", fontWeight: 700, padding: "0.25rem 0.5rem", borderRadius: "9999px" }}>{tag}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ==================== MAIN PAGE ====================
 export default function SemarakPage() {
   const [dark, setDark] = useDarkMode();
   const [musicStarted, setMusicStarted] = useState(false);
+  const [animationsStarted, setAnimationsStarted] = useState(false);
+  const [activeTab, setActiveTab] = useState("beranda");
+
+  const tabs = [
+    { id: "beranda", label: "Home", icon: <Home size={16} /> },
+    { id: "tirakatan", label: "Tirakatan", icon: <Moon size={16} /> },
+    { id: "fitur", label: "Fitur", icon: <Sparkles size={16} /> },
+    { id: "arsip", label: "Arsip", icon: <Camera size={16} /> },
+    { id: "game", label: "Game", icon: <Gamepad2 size={16} /> },
+    { id: "tentang", label: "Tentang", icon: <Info size={16} /> },
+  ];
 
   const vars = dark ? {
     "--sd-bg": "#0a0a0a", "--sd-bg-card": "#171717", "--sd-bg-secondary": "#262626",
@@ -391,7 +906,8 @@ export default function SemarakPage() {
 
   return (
     <div style={{ ...vars, minHeight: "100vh", backgroundColor: "var(--sd-bg)", fontFamily: "ui-sans-serif, system-ui, sans-serif", display: "flex", flexDirection: "column", color: "var(--sd-text)", transition: "background-color 0.3s, color 0.3s" }}>
-      <WelcomePopup onClose={() => setMusicStarted(true)} />
+      <WelcomePopup onClose={() => { setMusicStarted(true); setAnimationsStarted(true); }} />
+      <FloatingElements active={animationsStarted} />
       {/* Festive ribbon */}
       <div style={{ width: "100%", backgroundColor: "#dc2626", color: "#fff", padding: "0.5rem 0.75rem", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.65rem", fontWeight: 700, borderBottom: "1px solid #b91c1c", userSelect: "none" }}>
         <div style={{ display: "flex", alignItems: "gap: 0.375rem", minWidth: 0, gap: "0.375rem" }}>
@@ -409,32 +925,154 @@ export default function SemarakPage() {
       </div>
 
       {/* Hero */}
-      <div style={{ position: "relative", background: "linear-gradient(to bottom right, #b91c1c, #dc2626, #d97706)", color: "#fff", padding: "clamp(2rem, 5vw, 4rem) 1rem", textAlign: "center", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: "0.75rem", left: "0.75rem", color: "#fca5a5", opacity: 0.2, pointerEvents: "none", fontSize: "clamp(2.5rem, 8vw, 4.5rem)", userSelect: "none" }}>🇮🇩</div>
-        <div style={{ position: "absolute", bottom: "0.75rem", right: "0.75rem", color: "#fca5a5", opacity: 0.2, pointerEvents: "none", fontSize: "clamp(2.5rem, 8vw, 4.5rem)", userSelect: "none" }}>🦅</div>
+      <div className="semarak-hero" style={{ position: "relative", background: "linear-gradient(-45deg, #b91c1c, #dc2626, #d97706, #b91c1c)", backgroundSize: "400% 400%", animation: animationsStarted ? "gradientShift 15s ease infinite" : "none", color: "#fff", padding: "clamp(2rem, 5vw, 4rem) 1rem", textAlign: "center", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "0.75rem", left: "0.75rem", color: "#fca5a5", opacity: 0.2, pointerEvents: "none", fontSize: "clamp(2.5rem, 8vw, 4.5rem)", userSelect: "none", animation: animationsStarted ? "bounce-soft 5s ease-in-out infinite" : "none" }}>🇮🇩</div>
+        <div style={{ position: "absolute", bottom: "0.75rem", right: "0.75rem", color: "#fca5a5", opacity: 0.2, pointerEvents: "none", fontSize: "clamp(2.5rem, 8vw, 4.5rem)", userSelect: "none", animation: animationsStarted ? "bounce-soft 5s ease-in-out infinite 1s" : "none" }}>🦅</div>
+        <div style={{ position: "absolute", top: "50%", left: "10%", width: "100px", height: "100px", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.05)", animation: animationsStarted ? "floatBubble 10s ease-in-out infinite" : "none" }} />
+        <div style={{ position: "absolute", bottom: "20%", right: "15%", width: "60px", height: "60px", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.08)", animation: animationsStarted ? "floatBubble 12s ease-in-out infinite 2s" : "none" }} />
         <div style={{ maxWidth: "48rem", margin: "0 auto", position: "relative", zIndex: 10 }}>
-          <img src="/logo-hut-ri81.jpeg" alt="Logo HUT RI Ke-81" style={{ display: "block", width: "clamp(100px, 20vw, 180px)", maxWidth: "180px", height: "auto", margin: "0 auto 1rem", borderRadius: "12px", filter: "drop-shadow(0 4px 16px rgba(0,0,0,0.35))" }} />
-          <span style={{ backgroundColor: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)", fontSize: "0.6rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", display: "inline-block", marginBottom: "0.5rem" }}>Dirgahayu Republik Indonesia</span>
-          <h2 style={{ fontSize: "clamp(1.5rem, 6vw, 3.75rem)", fontWeight: 900, letterSpacing: "-0.025em", textTransform: "uppercase", lineHeight: 1.2, marginBottom: "0.5rem" }}>Selamat Datang Warga<br />Melimewah</h2>
-          <p style={{ color: "#fecaca", fontSize: "clamp(0.7rem, 2.5vw, 1.125rem)", maxWidth: "36rem", margin: "0 auto", fontWeight: 500, lineHeight: 1.6, padding: "0 0.5rem" }}>Sambut kemerdekaan RI ke-81 dengan berkarya dan mempererat silaturahmi!</p>
-          <Link to="/login" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", backgroundColor: "#fff", color: "#b91c1c", fontWeight: 900, padding: "0.625rem 1.5rem", borderRadius: "9999px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: "0.5rem", textDecoration: "none" }}>
-            Masuk ke Dashboard E-Meli
-          </Link>
+          <motion.img
+            key={animationsStarted ? "logo-animated" : "logo-static"}
+            initial={animationsStarted ? { scale: 0, rotate: -180 } : { scale: 1, rotate: 0 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={animationsStarted ? { type: "spring", stiffness: 100, damping: 10, delay: 0.2 } : { duration: 0 }}
+            src="/logo-hut-ri81.jpeg" alt="Logo HUT RI Ke-81" style={{ display: "block", width: "clamp(100px, 20vw, 180px)", maxWidth: "180px", height: "auto", margin: "0 auto 1rem", borderRadius: "12px", filter: "drop-shadow(0 4px 16px rgba(0,0,0,0.35))" }} />
+          <motion.span
+            initial={animationsStarted ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={animationsStarted ? { delay: 0.4 } : { duration: 0 }}
+            style={{ backgroundColor: "rgba(255,255,255,0.1)", backdropFilter: "blur(12px)", color: "#fff", border: "1px solid rgba(255,255,255,0.2)", fontSize: "0.6rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", display: "inline-block", marginBottom: "0.5rem", animation: animationsStarted ? "pulse-glow 4s ease-in-out infinite" : "none" }}>Dirgahayu Republik Indonesia</motion.span>
+          <motion.h2
+            initial={animationsStarted ? { opacity: 0, y: 30 } : { opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={animationsStarted ? { delay: 0.5 } : { duration: 0 }}
+            style={{ fontSize: "clamp(1.5rem, 6vw, 3.75rem)", fontWeight: 900, letterSpacing: "-0.025em", textTransform: "uppercase", lineHeight: 1.2, marginBottom: "0.5rem" }}>Selamat Datang Warga<br />Melimewah</motion.h2>
+          <motion.p
+            initial={animationsStarted ? { opacity: 0 } : { opacity: 1 }}
+            animate={{ opacity: 1 }}
+            transition={animationsStarted ? { delay: 0.6 } : { duration: 0 }}
+            style={{ color: "#fecaca", fontSize: "clamp(0.7rem, 2.5vw, 1.125rem)", maxWidth: "36rem", margin: "0 auto", fontWeight: 500, lineHeight: 1.6, padding: "0 0.5rem" }}>Sambut kemerdekaan RI ke-81 dengan berkarya dan mempererat silaturahmi!</motion.p>
+          <motion.div
+            initial={animationsStarted ? { opacity: 0, scale: 0.8 } : { opacity: 1, scale: 1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={animationsStarted ? { delay: 0.7, type: "spring" } : { duration: 0 }}>
+            <Link to="/login" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", backgroundColor: "#fff", color: "#b91c1c", fontWeight: 900, padding: "0.625rem 1.5rem", borderRadius: "9999px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: "0.5rem", textDecoration: "none", transition: "all 0.3s" }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.05)"; e.currentTarget.style.boxShadow = "0 15px 25px rgba(0,0,0,0.2)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 10px 15px -3px rgba(0,0,0,0.1)"; }}>
+              Masuk ke Dashboard E-Meli
+            </Link>
+          </motion.div>
         </div>
+        <style>{`
+          @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+          @keyframes floatBubble {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.1); }
+          }
+        `}</style>
       </div>
+
+      {/* Running Text */}
+      <div className="semarak-marquee" style={{ backgroundColor: "#dc2626", overflow: "hidden", whiteSpace: "nowrap", padding: "0.5rem 0" }}>
+        <div style={{ display: "inline-block", animation: animationsStarted ? "marquee 30s linear infinite" : "none", color: "#fff", fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.05em" }}>
+          <span style={{ margin: "0 3rem" }}>MERDEKA!</span>
+          <span style={{ margin: "0 3rem" }}>DIRGAHAYU REPUBLIK INDONESIA KE-81</span>
+          <span style={{ margin: "0 3rem" }}>17 AGUSTUS 2026</span>
+          <span style={{ margin: "0 3rem" }}>SEKALI MERDEKA TETAP MERDEKA</span>
+          <span style={{ margin: "0 3rem" }}>BHINNEKA TUNGGAL IKA</span>
+          <span style={{ margin: "0 3rem" }}>GG. MELIMEWAH BERSATU</span>
+          <span style={{ margin: "0 3rem" }}>MERDEKA!</span>
+          <span style={{ margin: "0 3rem" }}>DIRGAHAYU REPUBLIK INDONESIA KE-81</span>
+          <span style={{ margin: "0 3rem" }}>17 AGUSTUS 2026</span>
+          <span style={{ margin: "0 3rem" }}>SEKALI MERDEKA TETAP MERDEKA</span>
+          <span style={{ margin: "0 3rem" }}>BHINNEKA TUNGGAL IKA</span>
+          <span style={{ margin: "0 3rem" }}>GG. MELIMEWAH BERSATU</span>
+        </div>
+        <style>{`
+          @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+        `}</style>
+      </div>
+
+      {/* Tab Navigation */}
+      <motion.div
+        initial={animationsStarted ? { opacity: 0, y: -20 } : { opacity: 1, y: 0 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={animationsStarted ? { delay: 0.8 } : { duration: 0 }}
+        style={{ backgroundColor: "var(--sd-bg-card)", borderBottom: "1px solid var(--sd-border)", position: "sticky", top: 0, zIndex: 40, transition: "background-color 0.3s" }}>
+        <div className="semarak-tabs">
+          {tabs.map((tab, i) => (
+            <motion.button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className="semarak-tab-btn"
+              initial={animationsStarted ? { opacity: 0, y: -10 } : { opacity: 1, y: 0 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={animationsStarted ? { delay: 0.9 + i * 0.1 } : { duration: 0 }}
+              whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+              style={{
+                backgroundColor: activeTab === tab.id ? "#dc2626" : "transparent",
+                color: activeTab === tab.id ? "#fff" : "var(--sd-text-muted)",
+                boxShadow: activeTab === tab.id ? "0 4px 12px rgba(220,38,38,0.3)" : "none"
+              }}>
+              {tab.icon}
+              <span>{tab.label}</span>
+            </motion.button>
+          ))}
+        </div>
+      </motion.div>
 
       {/* Main sections */}
       <main style={{ flex: 1, paddingBottom: "3rem" }}>
-        <Countdown />
-        <TeksProklamasi />
-        <HallOfFame />
+        {activeTab === "beranda" && (
+          <>
+            <Countdown animationsStarted={animationsStarted} />
+            <TeksProklamasi animationsStarted={animationsStarted} />
+
+            {/* Coming Soon: Hall of Fame & Susunan Panitia */}
+            <div style={{ width: "100%", maxWidth: "56rem", margin: "0 auto", padding: "1.5rem clamp(0.75rem, 3vw, 1.25rem)" }}>
+              <div className="semarak-coming-soon-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1rem" }}>
+                {/* Hall of Fame Coming Soon */}
+                <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "1rem", padding: "2rem 1.5rem", textAlign: "center", position: "relative", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "4px", background: "linear-gradient(90deg, #dc2626, #d97706, #dc2626)", backgroundSize: "200% 100%", animation: "shimmer 3s linear infinite" }} />
+                  <div style={{ fontSize: "3rem", marginBottom: "0.75rem" }}>&#127942;</div>
+                  <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--sd-text)", margin: "0 0 0.375rem" }}>Hall of Fame</h3>
+                  <p style={{ fontSize: "0.75rem", color: "var(--sd-text-muted)", margin: "0 0 1rem" }}>Momen-momen perayaan HUT RI Ke-81</p>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 1rem", borderRadius: "9999px", backgroundColor: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.2)", color: "#dc2626", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.05em" }}>
+                    <span style={{ animation: "pulse 2s infinite" }}>&#128337;</span> COMING SOON
+                  </div>
+                </div>
+
+                {/* Susunan Panitia Coming Soon */}
+                <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "1rem", padding: "2rem 1.5rem", textAlign: "center", position: "relative", overflow: "hidden" }}>
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "4px", background: "linear-gradient(90deg, #d97706, #dc2626, #d97706)", backgroundSize: "200% 100%", animation: "shimmer 3s linear infinite" }} />
+                  <div style={{ fontSize: "3rem", marginBottom: "0.75rem" }}>&#129333;</div>
+                  <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--sd-text)", margin: "0 0 0.375rem" }}>Susunan Panitia Inti</h3>
+                  <p style={{ fontSize: "0.75rem", color: "var(--sd-text-muted)", margin: "0 0 1rem" }}>Pengurus HUT RI Ke-81 Tahun 2026</p>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 1rem", borderRadius: "9999px", backgroundColor: "rgba(217,119,6,0.1)", border: "1px solid rgba(217,119,6,0.2)", color: "#d97706", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.05em" }}>
+                    <span style={{ animation: "pulse 2s infinite" }}>&#128337;</span> COMING SOON
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+        {activeTab === "tirakatan" && <TirakatanTab />}
+        {activeTab === "fitur" && <FiturTab />}
+        {activeTab === "arsip" && <ArsipTab />}
+        {activeTab === "game" && <GameTab />}
+        {activeTab === "tentang" && <TentangTab />}
       </main>
 
       {/* Music Player */}
       <MusicPlayer startTrigger={musicStarted} />
 
       {/* Footer */}
-      <footer style={{ backgroundColor: "var(--sd-bg-card)", borderTop: "1px solid var(--sd-border)", padding: "1.25rem", textAlign: "center", userSelect: "none", marginTop: "auto", transition: "background-color 0.3s" }}>
+      <footer className="semarak-footer" style={{ backgroundColor: "var(--sd-bg-card)", borderTop: "1px solid var(--sd-border)", padding: "1.25rem", textAlign: "center", userSelect: "none", marginTop: "auto", transition: "background-color 0.3s" }}>
         <div style={{ maxWidth: "72rem", margin: "0 auto", color: "var(--sd-text-muted)", fontSize: "0.65rem" }}>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "0.375rem", marginBottom: "0.5rem" }}>
             <span style={{ color: "#dc2626", fontSize: "0.875rem" }}>🇮🇩</span>

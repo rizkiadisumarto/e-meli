@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const { queryAll, queryGet, queryRun } = require('../db/database');
+const { queryAllAsync, queryGetAsync, queryRunAsync } = require('../db/database');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
@@ -26,7 +26,7 @@ const upload = multer({
 });
 
 // GET /api/transactions
-router.get('/', authenticateToken, (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
     const { type, category_id, start_date, end_date, search, limit = 50, offset = 0 } = req.query;
     
@@ -39,28 +39,30 @@ router.get('/', authenticateToken, (req, res) => {
       WHERE t.id NOT IN (SELECT transaction_id FROM event_transactions WHERE transaction_id IS NOT NULL)
     `;
     const params = [];
+    let paramIdx = 1;
 
-    if (type) { query += ' AND t.type = ?'; params.push(type); }
-    if (category_id) { query += ' AND t.category_id = ?'; params.push(category_id); }
-    if (start_date) { query += ' AND t.date >= ?'; params.push(start_date); }
-    if (end_date) { query += ' AND t.date <= ?'; params.push(end_date); }
-    if (search) { query += ' AND (t.description LIKE ? OR m.name LIKE ?)'; params.push(`%${search}%`, `%${search}%`); }
+    if (type) { query += ` AND t.type = $${paramIdx++}`; params.push(type); }
+    if (category_id) { query += ` AND t.category_id = $${paramIdx++}`; params.push(category_id); }
+    if (start_date) { query += ` AND t.date >= $${paramIdx++}`; params.push(start_date); }
+    if (end_date) { query += ` AND t.date <= $${paramIdx++}`; params.push(end_date); }
+    if (search) { query += ` AND (t.description LIKE $${paramIdx} OR m.name LIKE $${paramIdx + 1})`; params.push(`%${search}%`, `%${search}%`); paramIdx += 2; }
 
-    query += ' ORDER BY t.date DESC, t.id DESC LIMIT ? OFFSET ?';
+    query += ` ORDER BY t.date DESC, t.id DESC LIMIT $${paramIdx++} OFFSET $${paramIdx++}`;
     params.push(Number(limit), Number(offset));
 
-    const transactions = queryAll(query, params);
+    const transactions = await queryAllAsync(query, params);
     
     // Get total count
     let countQuery = `SELECT COUNT(*) as total FROM transactions t LEFT JOIN members m ON t.member_id = m.id WHERE t.id NOT IN (SELECT transaction_id FROM event_transactions WHERE transaction_id IS NOT NULL)`;
     const countParams = [];
-    if (type) { countQuery += ' AND t.type = ?'; countParams.push(type); }
-    if (category_id) { countQuery += ' AND t.category_id = ?'; countParams.push(category_id); }
-    if (start_date) { countQuery += ' AND t.date >= ?'; countParams.push(start_date); }
-    if (end_date) { countQuery += ' AND t.date <= ?'; countParams.push(end_date); }
-    if (search) { countQuery += ' AND (t.description LIKE ? OR m.name LIKE ?)'; countParams.push(`%${search}%`, `%${search}%`); }
+    let cParamIdx = 1;
+    if (type) { countQuery += ` AND t.type = $${cParamIdx++}`; countParams.push(type); }
+    if (category_id) { countQuery += ` AND t.category_id = $${cParamIdx++}`; countParams.push(category_id); }
+    if (start_date) { countQuery += ` AND t.date >= $${cParamIdx++}`; countParams.push(start_date); }
+    if (end_date) { countQuery += ` AND t.date <= $${cParamIdx++}`; countParams.push(end_date); }
+    if (search) { countQuery += ` AND (t.description LIKE $${cParamIdx} OR m.name LIKE $${cParamIdx + 1})`; countParams.push(`%${search}%`, `%${search}%`); }
     
-    const countResult = queryGet(countQuery, countParams);
+    const countResult = await queryGetAsync(countQuery, countParams);
 
     res.json({ transactions, total: countResult ? countResult.total : 0 });
   } catch (err) {
@@ -69,14 +71,14 @@ router.get('/', authenticateToken, (req, res) => {
 });
 
 // GET /api/transactions/:id
-router.get('/:id', authenticateToken, (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
   try {
-    const transaction = queryGet(`
+    const transaction = await queryGetAsync(`
       SELECT t.*, c.name as category_name, m.name as member_name
       FROM transactions t
       LEFT JOIN categories c ON t.category_id = c.id
       LEFT JOIN members m ON t.member_id = m.id
-      WHERE t.id = ?
+      WHERE t.id = $1
     `, [req.params.id]);
     
     if (!transaction) return res.status(404).json({ error: 'Transaksi tidak ditemukan' });
@@ -87,7 +89,7 @@ router.get('/:id', authenticateToken, (req, res) => {
 });
 
 // POST /api/transactions
-router.post('/', authenticateToken, requireAdmin, upload.single('proof_image'), (req, res) => {
+router.post('/', authenticateToken, requireAdmin, upload.single('proof_image'), async (req, res) => {
   try {
     const { type, category_id, amount, description, date, member_id } = req.body;
     const proof_image = req.file ? `/uploads/${req.file.filename}` : null;
@@ -95,12 +97,12 @@ router.post('/', authenticateToken, requireAdmin, upload.single('proof_image'), 
       return res.status(400).json({ error: 'Type, amount, dan date harus diisi' });
     }
 
-    const result = queryRun(
-      'INSERT INTO transactions (type, category_id, amount, description, date, member_id, created_by, proof_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    const result = await queryRunAsync(
+      'INSERT INTO transactions (type, category_id, amount, description, date, member_id, created_by, proof_image) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
       [type, category_id || null, amount, description || '', date, member_id || null, req.user.id, proof_image]
     );
 
-    const transaction = queryGet('SELECT * FROM transactions WHERE id = ?', [result.lastInsertRowid]);
+    const transaction = await queryGetAsync('SELECT * FROM transactions WHERE id = $1', [result.lastInsertRowid]);
     res.status(201).json(transaction);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -108,16 +110,16 @@ router.post('/', authenticateToken, requireAdmin, upload.single('proof_image'), 
 });
 
 // PUT /api/transactions/:id
-router.put('/:id', authenticateToken, requireAdmin, (req, res) => {
+router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const { type, category_id, amount, description, date, member_id } = req.body;
     
-    queryRun(
-      'UPDATE transactions SET type=?, category_id=?, amount=?, description=?, date=?, member_id=? WHERE id=?',
+    await queryRunAsync(
+      'UPDATE transactions SET type=$1, category_id=$2, amount=$3, description=$4, date=$5, member_id=$6 WHERE id=$7',
       [type, category_id || null, amount, description || '', date, member_id || null, req.params.id]
     );
 
-    const transaction = queryGet('SELECT * FROM transactions WHERE id = ?', [req.params.id]);
+    const transaction = await queryGetAsync('SELECT * FROM transactions WHERE id = $1', [req.params.id]);
     res.json(transaction);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -125,9 +127,9 @@ router.put('/:id', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // DELETE /api/transactions/:id
-router.delete('/:id', authenticateToken, requireAdmin, (req, res) => {
+router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    queryRun('DELETE FROM transactions WHERE id = ?', [req.params.id]);
+    await queryRunAsync('DELETE FROM transactions WHERE id = $1', [req.params.id]);
     res.json({ message: 'Transaksi berhasil dihapus' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -135,9 +137,9 @@ router.delete('/:id', authenticateToken, requireAdmin, (req, res) => {
 });
 
 // GET /api/transactions/categories/all
-router.get('/categories/all', authenticateToken, (req, res) => {
+router.get('/categories/all', authenticateToken, async (req, res) => {
   try {
-    const categories = queryAll('SELECT * FROM categories ORDER BY type, name');
+    const categories = await queryAllAsync('SELECT * FROM categories ORDER BY type, name');
     res.json(categories);
   } catch (err) {
     res.status(500).json({ error: err.message });

@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Search, User, X, Lock, Sun, Moon, Eye, EyeOff } from 'lucide-react';
+import { Search, User, X, Lock, Sun, Moon, Eye, EyeOff, LogOut } from 'lucide-react';
 import './Header.css';
 
 const Header = ({ title = "Dashboard" }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [pwForm, setPwForm] = useState({ current_password: '', new_password: '', confirm_password: '' });
@@ -117,6 +117,20 @@ const Header = ({ title = "Dashboard" }) => {
                 onMouseLeave={e => e.currentTarget.style.background='transparent'}
               >
                 <Lock size={16} /> Ganti Password
+              </button>
+              <div style={{ height:'1px', background:'var(--border-color)', margin:'0.25rem 0' }} />
+              <button
+                onClick={() => { if (window.confirm('Apakah anda yakin ingin keluar?')) { logout(); } }}
+                style={{
+                  display:'flex', alignItems:'center', gap:'0.75rem', width:'100%',
+                  padding:'0.6rem 0.75rem', border:'none', background:'transparent',
+                  color:'var(--danger, #dc2626)', cursor:'pointer', borderRadius:'8px',
+                  fontSize:'0.875rem', fontFamily:'inherit', textAlign:'left'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background='var(--danger-light, #fee2e2)'}
+                onMouseLeave={e => e.currentTarget.style.background='transparent'}
+              >
+                <LogOut size={16} /> Keluar
               </button>
             </div>
           )}
