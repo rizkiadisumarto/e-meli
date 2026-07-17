@@ -28,9 +28,6 @@ app.use('/api/events', eventRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/settings', settingsRoutes);
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 // Serve static files from client build (production)
 app.use(express.static(path.join(__dirname, '../client/dist')));
 app.get('*', (req, res) => {

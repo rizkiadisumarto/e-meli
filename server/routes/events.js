@@ -1,29 +1,25 @@
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
 const { queryAllAsync, queryGetAsync, queryRunAsync } = require('../db/database');
 const { authenticateToken, requireAdminOrCommittee } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Multer config for proof image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `proof-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-  }
-});
+// Multer config — memoryStorage so images go to DB as base64 (no disk dependency)
 const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = /jpeg|jpg|png|webp/;
-    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
+    const ext = allowed.test(file.originalname.split('.').pop().toLowerCase());
     const mime = allowed.test(file.mimetype);
     cb(null, ext && mime);
   }
 });
+
+function bufferToDataUrl(buffer, mimetype) {
+  return `data:${mimetype};base64,${buffer.toString('base64')}`;
+}
 
 // ==================== EVENT CRUD ====================
 
@@ -448,7 +444,7 @@ router.get('/:id/transactions', authenticateToken, async (req, res) => {
 router.post('/:id/transactions', authenticateToken, requireAdminOrCommittee, upload.single('proof_image'), async (req, res) => {
   try {
     const { type, category_id, amount, description, date, member_id } = req.body;
-    const proof_image = req.file ? `/uploads/${req.file.filename}` : null;
+    const proof_image = req.file ? bufferToDataUrl(req.file.buffer, req.file.mimetype) : null;
 
     // Create the transaction
     const txResult = await queryRunAsync(
