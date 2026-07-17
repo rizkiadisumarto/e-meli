@@ -179,16 +179,16 @@ const EventsPage = () => {
           <h2>Kegiatan / Event</h2>
           <p className="text-muted text-sm mt-1">Kelola acara dan kegiatan komunitas</p>
         </div>
-        {isAdminOrCommittee && (
-          <div className="flex gap-2">
-            <button className="btn btn-outline" onClick={handleExport}>
-              <FileSpreadsheet size={18} /> Export Excel
-            </button>
+        <div className="flex gap-2">
+          <button className="btn btn-outline" onClick={handleExport}>
+            <FileSpreadsheet size={18} /> Export Excel
+          </button>
+          {isAdminOrCommittee && (
             <button className="btn btn-primary shadow-glow" onClick={openCreateModal}>
               <Plus size={18} /> Buat Event Baru
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-6">
