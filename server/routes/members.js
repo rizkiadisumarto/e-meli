@@ -80,6 +80,44 @@ router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
   }
 });
 
+// POST /api/members/import - Import members from Excel/JSON
+router.post('/import', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { members } = req.body;
+    if (!members || !Array.isArray(members)) {
+      return res.status(400).json({ error: 'Data anggota tidak valid' });
+    }
+
+    let imported = 0;
+    let skipped = 0;
+    for (const m of members) {
+      try {
+        const name = m.Nama || m.name || '';
+        if (!name.trim()) { skipped++; continue; }
+
+        const address = m.Alamat || m.address || '';
+        const phone = m.Telepon || m.phone || '';
+        const status = (m.Status || m.status || 'active').toLowerCase().trim();
+
+        // Check if member already exists
+        const existing = await queryGetAsync('SELECT id FROM members WHERE name = $1', [name.trim()]);
+        if (existing) { skipped++; continue; }
+
+        await queryRunAsync(
+          'INSERT INTO members (name, address, phone, status) VALUES ($1, $2, $3, $4)',
+          [name.trim(), address, phone, status === 'inactive' ? 'inactive' : 'active']
+        );
+        imported++;
+      } catch (e) {
+        skipped++;
+      }
+    }
+    res.json({ message: `Import selesai: ${imported} anggota berhasil, ${skipped} dilewati`, imported, skipped });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // DELETE /api/members/:id
 router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {

@@ -32,6 +32,7 @@ import EventDetailPage from './pages/EventDetailPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
 import UsersPage from './pages/UsersPage';
+import ImportPage from './pages/ImportPage';
 import SemarakPage from './pages/SemarakPage';
 
 const ProtectedRoute = ({ children, requireAdmin }) => {
@@ -66,6 +67,11 @@ const AppRoutes = () => {
           <Route path="events/:id" element={<EventDetailPage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="users" element={<UsersPage />} />
+          <Route path="import" element={
+            <ProtectedRoute requireAdmin={true}>
+              <ImportPage />
+            </ProtectedRoute>
+          } />
           <Route path="settings" element={
             <ProtectedRoute requireAdmin={true}>
               <SettingsPage />

@@ -4,6 +4,12 @@ const fs = require('fs');
 let db = null;
 let isPostgres = false;
 
+// Convert PostgreSQL $1,$2 placeholders to ? for SQLite
+function toSQLite(sql) {
+  let i = 0;
+  return sql.replace(/\$\d+/g, () => '?');
+}
+
 async function initializeDb() {
   if (db) return db;
 
@@ -64,7 +70,7 @@ function queryAll(sql, params = []) {
   if (isPostgres) {
     return db.query(sql, params).then(res => res.rows);
   }
-  const stmt = db.prepare(sql);
+  const stmt = db.prepare(toSQLite(sql));
   return stmt.all(...params);
 }
 
@@ -72,7 +78,7 @@ function queryGet(sql, params = []) {
   if (isPostgres) {
     return db.query(sql, params).then(res => res.rows[0] || null);
   }
-  const stmt = db.prepare(sql);
+  const stmt = db.prepare(toSQLite(sql));
   return stmt.get(...params) || null;
 }
 
@@ -83,7 +89,7 @@ function queryRun(sql, params = []) {
       changes: res.rowCount
     }));
   }
-  const stmt = db.prepare(sql);
+  const stmt = db.prepare(toSQLite(sql));
   const result = stmt.run(...params);
   return { lastInsertRowid: result.lastInsertRowid, changes: result.changes };
 }
@@ -94,7 +100,7 @@ async function queryAllAsync(sql, params = []) {
     const res = await db.query(sql, params);
     return res.rows;
   }
-  const stmt = db.prepare(sql);
+  const stmt = db.prepare(toSQLite(sql));
   return stmt.all(...params);
 }
 
@@ -103,7 +109,7 @@ async function queryGetAsync(sql, params = []) {
     const res = await db.query(sql, params);
     return res.rows[0] || null;
   }
-  const stmt = db.prepare(sql);
+  const stmt = db.prepare(toSQLite(sql));
   return stmt.get(...params) || null;
 }
 
@@ -115,7 +121,7 @@ async function queryRunAsync(sql, params = []) {
       changes: res.rowCount
     };
   }
-  const stmt = db.prepare(sql);
+  const stmt = db.prepare(toSQLite(sql));
   const result = stmt.run(...params);
   return { lastInsertRowid: result.lastInsertRowid, changes: result.changes };
 }

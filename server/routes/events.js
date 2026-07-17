@@ -140,6 +140,51 @@ router.put('/:id', authenticateToken, requireAdminOrCommittee, async (req, res) 
   }
 });
 
+// POST /api/events/import - Import events from Excel/JSON
+router.post('/import', authenticateToken, requireAdminOrCommittee, async (req, res) => {
+  try {
+    const { events } = req.body;
+    if (!events || !Array.isArray(events)) {
+      return res.status(400).json({ error: 'Data kegiatan tidak valid' });
+    }
+
+    let imported = 0;
+    let skipped = 0;
+    for (const ev of events) {
+      try {
+        const name = ev.Nama || ev.name || '';
+        if (!name.trim()) { skipped++; continue; }
+
+        const startDate = ev['Tanggal Mulai'] || ev.start_date || '';
+        if (!startDate) { skipped++; continue; }
+
+        const description = ev.Deskripsi || ev.description || '';
+        const locationName = ev.Lokasi || ev.location_name || '';
+        const locationAddress = ev['Alamat Lokasi'] || ev.location_address || '';
+        const endDate = ev['Tanggal Selesai'] || ev.end_date || null;
+        const status = (ev.Status || ev.status || 'draft').toLowerCase().trim();
+        const targetPerPerson = parseFloat(String(ev['Target Per Orang'] || ev.target_per_person || '0').replace(/[^\d.-]/g, '')) || 0;
+        const notes = ev.Catatan || ev.notes || '';
+
+        // Check if event already exists by name + start_date
+        const existing = await queryGetAsync('SELECT id FROM events WHERE name = $1 AND start_date = $2', [name.trim(), startDate]);
+        if (existing) { skipped++; continue; }
+
+        await queryRunAsync(
+          'INSERT INTO events (name, description, location_name, location_address, start_date, end_date, status, target_per_person, notes, created_by) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
+          [name.trim(), description, locationName, locationAddress, startDate, endDate, ['draft','active','completed','cancelled'].includes(status) ? status : 'draft', targetPerPerson, notes, req.user.id]
+        );
+        imported++;
+      } catch (e) {
+        skipped++;
+      }
+    }
+    res.json({ message: `Import selesai: ${imported} kegiatan berhasil, ${skipped} dilewati`, imported, skipped });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // DELETE /api/events/:id
 router.delete('/:id', authenticateToken, requireAdminOrCommittee, async (req, res) => {
   try {

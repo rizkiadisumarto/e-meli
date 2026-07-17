@@ -9,7 +9,8 @@ import {
   Calendar,
   BarChart3,
   Settings,
-  UserCheck
+  UserCheck,
+  Upload
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -33,6 +34,7 @@ const Sidebar = ({ open, onClose }) => {
   ];
 
   if (isAdmin) {
+    navItems.push({ name: 'Import Data', path: '/app/import', icon: <Upload size={20} /> });
     navItems.push({ name: 'Pengaturan', path: '/app/settings', icon: <Settings size={20} /> });
   }
 

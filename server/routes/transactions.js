@@ -110,14 +110,22 @@ router.post('/', authenticateToken, requireAdmin, upload.single('proof_image'), 
 });
 
 // PUT /api/transactions/:id
-router.put('/:id', authenticateToken, requireAdmin, async (req, res) => {
+router.put('/:id', authenticateToken, requireAdmin, upload.single('proof_image'), async (req, res) => {
   try {
     const { type, category_id, amount, description, date, member_id } = req.body;
-    
-    await queryRunAsync(
-      'UPDATE transactions SET type=$1, category_id=$2, amount=$3, description=$4, date=$5, member_id=$6 WHERE id=$7',
-      [type, category_id || null, amount, description || '', date, member_id || null, req.params.id]
-    );
+    const proof_image = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+    if (proof_image !== undefined) {
+      await queryRunAsync(
+        'UPDATE transactions SET type=$1, category_id=$2, amount=$3, description=$4, date=$5, member_id=$6, proof_image=$7 WHERE id=$8',
+        [type, category_id || null, amount, description || '', date, member_id || null, proof_image, req.params.id]
+      );
+    } else {
+      await queryRunAsync(
+        'UPDATE transactions SET type=$1, category_id=$2, amount=$3, description=$4, date=$5, member_id=$6 WHERE id=$7',
+        [type, category_id || null, amount, description || '', date, member_id || null, req.params.id]
+      );
+    }
 
     const transaction = await queryGetAsync('SELECT * FROM transactions WHERE id = $1', [req.params.id]);
     res.json(transaction);
@@ -131,6 +139,58 @@ router.delete('/:id', authenticateToken, requireAdmin, async (req, res) => {
   try {
     await queryRunAsync('DELETE FROM transactions WHERE id = $1', [req.params.id]);
     res.json({ message: 'Transaksi berhasil dihapus' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/transactions/import - Import transactions from Excel/JSON
+router.post('/import', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const { transactions } = req.body;
+    if (!transactions || !Array.isArray(transactions)) {
+      return res.status(400).json({ error: 'Data transaksi tidak valid' });
+    }
+
+    let imported = 0;
+    let skipped = 0;
+    for (const tx of transactions) {
+      try {
+        const type = (tx.Tipe || tx.type || '').toLowerCase().trim();
+        if (type !== 'income' && type !== 'expense') { skipped++; continue; }
+
+        const amount = parseFloat(String(tx.Nominal || tx.amount || '0').replace(/[^\d.-]/g, ''));
+        if (!amount || amount <= 0) { skipped++; continue; }
+
+        const date = tx.Tanggal || tx.date || new Date().toISOString().split('T')[0];
+        const description = tx.Keterangan || tx.description || '';
+
+        // Try to match category by name
+        let categoryId = null;
+        const catName = tx.Kategori || tx.category_name || '';
+        if (catName) {
+          const cat = await queryGetAsync('SELECT id FROM categories WHERE name = $1', [catName]);
+          if (cat) categoryId = cat.id;
+        }
+
+        // Try to match member by name
+        let memberId = null;
+        const memberName = tx['Dari / Kepada'] || tx.member_name || '';
+        if (memberName) {
+          const member = await queryGetAsync('SELECT id FROM members WHERE name = $1', [memberName]);
+          if (member) memberId = member.id;
+        }
+
+        await queryRunAsync(
+          'INSERT INTO transactions (type, category_id, amount, description, date, member_id, created_by) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+          [type, categoryId, amount, description, date, memberId || null, req.user.id]
+        );
+        imported++;
+      } catch (e) {
+        skipped++;
+      }
+    }
+    res.json({ message: `Import selesai: ${imported} transaksi berhasil, ${skipped} dilewati`, imported, skipped });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

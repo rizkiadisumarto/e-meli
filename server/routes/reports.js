@@ -43,11 +43,11 @@ router.get('/monthly', authenticateToken, async (req, res) => {
 
     const monthly = await queryAllAsync(`
       SELECT
-        EXTRACT(MONTH FROM date)::INTEGER as month,
+        CAST(strftime('%m', date) AS INTEGER) as month,
         type,
         SUM(amount) as total
       FROM transactions
-      WHERE EXTRACT(YEAR FROM date) = $1
+      WHERE CAST(strftime('%Y', date) AS INTEGER) = $1
         AND id NOT IN (SELECT transaction_id FROM event_transactions WHERE transaction_id IS NOT NULL)
       GROUP BY month, type
       ORDER BY month
