@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Plus, Calendar, MapPin, Users, TrendingUp, CheckCircle, Clock, X, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Calendar, MapPin, Users, TrendingUp, CheckCircle, Clock, X, Edit2, Trash2, FileSpreadsheet } from 'lucide-react';
 import { formatNumberInput, parseNumberInput } from '../utils/format';
+import { exportToExcel } from '../utils/exportExcel';
 import MapPicker from '../components/UI/MapPicker';
 import './EventsPage.css';
 
@@ -141,6 +142,26 @@ const EventsPage = () => {
     }).format(amount);
   };
 
+  const handleExport = () => {
+    const data = events.map(ev => ({
+      'Nama': ev.name,
+      'Tanggal Mulai': ev.start_date,
+      'Tanggal Selesai': ev.end_date || '',
+      'Lokasi': ev.location_name || '',
+      'Alamat': ev.location_address || '',
+      'Status': ev.status,
+      'Target Per Orang': ev.target_per_person,
+      'Peserta': ev.participant_count,
+      'Hadir': ev.present_count,
+      'Pemasukan': ev.total_income,
+      'Pengeluaran': ev.total_expense,
+      'Saldo': ev.balance,
+      'Deskripsi': ev.description || '',
+      'Catatan': ev.notes || ''
+    }));
+    exportToExcel(data, 'Data Kegiatan', 'Kegiatan');
+  };
+
   const StatusBadge = ({ status }) => {
     switch(status) {
       case 'completed': return <span className="badge badge-success"><CheckCircle size={12} className="mr-1" /> Selesai</span>;
@@ -159,9 +180,14 @@ const EventsPage = () => {
           <p className="text-muted text-sm mt-1">Kelola acara dan kegiatan komunitas</p>
         </div>
         {isAdminOrCommittee && (
-          <button className="btn btn-primary shadow-glow" onClick={openCreateModal}>
-            <Plus size={18} /> Buat Event Baru
-          </button>
+          <div className="flex gap-2">
+            <button className="btn btn-outline" onClick={handleExport}>
+              <FileSpreadsheet size={18} /> Export Excel
+            </button>
+            <button className="btn btn-primary shadow-glow" onClick={openCreateModal}>
+              <Plus size={18} /> Buat Event Baru
+            </button>
+          </div>
         )}
       </div>
 
