@@ -132,8 +132,11 @@ function WelcomePopup({ onClose }) {
         <h2 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--sd-text, #262626)", marginBottom: "0.375rem", lineHeight: 1.4 }}>
           Negeri Indonesia bak Surgawi
         </h2>
-        <p style={{ fontSize: "0.875rem", color: "#dc2626", fontWeight: 600, marginBottom: "1rem" }}>
+        <p style={{ fontSize: "0.875rem", color: "#dc2626", fontWeight: 600, marginBottom: "0.75rem" }}>
           Gemah Ripah Loh Jinawi
+        </p>
+        <p style={{ fontSize: "0.75rem", color: "var(--sd-text-muted, #737373)", lineHeight: 1.6, marginBottom: "1rem", fontStyle: "italic" }}>
+          "Alhamdulillahi rabbil 'alamin. Tiada kata yang paling pantas untuk diucapkan selain puji dan syukur ke hadirat Allah SWT, karena atas izin dan kasih sayang-Nya, langkah perjuangan kita membuahkan hasil manis yang membanggakan."
         </p>
         <button onClick={handleClose} style={{ background: "#dc2626", color: "#fff", border: "none", borderRadius: "0.5rem", padding: "0.5rem 2rem", fontSize: "0.875rem", fontWeight: 600, cursor: "pointer" }}>
           MERDEKA!
