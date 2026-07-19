@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Users, Shield, Eye, UserCheck } from 'lucide-react';
+import { Users, Shield, Eye, UserCheck, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import './UsersPage.css';
 
 const UsersPage = () => {
@@ -25,6 +26,28 @@ const UsersPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const exportToExcel = () => {
+    const data = users.map((u, i) => ({
+      'No': i + 1,
+      'Nama Lengkap': u.full_name || '-',
+      'Username': u.username || '-',
+      'No. HP': u.phone || '-',
+      'Role': u.role === 'admin' ? 'Administrator' : u.role === 'committee' ? 'Committee' : 'User'
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Daftar Pengguna');
+
+    // Auto-width columns
+    const colWidths = Object.keys(data[0] || {}).map(key => ({
+      wch: Math.max(key.length + 2, ...data.map(row => String(row[key] || '').length + 2))
+    }));
+    ws['!cols'] = colWidths;
+
+    XLSX.writeFile(wb, `Daftar-Pengguna-${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
   const getRoleInfo = (role) => {
@@ -53,6 +76,28 @@ const UsersPage = () => {
           <h2>Daftar Pengguna</h2>
           <p className="text-muted text-sm mt-1">Lihat siapa saja yang menjadi admin, committee, dan user</p>
         </div>
+        <button
+          onClick={exportToExcel}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.5rem 1rem',
+            backgroundColor: '#059669',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '0.5rem',
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'opacity 0.2s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+        >
+          <Download size={16} />
+          Export Excel
+        </button>
       </div>
 
       {/* Summary Cards */}

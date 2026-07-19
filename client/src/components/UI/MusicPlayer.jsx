@@ -1,81 +1,17 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { useMusic } from '../../context/MusicContext';
 
 const MusicPlayer = () => {
-  const audioRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const { isPlaying, isMuted, playbackRate, togglePlay, toggleMute, changeSpeed } = useMusic();
   const [showTooltip, setShowTooltip] = useState(false);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    // Play muted first (browsers allow this), then unmute after 1 second
-    audio.volume = 0.3;
-    audio.muted = true;
-    audio.play().then(() => {
-      setIsPlaying(true);
-      setTimeout(() => {
-        audio.muted = false;
-        setIsMuted(false);
-      }, 1000);
-    }).catch(() => {
-      // If blocked, try on first user interaction
-      const unlock = () => {
-        audio.volume = 0.3;
-        audio.muted = true;
-        audio.play().then(() => {
-          setIsPlaying(true);
-          setTimeout(() => {
-            audio.muted = false;
-            setIsMuted(false);
-          }, 1000);
-        }).catch(() => {});
-        document.removeEventListener('click', unlock);
-      };
-      document.addEventListener('click', unlock, { once: true });
-    });
-
-    const handleEnded = () => {
-      audio.currentTime = 0;
-      audio.play().catch(() => {});
-    };
-    audio.addEventListener('ended', handleEnded);
-    return () => audio.removeEventListener('ended', handleEnded);
-  }, []);
-
-  const togglePlay = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    try {
-      if (isPlaying) {
-        audio.pause();
-        setIsPlaying(false);
-      } else {
-        audio.volume = 0.3;
-        audio.muted = false;
-        await audio.play();
-        setIsPlaying(true);
-        setIsMuted(false);
-      }
-    } catch (err) {
-      console.error('Audio play error:', err);
-    }
-  };
-
-  const toggleMute = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.muted = !audio.muted;
-    setIsMuted(!isMuted);
-  };
+  const [showSpeed, setShowSpeed] = useState(false);
 
   return (
     <div
       className="music-player"
       onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
+      onMouseLeave={() => { setShowTooltip(false); setShowSpeed(false); }}
       style={{
         position: 'fixed',
         bottom: '1.5rem',
@@ -86,21 +22,40 @@ const MusicPlayer = () => {
         gap: '0.5rem'
       }}
     >
-      <audio ref={audioRef} src="/indonesia-raya.ogg" preload="auto" loop />
-
       {showTooltip && (
         <div style={{
-          background: 'var(--bg-card)',
-          border: '1px solid var(--border-color)',
+          background: 'var(--bg-card, #fff)',
+          border: '1px solid var(--border-color, #e5e5e5)',
           borderRadius: '8px',
           padding: '0.5rem 0.75rem',
           fontSize: '0.75rem',
-          color: 'var(--text-muted)',
+          color: 'var(--text-muted, #737373)',
           whiteSpace: 'nowrap',
-          boxShadow: 'var(--shadow-lg)',
+          boxShadow: 'var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1))',
           animation: 'fade-in 0.2s ease'
         }}>
-          Indonesia Raya
+          Hari Merdeka
+        </div>
+      )}
+
+      {showSpeed && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.25rem',
+          background: 'var(--glass-bg, rgba(255,255,255,0.9))',
+          backdropFilter: 'blur(12px)',
+          border: '1px solid var(--glass-border, #e5e5e5)',
+          borderRadius: '8px',
+          padding: '0.375rem 0.5rem',
+          boxShadow: 'var(--shadow-md)'
+        }}>
+          {[0.5, 1, 1.5, 2].map(rate => (
+            <button key={rate} onClick={() => changeSpeed(rate)}
+              style={{ fontSize: '0.6rem', padding: '0.15rem 0.375rem', borderRadius: '0.25rem', border: 'none', cursor: 'pointer', fontWeight: 600, backgroundColor: playbackRate === rate ? '#dc2626' : 'transparent', color: playbackRate === rate ? '#fff' : 'var(--text-muted, #737373)' }}>
+              {rate}x
+            </button>
+          ))}
         </div>
       )}
 
@@ -108,21 +63,21 @@ const MusicPlayer = () => {
         display: 'flex',
         alignItems: 'center',
         gap: '0.25rem',
-        background: 'var(--glass-bg)',
+        background: 'var(--glass-bg, rgba(255,255,255,0.9))',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        border: '1px solid var(--glass-border)',
+        border: '1px solid var(--glass-border, #e5e5e5)',
         borderRadius: '9999px',
         padding: '0.4rem 0.5rem',
         boxShadow: 'var(--shadow-md)'
       }}>
         <button
           onClick={togglePlay}
-          title={isPlaying ? 'Pause' : 'Play Indonesia Raya'}
+          title={isPlaying ? 'Pause' : 'Play Hari Merdeka'}
           style={{
-            background: isPlaying ? 'var(--primary)' : 'transparent',
+            background: isPlaying ? '#dc2626' : 'transparent',
             border: 'none',
-            color: isPlaying ? '#fff' : 'var(--primary)',
+            color: isPlaying ? '#fff' : '#dc2626',
             cursor: 'pointer',
             borderRadius: '50%',
             width: '32px',
@@ -142,7 +97,7 @@ const MusicPlayer = () => {
           style={{
             background: 'transparent',
             border: 'none',
-            color: 'var(--text-muted)',
+            color: 'var(--text-muted, #737373)',
             cursor: 'pointer',
             borderRadius: '50%',
             width: '28px',
@@ -154,6 +109,28 @@ const MusicPlayer = () => {
           }}
         >
           {isMuted ? <VolumeX size={14} /> : <Volume2 size={14} />}
+        </button>
+
+        <button
+          onClick={() => setShowSpeed(!showSpeed)}
+          title="Playback Speed"
+          style={{
+            background: showSpeed ? '#dc2626' : 'transparent',
+            border: 'none',
+            color: showSpeed ? '#fff' : 'var(--text-muted, #737373)',
+            cursor: 'pointer',
+            borderRadius: '50%',
+            width: '28px',
+            height: '28px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '0.6rem',
+            fontWeight: 700,
+            transition: 'all 0.2s ease'
+          }}
+        >
+          {playbackRate}x
         </button>
       </div>
     </div>

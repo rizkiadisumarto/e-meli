@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { MusicProvider } from './context/MusicContext';
 import Layout from './components/Layout/Layout';
 import { useState, useEffect, Component } from 'react';
 
@@ -87,9 +88,11 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ErrorBoundary>
-          <AppRoutes />
-        </ErrorBoundary>
+        <MusicProvider>
+          <ErrorBoundary>
+            <AppRoutes />
+          </ErrorBoundary>
+        </MusicProvider>
       </AuthProvider>
     </BrowserRouter>
   );

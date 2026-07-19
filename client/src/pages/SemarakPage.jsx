@@ -7,6 +7,7 @@ import {
   FileText, MapPin, Phone, Mail, Clock, Gamepad2, Star, BookOpen, Coffee,
   Download, FileDown, Trophy
 } from "lucide-react";
+import { useMusic } from "../context/MusicContext";
 import "./SemarakPage.css";
 
 // ==================== FLOATING ANIMATION COMPONENTS ====================
@@ -311,47 +312,18 @@ function TeksProklamasi({ animationsStarted }) {
 
 // ==================== MUSIC PLAYER ====================
 function MusicPlayer({ startTrigger }) {
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [started, setStarted] = useState(false);
-  const audioRef = useRef(null);
-
-  const playMusic = () => {
-    const audio = audioRef.current;
-    if (!audio || started) return;
-    setStarted(true);
-    audio.muted = true;
-    audio.volume = 0;
-    audio.play().then(() => {
-      let vol = 0;
-      const fade = setInterval(() => {
-        vol = Math.min(vol + 0.02, 1);
-        audio.volume = vol;
-        if (vol >= 1) { audio.muted = false; clearInterval(fade); setIsPlaying(true); }
-      }, 50);
-      setTimeout(() => { audio.muted = false; }, 1000);
-    }).catch(() => {});
-  };
+  const { isPlaying, playbackRate, playMusic, togglePlay, changeSpeed } = useMusic();
 
   useEffect(() => {
     if (startTrigger) playMusic();
   }, [startTrigger]);
 
-  const togglePlay = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (isPlaying) { audio.pause(); setIsPlaying(false); }
-    else { audio.muted = false; audio.volume = 1; audio.play().then(() => setIsPlaying(true)).catch(() => {}); }
-  };
-
   return (
     <div className="semarak-music-player" style={{ position: "fixed", bottom: "1rem", right: "1rem", zIndex: 50 }}>
-      <audio ref={audioRef} src="/hari-merdeka.mp3" loop />
       {isExpanded && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
           style={{ backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.75rem", boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)", border: "1px solid var(--sd-border, #e5e5e5)", padding: "0.75rem", marginBottom: "0.5rem", maxWidth: "12rem" }}>
-          <p style={{ fontSize: "0.65rem", fontWeight: 700, color: "var(--sd-text, #262626)", marginBottom: "0.125rem" }}>Hari Merdeka</p>
-          <p style={{ fontSize: "0.55rem", color: "var(--sd-text-muted, #737373)", marginBottom: "0.5rem" }}>Cipt. H. Mutahar</p>
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
             <button onClick={togglePlay} style={{ width: "2rem", height: "2rem", backgroundColor: "#dc2626", color: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "none" }}>
               {isPlaying
@@ -363,6 +335,16 @@ function MusicPlayer({ startTrigger }) {
                 <div style={{ height: "100%", backgroundColor: "#ef4444", borderRadius: "9999px", width: isPlaying ? "60%" : "0%", transition: "width 0.3s", animation: isPlaying ? "pulse 2s infinite" : undefined }} />
               </div>
             </div>
+          </div>
+          {/* Speed Controls */}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", marginTop: "0.5rem" }}>
+            <span style={{ fontSize: "0.55rem", color: "var(--sd-text-muted, #737373)", marginRight: "0.25rem" }}>Speed:</span>
+            {[0.5, 1, 1.5, 2].map(rate => (
+              <button key={rate} onClick={() => changeSpeed(rate)}
+                style={{ fontSize: "0.55rem", padding: "0.15rem 0.375rem", borderRadius: "0.25rem", border: "none", cursor: "pointer", fontWeight: 600, backgroundColor: playbackRate === rate ? "#dc2626" : "var(--sd-bg-secondary, #e5e5e5)", color: playbackRate === rate ? "#fff" : "var(--sd-text-muted, #737373)" }}>
+                {rate}x
+              </button>
+            ))}
           </div>
         </motion.div>
       )}

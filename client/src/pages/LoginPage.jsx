@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Lock, User, LogIn, Eye, EyeOff, X, ArrowLeft } from 'lucide-react';
+import MusicPlayer from '../components/UI/MusicPlayer';
 import './LoginPage.css';
 
 const LoginPage = () => {
@@ -31,6 +32,7 @@ const LoginPage = () => {
   };
 
   return (
+    <>
     <div className="login-container">
       <div className="login-bg-shapes">
         <div className="shape shape-1"></div>
@@ -202,6 +204,8 @@ const LoginPage = () => {
         </div>
       )}
     </div>
+    <MusicPlayer />
+    </>
   );
 };
 
