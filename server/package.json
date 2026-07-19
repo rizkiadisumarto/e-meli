@@ -12,7 +12,9 @@
     "dev:local": "npm install better-sqlite3 && node --watch server.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.7",
     "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^12.11.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",

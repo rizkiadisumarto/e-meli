@@ -6,17 +6,9 @@ const { authenticateToken, requireAdminOrCommittee } = require('../middleware/au
 
 const router = express.Router();
 
-// Multer config for proof image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `proof-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-  }
-});
 const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = /jpeg|jpg|png|webp/;
     const ext = allowed.test(path.extname(file.originalname).toLowerCase());
@@ -403,7 +395,10 @@ router.get('/:id/transactions', authenticateToken, async (req, res) => {
 router.post('/:id/transactions', authenticateToken, requireAdminOrCommittee, upload.single('proof_image'), async (req, res) => {
   try {
     const { type, category_id, amount, description, date, member_id } = req.body;
-    const proof_image = req.file ? `/uploads/${req.file.filename}` : null;
+    let proof_image = null;
+    if (req.file) {
+      proof_image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+    }
 
     // Create the transaction
     const txResult = await queryRunAsync(

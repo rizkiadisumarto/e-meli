@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Plus, Calendar, MapPin, Users, TrendingUp, CheckCircle, Clock, X, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Calendar, MapPin, Users, TrendingUp, CheckCircle, Clock, X, Edit2, Trash2, FileSpreadsheet } from 'lucide-react';
 import { formatNumberInput, parseNumberInput } from '../utils/format';
+import { exportToExcel } from '../utils/exportExcel';
 import MapPicker from '../components/UI/MapPicker';
 import './EventsPage.css';
 
@@ -151,6 +152,23 @@ const EventsPage = () => {
 
   if (loading) return <div className="flex justify-center p-8">Loading events...</div>;
 
+  const handleExportEvents = () => {
+    if (events.length === 0) return;
+    const data = events.map((e, i) => ({
+      'No': i + 1,
+      'Nama Event': e.name,
+      'Tanggal Mulai': e.start_date ? new Date(e.start_date).toLocaleDateString('id-ID') : '-',
+      'Tanggal Selesai': e.end_date ? new Date(e.end_date).toLocaleDateString('id-ID') : '-',
+      'Lokasi': e.location_name || '-',
+      'Status': e.status === 'completed' ? 'Selesai' : e.status === 'ongoing' ? 'Berlangsung' : 'Draft',
+      'Target Iuran': e.target_per_person || 0,
+      'Peserta': e.participant_count || 0,
+      'Pemasukan': e.total_income || 0,
+      'Pengeluaran': e.total_expense || 0
+    }));
+    exportToExcel(data, 'Data Kegiatan', 'Kegiatan');
+  };
+
   return (
     <div className="events-page">
       <div className="page-header flex justify-between items-center mb-6">
@@ -158,11 +176,18 @@ const EventsPage = () => {
           <h2>Kegiatan / Event</h2>
           <p className="text-muted text-sm mt-1">Kelola acara dan kegiatan komunitas</p>
         </div>
-        {isAdminOrCommittee && (
-          <button className="btn btn-primary shadow-glow" onClick={openCreateModal}>
-            <Plus size={18} /> Buat Event Baru
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {events.length > 0 && (
+            <button className="btn btn-outline" onClick={handleExportEvents}>
+              <FileSpreadsheet size={18} /> Export Excel
+            </button>
+          )}
+          {isAdminOrCommittee && (
+            <button className="btn btn-primary shadow-glow" onClick={openCreateModal}>
+              <Plus size={18} /> Buat Event Baru
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-6">

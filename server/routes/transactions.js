@@ -6,16 +6,8 @@ const { authenticateToken, requireAdmin } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Multer config for proof image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `proof-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-  }
-});
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = /jpeg|jpg|png|webp/;
@@ -92,7 +84,10 @@ router.get('/:id', authenticateToken, async (req, res) => {
 router.post('/', authenticateToken, requireAdmin, upload.single('proof_image'), async (req, res) => {
   try {
     const { type, category_id, amount, description, date, member_id } = req.body;
-    const proof_image = req.file ? `/uploads/${req.file.filename}` : null;
+    let proof_image = null;
+    if (req.file) {
+      proof_image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+    }
     if (!type || !amount || !date) {
       return res.status(400).json({ error: 'Type, amount, dan date harus diisi' });
     }

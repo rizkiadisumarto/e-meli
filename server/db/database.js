@@ -44,7 +44,7 @@ async function initializeDb() {
       console.error('');
       process.exit(1);
     }
-    const DB_PATH = path.join(__dirname, 'kas.db');
+    const DB_PATH = path.join(__dirname, 'emeli.db');
 
     db = new Database(DB_PATH);
     db.pragma('journal_mode = WAL');
@@ -59,12 +59,17 @@ async function initializeDb() {
   }
 }
 
+// Convert PostgreSQL $1,$2 placeholders to SQLite ? placeholders
+function toSqlite(sql) {
+  return sql.replace(/\$\d+/g, '?');
+}
+
 // Query helpers for SQLite
 function queryAll(sql, params = []) {
   if (isPostgres) {
     return db.query(sql, params).then(res => res.rows);
   }
-  const stmt = db.prepare(sql);
+  const stmt = db.prepare(toSqlite(sql));
   return stmt.all(...params);
 }
 
@@ -72,7 +77,7 @@ function queryGet(sql, params = []) {
   if (isPostgres) {
     return db.query(sql, params).then(res => res.rows[0] || null);
   }
-  const stmt = db.prepare(sql);
+  const stmt = db.prepare(toSqlite(sql));
   return stmt.get(...params) || null;
 }
 
@@ -83,7 +88,7 @@ function queryRun(sql, params = []) {
       changes: res.rowCount
     }));
   }
-  const stmt = db.prepare(sql);
+  const stmt = db.prepare(toSqlite(sql));
   const result = stmt.run(...params);
   return { lastInsertRowid: result.lastInsertRowid, changes: result.changes };
 }
@@ -94,7 +99,7 @@ async function queryAllAsync(sql, params = []) {
     const res = await db.query(sql, params);
     return res.rows;
   }
-  const stmt = db.prepare(sql);
+  const stmt = db.prepare(toSqlite(sql));
   return stmt.all(...params);
 }
 
@@ -103,7 +108,7 @@ async function queryGetAsync(sql, params = []) {
     const res = await db.query(sql, params);
     return res.rows[0] || null;
   }
-  const stmt = db.prepare(sql);
+  const stmt = db.prepare(toSqlite(sql));
   return stmt.get(...params) || null;
 }
 
@@ -115,7 +120,17 @@ async function queryRunAsync(sql, params = []) {
       changes: res.rowCount
     };
   }
-  const stmt = db.prepare(sql);
+  const sqliteSql = toSqlite(sql);
+  // Handle RETURNING clause for SQLite
+  if (/\bRETURNING\b/i.test(sqliteSql)) {
+    const stmt = db.prepare(sqliteSql);
+    const row = stmt.get(...params);
+    return {
+      lastInsertRowid: row?.id || db.prepare('SELECT last_insert_rowid() as id').get().id,
+      changes: 1
+    };
+  }
+  const stmt = db.prepare(sqliteSql);
   const result = stmt.run(...params);
   return { lastInsertRowid: result.lastInsertRowid, changes: result.changes };
 }

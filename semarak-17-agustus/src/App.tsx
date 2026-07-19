@@ -5,6 +5,7 @@ import { Flag, Trophy, Sparkles, MessageSquare, Image as ImageIcon, Volume2, Vol
 import Countdown from "./components/Countdown";
 import MiniGames from "./components/MiniGames";
 import GreetingsWall from "./components/GreetingsWall";
+import PanitiaInti from "./components/PanitiaInti";
 
 const hutRiLogo = new URL("./assets/images/hut_ri_81_logo_1783879706658.jpg", import.meta.url).href;
 
@@ -83,6 +84,9 @@ export default function App() {
 
           {/* Mini games arena */}
           <MiniGames />
+
+          {/* Panitia Inti */}
+          <PanitiaInti />
 
           {/* Sticky Greetings wall */}
           <GreetingsWall />

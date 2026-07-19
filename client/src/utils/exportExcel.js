@@ -153,3 +153,159 @@ export const exportUsers = (users, filename = 'Data Pengguna') => {
 
   exportToExcel(data, filename, 'Pengguna');
 };
+
+// ==================== IMPORT FUNCTIONS ====================
+
+// Parse Excel file and return data
+export const parseExcelFile = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+        resolve(jsonData);
+      } catch (err) {
+        reject(err);
+      }
+    };
+    reader.onerror = () => reject(new Error('Gagal membaca file'));
+    reader.readAsArrayBuffer(file);
+  });
+};
+
+// Import transactions from Excel
+export const importTransactions = async (file, token) => {
+  const data = await parseExcelFile(file);
+  const results = { success: 0, failed: 0, errors: [] };
+
+  for (const row of data) {
+    try {
+      const payload = {
+        type: row['Tipe'] === 'Pemasukan' ? 'income' : 'expense',
+        category_id: row['Kategori ID'] || null,
+        amount: row['Nominal'] || row['amount'] || 0,
+        description: row['Keterangan'] || row['description'] || '',
+        date: row['Tanggal'] || row['date'] || new Date().toISOString().split('T')[0],
+        member_id: row['Anggota ID'] || row['member_id'] || null
+      };
+
+      const res = await fetch('/api/transactions', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) results.success++;
+      else results.failed++;
+    } catch (err) {
+      results.failed++;
+      results.errors.push(err.message);
+    }
+  }
+  return results;
+};
+
+// Import members from Excel
+export const importMembers = async (file, token) => {
+  const data = await parseExcelFile(file);
+  const results = { success: 0, failed: 0, errors: [] };
+
+  for (const row of data) {
+    try {
+      const payload = {
+        name: row['Nama'] || row['name'],
+        address: row['Alamat'] || row['address'] || '',
+        phone: row['No. HP'] || row['phone'] || '',
+        status: row['Status'] === 'Non-Aktif' ? 'inactive' : 'active'
+      };
+
+      if (!payload.name) { results.failed++; continue; }
+
+      const res = await fetch('/api/members', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) results.success++;
+      else results.failed++;
+    } catch (err) {
+      results.failed++;
+      results.errors.push(err.message);
+    }
+  }
+  return results;
+};
+
+// Import events from Excel
+export const importEvents = async (file, token) => {
+  const data = await parseExcelFile(file);
+  const results = { success: 0, failed: 0, errors: [] };
+
+  for (const row of data) {
+    try {
+      const payload = {
+        name: row['Nama Event'] || row['name'],
+        start_date: row['Tanggal Mulai'] || row['start_date'],
+        end_date: row['Tanggal Selesai'] || row['end_date'] || null,
+        location_name: row['Lokasi'] || row['location_name'] || '',
+        location_address: row['Alamat'] || row['location_address'] || '',
+        status: row['Status'] || 'draft',
+        target_per_person: row['Target Iuran'] || row['target_per_person'] || 0,
+        description: row['Deskripsi'] || row['description'] || '',
+        notes: row['Catatan'] || row['notes'] || ''
+      };
+
+      if (!payload.name) { results.failed++; continue; }
+
+      const res = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) results.success++;
+      else results.failed++;
+    } catch (err) {
+      results.failed++;
+      results.errors.push(err.message);
+    }
+  }
+  return results;
+};
+
+// Import users from Excel
+export const importUsers = async (file, token) => {
+  const data = await parseExcelFile(file);
+  const results = { success: 0, failed: 0, errors: [] };
+
+  for (const row of data) {
+    try {
+      const payload = {
+        username: row['Username'] || row['username'],
+        password: row['Password'] || row['password'] || 'password123',
+        full_name: row['Nama Lengkap'] || row['full_name'] || '',
+        role: row['Role'] === 'Administrator' ? 'admin' : row['Role'] === 'Committee' ? 'committee' : 'viewer',
+        phone: row['No. HP'] || row['phone'] || ''
+      };
+
+      if (!payload.username || !payload.full_name) { results.failed++; continue; }
+
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) results.success++;
+      else results.failed++;
+    } catch (err) {
+      results.failed++;
+      results.errors.push(err.message);
+    }
+  }
+  return results;
+};

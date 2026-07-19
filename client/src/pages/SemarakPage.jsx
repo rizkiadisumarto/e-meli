@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Flag, Calendar, Heart, Volume2, Sun, Moon, X, Shield, Crown, PenLine, Users,
   Home, Sparkles, Camera, Info, ChevronRight, Wallet, CreditCard, BarChart3,
-  FileText, MapPin, Phone, Mail, Clock, Gamepad2, Star, BookOpen, Coffee
+  FileText, MapPin, Phone, Mail, Clock, Gamepad2, Star, BookOpen, Coffee,
+  Download, FileDown, Trophy
 } from "lucide-react";
 import "./SemarakPage.css";
 
@@ -398,7 +399,7 @@ function HallOfFame() {
           <div style={{ position: "absolute", bottom: "-1rem", left: "-1rem", width: "4rem", height: "4rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.08)" }} />
           <div style={{ fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: "0.5rem" }}>&#127942;</div>
           <h2 style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Hall of Fame</h2>
-          <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>HUT RI Ke-80 — 17 Agustus 2025</p>
+          <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>Malam Tirakat 16 Agustus & HUT RI Ke-80 — 17 Agustus 2025</p>
         </div>
 
         <div style={{ padding: "clamp(1rem, 3vw, 2rem)" }}>
@@ -424,7 +425,7 @@ function HallOfFame() {
 
           <div style={{ marginTop: "1rem", textAlign: "center" }}>
             <p style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)", color: "var(--sd-text-muted, #737373)", fontStyle: "italic" }}>
-              Momen-momen indah perayaan HUT RI Ke-80 bersama warga Melimewah
+              Momen-momen indah perayaan Malam Tirakat & HUT RI Ke-80 bersama warga Melimewah
             </p>
           </div>
 
@@ -432,7 +433,7 @@ function HallOfFame() {
           <div style={{ marginTop: "1.5rem", padding: "clamp(1rem, 3vw, 1.5rem)", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
             <div style={{ textAlign: "center", marginBottom: "1rem" }}>
               <span style={{ display: "inline-block", backgroundColor: "#dc2626", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>Panitia Inti</span>
-              <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Susunan Pengurus HUT RI Ke-80 Tahun 2025</h3>
+              <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Susunan Pengurus Malam Tirakat & HUT RI Ke-80 Tahun 2025</h3>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
@@ -475,6 +476,92 @@ function HallOfFame() {
   );
 }
 
+// ==================== LAPORAN KEGIATAN ====================
+function LaporanKegiatan() {
+  const laporan = [
+    {
+      title: "Laporan Event 17-an Gang Melimewah 2025",
+      desc: "Laporan lengkap pelaksanaan perayaan Malam Tirakat 16 Agustus & 17 Agustus di Gang Melimewah tahun 2025.",
+      file: "/laporan/Laporan-Event-17an-2025.pdf",
+      icon: "🏁",
+      color: "#dc2626",
+    },
+    {
+      title: "Laporan Malam Tirakatan Agustus 2025",
+      desc: "Laporan kegiatan malam tirakatan 16 Agustus menjelang HUT RI Ke-80 tahun 2025.",
+      file: "/laporan/Laporan-Tirakatan-2025.pdf",
+      icon: "🌙",
+      color: "#7c3aed",
+    },
+    {
+      title: "Laporan Ringkas Transparan 17-an 2025",
+      desc: "Ringkasan transparan keuangan dan pelaksanaan event Malam Tirakat 16 Agustus & 17 Agustus 2025.",
+      file: "/laporan/Laporan-Ringkas-17an-2025.pdf",
+      icon: "📊",
+      color: "#2563eb",
+    },
+    {
+      title: "Laporan Rincian Malam Tirakatan 2025",
+      desc: "Rincian detail kegiatan dan anggaran malam tirakatan 16 Agustus & HUT RI 17 Agustus 2025.",
+      file: "/laporan/Laporan-Tirakatan-Rincian-2025.pdf",
+      icon: "📋",
+      color: "#059669",
+    },
+  ];
+
+  return (
+    <div style={{ width: "100%", maxWidth: "56rem", margin: "0 auto", padding: "0 clamp(0.75rem, 3vw, 1.25rem)" }}>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
+        style={{ background: "var(--sd-bg-card, #fff)", borderRadius: "clamp(0.75rem, 2vw, 1.25rem)", border: "1px solid var(--sd-border, #e5e5e5)", boxShadow: "0 20px 40px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+
+        <div style={{ background: "linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)", padding: "clamp(1rem, 3vw, 1.5rem) clamp(1rem, 3vw, 2rem)", textAlign: "center", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: "-2rem", right: "-2rem", width: "6rem", height: "6rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.1)" }} />
+          <div style={{ position: "absolute", bottom: "-1rem", left: "-1rem", width: "4rem", height: "4rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.08)" }} />
+          <div style={{ fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: "0.5rem" }}>&#128196;</div>
+          <h2 style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Laporan Kegiatan</h2>
+          <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>Dokumen transparansi kegiatan komunitas</p>
+        </div>
+
+        <div style={{ padding: "clamp(1rem, 3vw, 2rem)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "1rem" }}>
+            {laporan.map((item, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.4 + i * 0.1 }}
+                style={{ backgroundColor: "var(--sd-bg-secondary, #fafafa)", border: "1px solid var(--sd-border, #e5e5e5)", borderRadius: "0.75rem", padding: "1.25rem", transition: "all 0.2s", display: "flex", flexDirection: "column" }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.75rem" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "0.5rem", backgroundColor: `${item.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.25rem", flexShrink: 0 }}>{item.icon}</div>
+                  <div style={{ flex: 1 }}>
+                    <h4 style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--sd-text, #262626)", margin: 0, lineHeight: 1.4 }}>{item.title}</h4>
+                  </div>
+                </div>
+                <p style={{ fontSize: "0.7rem", color: "var(--sd-text-muted, #737373)", margin: "0 0 1rem", lineHeight: 1.5, flex: 1 }}>{item.desc}</p>
+                <a href={item.file} target="_blank" rel="noopener noreferrer"
+                  style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", backgroundColor: item.color, color: "#fff", border: "none", borderRadius: "0.5rem", padding: "0.5rem 1rem", fontSize: "0.75rem", fontWeight: 700, cursor: "pointer", textDecoration: "none", transition: "opacity 0.2s" }}
+                  onMouseEnter={(e) => e.currentTarget.style.opacity = "0.9"}
+                  onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}>
+                  <Download style={{ width: "0.875rem", height: "0.875rem" }} />
+                  Lihat Laporan
+                </a>
+              </motion.div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: "1.25rem", padding: "clamp(0.75rem, 2vw, 1rem)", backgroundColor: "var(--sd-badge-bg, #f0f9ff)", border: "1px solid var(--sd-border, #bae6fd)", borderRadius: "0.75rem", display: "flex", alignItems: "flex-start", gap: "0.75rem" }}>
+            <span style={{ fontSize: "1.25rem", lineHeight: 1, flexShrink: 0 }}>&#128220;</span>
+            <div>
+              <p style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)", fontWeight: 700, color: "var(--sd-text, #262626)", margin: "0 0 0.25rem" }}>Transparansi Keuangan</p>
+              <p style={{ fontSize: "clamp(0.6rem, 1.3vw, 0.7rem)", color: "var(--sd-text-muted, #737373)", margin: 0, lineHeight: 1.6 }}>
+                Seluruh laporan kegiatan dan keuangan komunitas dapat diakses oleh semua warga untuk menjaga transparansi dan akuntabilitas.
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 // ==================== TAB: FITUR ====================
 function FiturTab() {
   const features = [
@@ -508,6 +595,113 @@ function FiturTab() {
   );
 }
 
+// ==================== URAIAN LOMBA ====================
+function UraianLomba() {
+  return (
+    <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "1rem", padding: "1.5rem", position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "4px", background: "linear-gradient(90deg, #dc2626, #fbbf24, #dc2626)", backgroundSize: "200% 100%", animation: "shimmer 3s linear infinite" }} />
+      <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
+        <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>&#127941;</div>
+        <h3 style={{ fontSize: "clamp(1rem, 2.5vw, 1.25rem)", fontWeight: 900, color: "var(--sd-text)", margin: "0 0 0.25rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Uraian Lomba-Lomba</h3>
+        <p style={{ fontSize: "0.7rem", color: "var(--sd-text-muted)", margin: 0 }}>Gebyar Kemerdekaan Gang Meli Mewah 2025</p>
+      </div>
+
+      {/* Kategori 2-4 Tahun */}
+      <div style={{ marginBottom: "1.25rem" }}>
+        <div style={{ background: "linear-gradient(135deg, #fbbf24, #f59e0b)", color: "#000", padding: "0.5rem 1rem", borderRadius: "0.5rem 0.5rem 0 0", fontWeight: 800, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+          Kategori Anak-Anak 2-4 Tahun
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.65rem" }}>
+            <thead>
+              <tr style={{ backgroundColor: "var(--sd-bg-secondary, #fafafa)" }}>
+                <th style={{ padding: "0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", fontWeight: 700, width: "40px" }}>No</th>
+                <th style={{ padding: "0.5rem", textAlign: "left", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Uraian Lomba</th>
+                <th style={{ padding: "0.5rem", textAlign: "left", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Kebutuhan Lomba</th>
+                <th style={{ padding: "0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Keterangan</th>
+                <th style={{ padding: "0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Waktu Pelaksanaan</th>
+                <th style={{ padding: "0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Juara</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Mewarnai</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Meja Portable, Crayon/Pensil Warna</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Milik Pribadi</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", color: "#dc2626", fontWeight: 600 }} rowSpan={1}>16 Agustus Lepas Ashar</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1, 2, 3</td></tr>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>2</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Balap Kelereng</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Kelereng, Sendok Plastik</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Panitia</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", color: "#dc2626", fontWeight: 600 }} rowSpan={2}>17 Agustus</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1, 2, 3</td></tr>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>3</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Memindahkan Bendera Merah Putih</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Botol Bekas Sirup, Sedotan, Bendera Plastik</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Panitia</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1, 2, 3</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Kategori 5-7 Tahun */}
+      <div style={{ marginBottom: "1.25rem" }}>
+        <div style={{ background: "linear-gradient(135deg, #34d399, #10b981)", color: "#000", padding: "0.5rem 1rem", borderRadius: "0.5rem 0.5rem 0 0", fontWeight: 800, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+          Kategori Anak-Anak 5-7 Tahun
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.65rem" }}>
+            <thead>
+              <tr style={{ backgroundColor: "var(--sd-bg-secondary, #fafafa)" }}>
+                <th style={{ padding: "0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", fontWeight: 700, width: "40px" }}>No</th>
+                <th style={{ padding: "0.5rem", textAlign: "left", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Uraian Lomba</th>
+                <th style={{ padding: "0.5rem", textAlign: "left", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Kebutuhan Lomba</th>
+                <th style={{ padding: "0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Keterangan</th>
+                <th style={{ padding: "0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Waktu Pelaksanaan</th>
+                <th style={{ padding: "0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Juara</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Mewarnai</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Meja Portable, Crayon/Pensil Warna</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Milik Pribadi</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", color: "#dc2626", fontWeight: 600 }}>16 Agustus Lepas Ashar</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1, 2, 3</td></tr>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>2</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Makan Kerupuk</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Tali Rafia, Kerupuk</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Panitia</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", color: "#dc2626", fontWeight: 600 }} rowSpan={4}>17 Agustus</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1, 2, 3</td></tr>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>3</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Balap Kelereng</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Kelereng, Sendok Plastik</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Panitia</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1, 2, 3</td></tr>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>4</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Memindahkan Bendera Merah Putih</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Botol Bekas Sirup, Sedotan, Bendera Plastik</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Panitia</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1, 2, 3</td></tr>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>5</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Joged Balon</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Balon</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Panitia</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Kategori 8-10 & 11-13 Tahun */}
+      <div style={{ marginBottom: "1rem" }}>
+        <div style={{ background: "linear-gradient(135deg, #60a5fa, #3b82f6)", color: "#fff", padding: "0.5rem 1rem", borderRadius: "0.5rem 0.5rem 0 0", fontWeight: 800, fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+          Kategori Anak-Anak 8-10 & 11-13 Tahun
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.65rem" }}>
+            <thead>
+              <tr style={{ backgroundColor: "var(--sd-bg-secondary, #fafafa)" }}>
+                <th style={{ padding: "0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", fontWeight: 700, width: "40px" }}>No</th>
+                <th style={{ padding: "0.5rem", textAlign: "left", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Uraian Lomba</th>
+                <th style={{ padding: "0.5rem", textAlign: "left", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Kebutuhan Lomba</th>
+                <th style={{ padding: "0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Keterangan</th>
+                <th style={{ padding: "0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Waktu Pelaksanaan</th>
+                <th style={{ padding: "0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", fontWeight: 700 }}>Juara</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Makan Kerupuk</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Tali Rafia, Kerupuk</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Panitia</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)", color: "#dc2626", fontWeight: 600 }} rowSpan={5}>17 Agustus</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1, 2, 3</td></tr>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>2</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Balap Kelereng</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Kelereng, Sendok Plastik</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Panitia</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1, 2, 3</td></tr>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>3</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Memindahkan Bendera Merah Putih</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Botol Bekas Sirup, Sedotan, Bendera Plastik</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Panitia</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1, 2, 3</td></tr>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>4</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Memasukkan Paku ke Botol</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Botol Bekas Sirup, Paku, Tali Rafia</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Panitia</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1, 2, 3</td></tr>
+              <tr><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>5</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)", fontWeight: 600 }}>Joged Balon</td><td style={{ padding: "0.4rem", borderBottom: "1px solid var(--sd-border)" }}>Balon</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>Panitia</td><td style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border)" }}>1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Info Tambahan */}
+      <div style={{ padding: "0.75rem 1rem", backgroundColor: "rgba(220,38,38,0.05)", border: "1px solid rgba(220,38,38,0.15)", borderRadius: "0.5rem", display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+        <span style={{ fontSize: "1rem", lineHeight: 1, flexShrink: 0 }}>&#127881;</span>
+        <div>
+          <p style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--sd-text)", margin: "0 0 0.25rem" }}>Catatan Penting</p>
+          <p style={{ fontSize: "0.65rem", color: "var(--sd-text-muted)", margin: 0, lineHeight: 1.5 }}>
+            Semua kebutuhan lomba disediakan oleh Panitia kecuali yang bertuliskan "Milik Pribadi". Pendaftaran GRATIS untuk seluruh warga Gang Meli Mewah.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ==================== TAB: ARSIP (Hall of Fame) ====================
 function ArsipTab() {
   return (
@@ -529,6 +723,10 @@ function ArsipTab() {
         }
       `}</style>
       <HallOfFame />
+      <div style={{ height: "1.5rem" }} />
+      <UraianLomba />
+      <div style={{ height: "1.5rem" }} />
+      <LaporanKegiatan />
     </div>
   );
 }
@@ -880,8 +1078,8 @@ export default function SemarakPage() {
   const tabs = [
     { id: "beranda", label: "Home", icon: <Home size={16} /> },
     { id: "tirakatan", label: "Tirakatan", icon: <Moon size={16} /> },
-    { id: "fitur", label: "Fitur", icon: <Sparkles size={16} /> },
     { id: "arsip", label: "Arsip", icon: <Camera size={16} /> },
+    { id: "fitur", label: "Fitur", icon: <Sparkles size={16} /> },
     { id: "game", label: "Game", icon: <Gamepad2 size={16} /> },
     { id: "tentang", label: "Tentang", icon: <Info size={16} /> },
   ];
@@ -1057,13 +1255,14 @@ export default function SemarakPage() {
                     <span style={{ animation: "pulse 2s infinite" }}>&#128337;</span> COMING SOON
                   </div>
                 </div>
+
               </div>
             </div>
           </>
         )}
         {activeTab === "tirakatan" && <TirakatanTab />}
-        {activeTab === "fitur" && <FiturTab />}
         {activeTab === "arsip" && <ArsipTab />}
+        {activeTab === "fitur" && <FiturTab />}
         {activeTab === "game" && <GameTab />}
         {activeTab === "tentang" && <TentangTab />}
       </main>
