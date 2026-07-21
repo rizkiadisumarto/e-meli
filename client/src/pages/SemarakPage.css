@@ -90,6 +90,50 @@
   .semarak-hall-image {
     aspect-ratio: 4/3 !important;
   }
+  .semarak-video-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.6rem !important;
+  }
+  .semarak-video {
+    aspect-ratio: 16/9 !important;
+  }
+  .semarak-video-card {
+    border-radius: 0.5rem !important;
+  }
+}
+
+/* Tablet: 2-column video grid */
+@media (min-width: 481px) and (max-width: 768px) {
+  .semarak-video-grid {
+    gap: 0.6rem !important;
+  }
+  .semarak-video {
+    aspect-ratio: 9/14 !important;
+  }
+}
+
+/* Tablet landscape & small laptop */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .semarak-video-grid {
+    gap: 0.75rem !important;
+  }
+  .semarak-video {
+    aspect-ratio: 9/14 !important;
+  }
+}
+
+/* Large laptop & desktop */
+@media (min-width: 1025px) {
+  .semarak-video-grid {
+    gap: 1rem !important;
+  }
+  .semarak-video {
+    aspect-ratio: 9/16 !important;
+  }
+  .semarak-video-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
 }
 
 /* Feature cards - single column on mobile */

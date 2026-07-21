@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Flag, Calendar, Heart, Volume2, Sun, Moon, X, Shield, Crown, PenLine, Users,
   Home, Sparkles, Camera, Info, ChevronRight, Wallet, CreditCard, BarChart3,
   FileText, MapPin, Phone, Mail, Clock, Gamepad2, Star, BookOpen, Coffee,
-  Download, FileDown, Trophy
+  Download, FileDown, Trophy, Play, PlayCircle
 } from "lucide-react";
 import { useMusic } from "../context/MusicContext";
 import "./SemarakPage.css";
@@ -356,6 +356,56 @@ function MusicPlayer({ startTrigger }) {
   );
 }
 
+// ==================== VIDEO GRID ====================
+function VideoGrid() {
+  const { isPlaying, togglePlay } = useMusic();
+  const [playingIdx, setPlayingIdx] = useState(null);
+  const videoRefs = useRef([]);
+
+  const videos = [
+    { src: "/hall-of-fame/video 1.mp4", label: "Video 1" },
+    { src: "/hall-of-fame/video 2.mp4", label: "Video 2" },
+    { src: "/hall-of-fame/video 3.mp4", label: "Video 3" },
+    { src: "/hall-of-fame/video 4.mp4", label: "Video 4" },
+  ];
+
+  const handlePlay = useCallback((idx) => {
+    // Pause other videos
+    videoRefs.current.forEach((v, i) => {
+      if (v && i !== idx) v.pause();
+    });
+    // Pause music if playing
+    if (isPlaying) togglePlay();
+    setPlayingIdx(idx);
+  }, [isPlaying, togglePlay]);
+
+  const handlePause = useCallback(() => {
+    setPlayingIdx(null);
+  }, []);
+
+  return (
+    <div className="semarak-video-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "0.75rem" }}>
+      {videos.map((video, idx) => (
+        <div key={idx} className="semarak-video-card" style={{ borderRadius: "0.75rem", overflow: "hidden", border: "1px solid var(--sd-border, #e5e5e5)", backgroundColor: "#000", transition: "transform 0.2s, box-shadow 0.2s", transform: playingIdx === idx ? "scale(1.02)" : "scale(1)", boxShadow: playingIdx === idx ? "0 8px 24px rgba(220,38,38,0.3)" : "none" }}>
+          <video
+            ref={el => videoRefs.current[idx] = el}
+            src={video.src}
+            controls
+            preload="metadata"
+            onPlay={() => handlePlay(idx)}
+            onPause={handlePause}
+            className="semarak-video"
+            style={{ width: "100%", aspectRatio: "9/16", objectFit: "cover", display: "block" }}
+          />
+          <div style={{ padding: "0.5rem 0.75rem", backgroundColor: "var(--sd-bg-card, #fff)", textAlign: "center" }}>
+            <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--sd-text, #262626)" }}>{video.label}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ==================== HALL OF FAME ====================
 function HallOfFame() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -412,6 +462,15 @@ function HallOfFame() {
             <p style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)", color: "var(--sd-text-muted, #737373)", fontStyle: "italic" }}>
               Momen-momen indah perayaan Malam Tirakat & HUT RI Ke-80 bersama warga Melimewah
             </p>
+          </div>
+
+          {/* Video Highlights */}
+          <div style={{ marginTop: "1.5rem" }}>
+            <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+              <span style={{ display: "inline-block", backgroundColor: "#dc2626", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>&#127909; Video Highlights</span>
+              <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Dokumentasi Video Perayaan</h3>
+            </div>
+            <VideoGrid />
           </div>
 
           {/* Susunan Panitia Inti */}
