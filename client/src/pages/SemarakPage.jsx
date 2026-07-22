@@ -5,10 +5,175 @@ import {
   Flag, Calendar, Heart, Volume2, Sun, Moon, X, Shield, Crown, PenLine, Users,
   Home, Sparkles, Camera, Info, ChevronRight, Wallet, CreditCard, BarChart3,
   FileText, MapPin, Phone, Mail, Clock, Gamepad2, Star, BookOpen, Coffee,
-  Download, FileDown, Trophy, Play, PlayCircle
+  Download, FileDown, Trophy, Play, PlayCircle, ZoomIn, ZoomOut, ChevronLeft, ChevronRight as ChevronRightIcon
 } from "lucide-react";
 import { useMusic } from "../context/MusicContext";
 import "./SemarakPage.css";
+
+// ==================== LIGHTBOX COMPONENT ====================
+function PhotoLightbox({ photos, currentIndex, isOpen, onClose }) {
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    setScale(1);
+  }, [currentIndex]);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: "rgba(0,0,0,0.95)",
+        zIndex: 9999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+      }}
+      onClick={onClose}
+    >
+      {/* Close button */}
+      <button
+        onClick={onClose}
+        style={{
+          position: "absolute",
+          top: "1rem",
+          right: "1rem",
+          background: "rgba(255,255,255,0.2)",
+          border: "none",
+          borderRadius: "50%",
+          width: "40px",
+          height: "40px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          zIndex: 10,
+          color: "#fff",
+        }}
+      >
+        <X size={20} />
+      </button>
+
+      {/* Zoom controls */}
+      <div
+        style={{
+          position: "absolute",
+          top: "1rem",
+          left: "1rem",
+          display: "flex",
+          gap: "0.5rem",
+          zIndex: 10,
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}
+          style={{
+            background: "rgba(255,255,255,0.2)",
+            border: "none",
+            borderRadius: "50%",
+            width: "40px",
+            height: "40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            color: "#fff",
+          }}
+        >
+          <ZoomOut size={18} />
+        </button>
+        <button
+          onClick={() => setScale((s) => Math.min(3, s + 0.25))}
+          style={{
+            background: "rgba(255,255,255,0.2)",
+            border: "none",
+            borderRadius: "50%",
+            width: "40px",
+            height: "40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            color: "#fff",
+          }}
+        >
+          <ZoomIn size={18} />
+        </button>
+        <span style={{ color: "#fff", fontSize: "0.75rem", display: "flex", alignItems: "center", padding: "0 0.5rem" }}>
+          {Math.round(scale * 100)}%
+        </span>
+      </div>
+
+      {/* Photo */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          maxWidth: "90vw",
+          maxHeight: "85vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          overflow: "auto",
+        }}
+      >
+        <img
+          src={photos[currentIndex]}
+          alt={`Foto ${currentIndex + 1}`}
+          style={{
+            maxWidth: "100%",
+            maxHeight: "85vh",
+            objectFit: "contain",
+            transform: `scale(${scale})`,
+            transition: "transform 0.3s ease, opacity 0.5s ease-in-out",
+            cursor: scale > 1 ? "grab" : "zoom-in",
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            setScale(scale === 1 ? 1.5 : 1);
+          }}
+        />
+      </div>
+
+      {/* Counter */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "1rem",
+          left: "50%",
+          transform: "translateX(-50%)",
+          backgroundColor: "rgba(0,0,0,0.6)",
+          backdropFilter: "blur(8px)",
+          padding: "0.5rem 1rem",
+          borderRadius: "9999px",
+          color: "#fff",
+          fontSize: "0.8rem",
+          fontWeight: 600,
+        }}
+      >
+        {currentIndex + 1} / {photos.length}
+      </div>
+    </motion.div>
+  );
+}
 
 // ==================== FLOATING ANIMATION COMPONENTS ====================
 function FloatingEmoji({ emoji, delay, duration, left, size }) {
@@ -410,6 +575,7 @@ function VideoGrid() {
 function HallOfFame() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   const photos = Array.from({ length: 65 }, (_, i) => `/hall-of-fame/photo-${String(i + 1).padStart(3, '0')}.jpeg`);
 
@@ -434,11 +600,15 @@ function HallOfFame() {
           <div style={{ position: "absolute", bottom: "-1rem", left: "-1rem", width: "4rem", height: "4rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.08)" }} />
           <div style={{ fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: "0.5rem" }}>&#127942;</div>
           <h2 style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Hall of Fame</h2>
-          <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>Malam Tirakat 16 Agustus & HUT RI Ke-80 — 17 Agustus 2025</p>
+          <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>Malam Tirakat 16 Agustus & HUT RI Ke-80 - 17 Agustus 2025</p>
         </div>
 
         <div style={{ padding: "clamp(1rem, 3vw, 2rem)" }}>
-          <div className="semarak-hall-image" style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: "0.75rem", overflow: "hidden", backgroundColor: "var(--sd-bg-secondary, #f5f5f5)" }}>
+          <div
+            className="semarak-hall-image"
+            style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: "0.75rem", overflow: "hidden", backgroundColor: "var(--sd-bg-secondary, #f5f5f5)", cursor: "zoom-in" }}
+            onClick={() => setLightboxOpen(true)}
+          >
             <img
               src={photos[currentIndex]}
               alt={`Hall of Fame ${currentIndex + 1}`}
@@ -454,8 +624,8 @@ function HallOfFame() {
               }}
             />
             <div style={{ position: "absolute", bottom: "1rem", left: "50%", transform: "translateX(-50%)", backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", padding: "0.375rem 0.75rem", borderRadius: "9999px", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <span style={{ color: "#fff", fontSize: "0.7rem", fontWeight: 600 }}>{currentIndex + 1} / {photos.length}</span>
-          </div>
+              <span style={{ color: "#fff", fontSize: "0.7rem", fontWeight: 600 }}>{currentIndex + 1} / {photos.length}</span>
+            </div>
           </div>
 
           <div style={{ marginTop: "1rem", textAlign: "center" }}>
@@ -516,6 +686,13 @@ function HallOfFame() {
           </div>
         </div>
       </motion.div>
+
+      <PhotoLightbox
+        photos={photos}
+        currentIndex={currentIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
     </div>
   );
 }
@@ -771,6 +948,961 @@ function ArsipTab() {
       <UraianLomba />
       <div style={{ height: "1.5rem" }} />
       <LaporanKegiatan />
+    </div>
+  );
+}
+
+// ==================== DATABASE 2024 TAB ====================
+function Database2024Tab() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  const photos = [
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.45%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.46%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.46%20PM%20(2).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.46%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.47%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.47%20PM%20(2).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.47%20PM%20(3).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.47%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.48%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.48%20PM%20(2).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.48%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.49%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.49%20PM%20(2).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.49%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.50%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.50%20PM%20(2).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.50%20PM%20(3).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.50%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.51%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.51%20PM%20(2).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.51%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.52%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.52%20PM%20(2).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.52%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.53.53%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.24%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.25%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.26%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.26%20PM%20(2).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.26%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.27%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.29%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.29%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.30%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.30%20PM%20(2).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.30%20PM%20(3).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.30%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.31%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.31%20PM%20(2).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.36%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.36%20PM%20(2).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.36%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.37%20PM%20(1).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.37%20PM%20(2).jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2010.59.37%20PM.jpeg",
+    "/hall-of-fame%202024/WhatsApp%20Image%202026-07-22%20at%2011.04.25%20PM.jpeg",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % photos.length);
+        setIsTransitioning(false);
+      }, 1500);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [photos.length]);
+
+  return (
+    <div>
+      {/* Logo HUT RI 79 with animation */}
+      <div style={{ display: "flex", justifyContent: "center", padding: "2rem 1rem 1rem" }}>
+        <motion.img
+          src="/logohutri79.jpeg"
+          alt="Logo HUT RI Ke-79"
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{
+            scale: [1, 1.08, 1, 1.05, 1],
+            rotate: [0, 5, -5, 3, 0],
+            y: [0, -10, 0, -5, 0],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          style={{ width: "clamp(160px, 30vw, 260px)", height: "auto", borderRadius: "16px", filter: "drop-shadow(0 6px 20px rgba(220,38,38,0.4))" }}
+        />
+      </div>
+      <style>{`
+        @keyframes glowPulse {
+          0% { box-shadow: 0 0 20px rgba(220,38,38,0.3); }
+          50% { box-shadow: 0 0 40px rgba(220,38,38,0.6); }
+          100% { box-shadow: 0 0 20px rgba(220,38,38,0.3); }
+        }
+      `}</style>
+
+      {/* Hall of Fame 2024 */}
+      <div style={{ width: "100%", maxWidth: "56rem", margin: "0 auto", padding: "0 clamp(0.75rem, 3vw, 1.25rem)" }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
+          style={{ background: "var(--sd-bg-card, #fff)", borderRadius: "clamp(0.75rem, 2vw, 1.25rem)", border: "1px solid var(--sd-border, #e5e5e5)", boxShadow: "0 20px 40px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+
+          <div style={{ background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)", padding: "clamp(1rem, 3vw, 1.5rem) clamp(1rem, 3vw, 2rem)", textAlign: "center", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: "-2rem", right: "-2rem", width: "6rem", height: "6rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.1)" }} />
+            <div style={{ position: "absolute", bottom: "-1rem", left: "-1rem", width: "4rem", height: "4rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.08)" }} />
+            <div style={{ fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: "0.5rem" }}>&#127942;</div>
+            <h2 style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Hall of Fame 2024</h2>
+            <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>Malam Tirakat 16 Agustus &amp; HUT RI Ke-79 - 17 Agustus 2024</p>
+          </div>
+
+          <div style={{ padding: "clamp(1rem, 3vw, 2rem)" }}>
+            <div
+              style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: "0.75rem", overflow: "hidden", backgroundColor: "var(--sd-bg-secondary, #f5f5f5)", animation: "glowPulse 3s ease-in-out infinite", cursor: "zoom-in" }}
+              onClick={() => setLightboxOpen(true)}
+            >
+              <img
+                src={photos[currentIndex]}
+                alt={`Hall of Fame 2024 - ${currentIndex + 1}`}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  opacity: isTransitioning ? 0 : 1,
+                  transition: "opacity 1.5s ease-in-out",
+                }}
+              />
+              <div style={{ position: "absolute", bottom: "1rem", left: "50%", transform: "translateX(-50%)", backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", padding: "0.375rem 0.75rem", borderRadius: "9999px", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span style={{ color: "#fff", fontSize: "0.7rem", fontWeight: 600 }}>{currentIndex + 1} / {photos.length}</span>
+              </div>
+            </div>
+
+            <div style={{ marginTop: "1rem", textAlign: "center" }}>
+              <p style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)", color: "var(--sd-text-muted, #737373)", fontStyle: "italic" }}>
+                Momen-momen indah perayaan Malam Tirakat &amp; HUT RI Ke-79 bersama warga Melimewah
+              </p>
+            </div>
+
+            {/* Susunan Panitia Inti */}
+            <div style={{ marginTop: "1.5rem", padding: "clamp(1rem, 3vw, 1.5rem)", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <span style={{ display: "inline-block", backgroundColor: "#dc2626", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>Panitia Inti</span>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Susunan Pengurus Malam Tirakat &amp; HUT RI Ke-79 Tahun 2024</h3>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #dc2626, #b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Shield size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pembina</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Hairul</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #d97706, #b45309)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Crown size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Ketua Panitia</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Arief</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #059669, #047857)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><PenLine size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Sekretaris</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Yusuf</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #2563eb, #1d4ed8)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Users size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Anggota</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Seluruh Warga GG. Melimewah</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Uraian Lomba-Lomba 2024 */}
+            <div style={{ marginTop: "1.5rem", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)", padding: "clamp(1rem, 3vw, 1.5rem)", position: "relative", overflow: "hidden" }}>
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "4px", background: "linear-gradient(90deg, #dc2626, #fbbf24, #dc2626)", backgroundSize: "200% 100%", animation: "shimmer 3s linear infinite" }} />
+              <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
+                <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>&#127941;</div>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 900, color: "var(--sd-text, #262626)", margin: "0 0 0.25rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Uraian Lomba-Lomba</h3>
+                <p style={{ fontSize: "0.65rem", color: "var(--sd-text-muted, #737373)", margin: 0 }}>Gebyar Kemerdekaan Gang Meli Mewah 2024</p>
+              </div>
+
+              {/* Kategori 2-4 Tahun */}
+              <div style={{ marginBottom: "1.25rem" }}>
+                <div style={{ background: "linear-gradient(135deg, #fbbf24, #f59e0b)", color: "#000", padding: "0.5rem 1rem", borderRadius: "0.5rem 0.5rem 0 0", fontWeight: 800, fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Kategori Anak-Anak 2-4 Tahun
+                </div>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.6rem" }}>
+                    <thead>
+                      <tr style={{ backgroundColor: "var(--sd-bg-card, #fff)" }}>
+                        <th style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700, width: "35px" }}>No</th>
+                        <th style={{ padding: "0.4rem", textAlign: "left", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Uraian Lomba</th>
+                        <th style={{ padding: "0.4rem", textAlign: "left", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Kebutuhan</th>
+                        <th style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Ket</th>
+                        <th style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Waktu</th>
+                        <th style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Juara</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Mewarnai</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Meja Portable, Crayon</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Pribadi</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", color: "#dc2626", fontWeight: 600 }} rowSpan={1}>16 Agustus</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1, 2, 3</td></tr>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>2</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Balap Kelereng</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Kelereng, Sendok</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Panitia</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", color: "#dc2626", fontWeight: 600 }} rowSpan={2}>17 Agustus</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1, 2, 3</td></tr>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>3</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Memindahkan Bendera</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Botol, Sedotan, Bendera</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Panitia</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1, 2, 3</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Kategori 5-7 Tahun */}
+              <div style={{ marginBottom: "1.25rem" }}>
+                <div style={{ background: "linear-gradient(135deg, #34d399, #10b981)", color: "#000", padding: "0.5rem 1rem", borderRadius: "0.5rem 0.5rem 0 0", fontWeight: 800, fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Kategori Anak-Anak 5-7 Tahun
+                </div>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.6rem" }}>
+                    <thead>
+                      <tr style={{ backgroundColor: "var(--sd-bg-card, #fff)" }}>
+                        <th style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700, width: "35px" }}>No</th>
+                        <th style={{ padding: "0.4rem", textAlign: "left", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Uraian Lomba</th>
+                        <th style={{ padding: "0.4rem", textAlign: "left", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Kebutuhan</th>
+                        <th style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Ket</th>
+                        <th style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Waktu</th>
+                        <th style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Juara</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Mewarnai</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Meja Portable, Crayon</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Pribadi</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", color: "#dc2626", fontWeight: 600 }}>16 Agustus</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1, 2, 3</td></tr>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>2</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Makan Kerupuk</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Tali Rafia, Kerupuk</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Panitia</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", color: "#dc2626", fontWeight: 600 }} rowSpan={4}>17 Agustus</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1, 2, 3</td></tr>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>3</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Balap Kelereng</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Kelereng, Sendok</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Panitia</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1, 2, 3</td></tr>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>4</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Memindahkan Bendera</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Botol, Sedotan, Bendera</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Panitia</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1, 2, 3</td></tr>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>5</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Joged Balon</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Balon</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Panitia</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Kategori 8-10 & 11-13 Tahun */}
+              <div style={{ marginBottom: "1rem" }}>
+                <div style={{ background: "linear-gradient(135deg, #60a5fa, #3b82f6)", color: "#fff", padding: "0.5rem 1rem", borderRadius: "0.5rem 0.5rem 0 0", fontWeight: 800, fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Kategori Anak-Anak 8-10 &amp; 11-13 Tahun
+                </div>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.6rem" }}>
+                    <thead>
+                      <tr style={{ backgroundColor: "var(--sd-bg-card, #fff)" }}>
+                        <th style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700, width: "35px" }}>No</th>
+                        <th style={{ padding: "0.4rem", textAlign: "left", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Uraian Lomba</th>
+                        <th style={{ padding: "0.4rem", textAlign: "left", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Kebutuhan</th>
+                        <th style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Ket</th>
+                        <th style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Waktu</th>
+                        <th style={{ padding: "0.4rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700 }}>Juara</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Makan Kerupuk</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Tali Rafia, Kerupuk</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Panitia</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", color: "#dc2626", fontWeight: 600 }} rowSpan={5}>17 Agustus</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1, 2, 3</td></tr>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>2</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Balap Kelereng</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Kelereng, Sendok</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Panitia</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1, 2, 3</td></tr>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>3</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Memindahkan Bendera</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Botol, Sedotan, Bendera</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Panitia</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1, 2, 3</td></tr>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>4</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Memasukkan Paku ke Botol</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Botol, Paku, Tali</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Panitia</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1, 2, 3</td></tr>
+                      <tr><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>5</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 600 }}>Joged Balon</td><td style={{ padding: "0.35rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Balon</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>Panitia</td><td style={{ padding: "0.35rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)" }}>1</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Info Tambahan */}
+              <div style={{ padding: "0.6rem 0.75rem", backgroundColor: "rgba(220,38,38,0.05)", border: "1px solid rgba(220,38,38,0.15)", borderRadius: "0.5rem", display: "flex", alignItems: "flex-start", gap: "0.5rem" }}>
+                <span style={{ fontSize: "0.9rem", lineHeight: 1, flexShrink: 0 }}>&#127881;</span>
+                <div>
+                  <p style={{ fontSize: "0.6rem", fontWeight: 700, color: "var(--sd-text, #262626)", margin: "0 0 0.15rem" }}>Catatan Penting</p>
+                  <p style={{ fontSize: "0.55rem", color: "var(--sd-text-muted, #737373)", margin: 0, lineHeight: 1.4 }}>
+                    Semua kebutuhan lomba disediakan oleh Panitia kecuali yang bertuliskan "Milik Pribadi". Pendaftaran GRATIS untuk seluruh warga Gang Meli Mewah.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Laporan Kegiatan 2024 */}
+            <div style={{ marginTop: "1.5rem", padding: "clamp(1rem, 3vw, 1.5rem)", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <span style={{ display: "inline-block", backgroundColor: "#2563eb", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>&#128196; Laporan Kegiatan</span>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Dokumen Transparansi Kegiatan 2024</h3>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "0.75rem" }}>
+                <motion.a
+                  href="/laporan%202024/Laporan_Rundown_Persiapan_Lomba_17an.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.4 }}
+                  style={{ backgroundColor: "var(--sd-bg-card, #fff)", border: "1px solid var(--sd-border, #e5e5e5)", borderRadius: "0.75rem", padding: "1rem", textDecoration: "none", display: "flex", flexDirection: "column", gap: "0.5rem", transition: "all 0.2s" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <div style={{ width: "2rem", height: "2rem", borderRadius: "0.5rem", background: "linear-gradient(135deg, #dc2626, #b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><FileText size={14} /></div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Rundown Persiapan Lomba 17-an</div>
+                      <div style={{ fontSize: "0.55rem", color: "var(--sd-text-muted, #737373)" }}>PDF Document</div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: "0.6rem", color: "var(--sd-text-muted, #737373)", margin: 0, lineHeight: 1.4 }}>Jadwal dan rundown persiapan lomba 17 Agustus 2024</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: "#2563eb", fontSize: "0.6rem", fontWeight: 600, marginTop: "auto" }}>
+                    <Download size={12} /> <span>Buka Dokumen</span>
+                  </div>
+                </motion.a>
+
+                <motion.a
+                  href="/laporan%202024/Laporan_Lomba_17_Agustus_2024.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.5 }}
+                  style={{ backgroundColor: "var(--sd-bg-card, #fff)", border: "1px solid var(--sd-border, #e5e5e5)", borderRadius: "0.75rem", padding: "1rem", textDecoration: "none", display: "flex", flexDirection: "column", gap: "0.5rem", transition: "all 0.2s" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <div style={{ width: "2rem", height: "2rem", borderRadius: "0.5rem", background: "linear-gradient(135deg, #059669, #047857)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><FileText size={14} /></div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Laporan Lomba 17 Agustus 2024</div>
+                      <div style={{ fontSize: "0.55rem", color: "var(--sd-text-muted, #737373)" }}>PDF Document</div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: "0.6rem", color: "var(--sd-text-muted, #737373)", margin: 0, lineHeight: 1.4 }}>Laporan lengkap hasil perlombaan 17 Agustus 2024</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: "#059669", fontSize: "0.6rem", fontWeight: 600, marginTop: "auto" }}>
+                    <Download size={12} /> <span>Buka Dokumen</span>
+                  </div>
+                </motion.a>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      <PhotoLightbox
+        photos={photos}
+        currentIndex={currentIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
+    </div>
+  );
+}
+
+// ==================== DATABASE 2023 TAB ====================
+function Database2023Tab() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const { isPlaying, togglePlay } = useMusic();
+  const [musicWasPlaying, setMusicWasPlaying] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const handleVideoPlay = () => {
+    if (isPlaying) {
+      setMusicWasPlaying(true);
+      togglePlay();
+    }
+  };
+
+  const handleVideoPause = () => {
+    if (musicWasPlaying) {
+      togglePlay();
+      setMusicWasPlaying(false);
+    }
+  };
+
+  const handleVideoEnded = () => {
+    if (musicWasPlaying) {
+      togglePlay();
+      setMusicWasPlaying(false);
+    }
+  };
+
+  const photos = [
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.41.13%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.41.14%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.41.15%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.41.15%20PM%20(1).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.41.15%20PM%20(2).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.41.32%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.05%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.44%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.45%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.45%20PM%20(1).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.45%20PM%20(2).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.45%20PM%20(3).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.46%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.46%20PM%20(1).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.46%20PM%20(2).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.46%20PM%20(3).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.47%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.47%20PM%20(1).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.47%20PM%20(2).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.47%20PM%20(3).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.48%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.48%20PM%20(1).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.48%20PM%20(2).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.49%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.49%20PM%20(1).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.50%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.50%20PM%20(1).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.51%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.51%20PM%20(1).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.51%20PM%20(2).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.51%20PM%20(3).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.43.31%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.43.32%20PM.jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.43.32%20PM%20(1).jpeg",
+    "/hall-of-fame%202023/WhatsApp%20Image%202026-07-22%20at%2010.43.32%20PM%20(2).jpeg",
+  ];
+
+  const videos = [
+    "/hall-of-fame%202023/WhatsApp%20Video%202026-07-22%20at%2010.41.31%20PM.mp4",
+    "/hall-of-fame%202023/WhatsApp%20Video%202026-07-22%20at%2010.42.43%20PM.mp4",
+    "/hall-of-fame%202023/WhatsApp%20Video%202026-07-22%20at%2010.42.52%20PM.mp4",
+    "/hall-of-fame%202023/WhatsApp%20Video%202026-07-22%20at%2010.42.52%20PM%20(1).mp4",
+    "/hall-of-fame%202023/WhatsApp%20Video%202026-07-22%20at%2010.42.58%20PM.mp4",
+    "/hall-of-fame%202023/WhatsApp%20Video%202026-07-22%20at%2010.43.27%20PM.mp4",
+    "/hall-of-fame%202023/WhatsApp%20Video%202026-07-22%20at%2010.43.28%20PM.mp4",
+    "/hall-of-fame%202023/WhatsApp%20Video%202026-07-22%20at%2010.43.31%20PM.mp4",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % photos.length);
+        setIsTransitioning(false);
+      }, 1500);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [photos.length]);
+
+  return (
+    <div>
+      {/* Logo HUT RI 78 with animation */}
+      <div style={{ display: "flex", justifyContent: "center", padding: "2rem 1rem 1rem" }}>
+        <motion.img
+          src="/logohutri78.jpeg"
+          alt="Logo HUT RI Ke-78"
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{
+            scale: [1, 1.08, 1, 1.05, 1],
+            rotate: [0, 5, -5, 3, 0],
+            y: [0, -10, 0, -5, 0],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          style={{ width: "clamp(160px, 30vw, 260px)", height: "auto", borderRadius: "16px", filter: "drop-shadow(0 6px 20px rgba(220,38,38,0.4))" }}
+        />
+      </div>
+
+      {/* Hall of Fame 2023 */}
+      <div style={{ width: "100%", maxWidth: "56rem", margin: "0 auto", padding: "0 clamp(0.75rem, 3vw, 1.25rem)" }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
+          style={{ background: "var(--sd-bg-card, #fff)", borderRadius: "clamp(0.75rem, 2vw, 1.25rem)", border: "1px solid var(--sd-border, #e5e5e5)", boxShadow: "0 20px 40px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+
+          <div style={{ background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)", padding: "clamp(1rem, 3vw, 1.5rem) clamp(1rem, 3vw, 2rem)", textAlign: "center", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: "-2rem", right: "-2rem", width: "6rem", height: "6rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.1)" }} />
+            <div style={{ position: "absolute", bottom: "-1rem", left: "-1rem", width: "4rem", height: "4rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.08)" }} />
+            <div style={{ fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: "0.5rem" }}>&#127942;</div>
+            <h2 style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Hall of Fame 2023</h2>
+            <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>Malam Tirakat 16 Agustus &amp; HUT RI Ke-78 - 17 Agustus 2023</p>
+          </div>
+
+          <div style={{ padding: "clamp(1rem, 3vw, 2rem)" }}>
+            <div
+              style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: "0.75rem", overflow: "hidden", backgroundColor: "var(--sd-bg-secondary, #f5f5f5)", animation: "glowPulse 3s ease-in-out infinite", cursor: "zoom-in" }}
+              onClick={() => setLightboxOpen(true)}
+            >
+              <img
+                src={photos[currentIndex]}
+                alt={`Hall of Fame 2023 - ${currentIndex + 1}`}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  opacity: isTransitioning ? 0 : 1,
+                  transition: "opacity 1.5s ease-in-out",
+                }}
+              />
+              <div style={{ position: "absolute", bottom: "1rem", left: "50%", transform: "translateX(-50%)", backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", padding: "0.375rem 0.75rem", borderRadius: "9999px", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span style={{ color: "#fff", fontSize: "0.7rem", fontWeight: 600 }}>{currentIndex + 1} / {photos.length}</span>
+              </div>
+            </div>
+
+            <div style={{ marginTop: "1rem", textAlign: "center" }}>
+              <p style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)", color: "var(--sd-text-muted, #737373)", fontStyle: "italic" }}>
+                Momen-momen indah perayaan Malam Tirakat &amp; HUT RI Ke-78 bersama warga Melimewah
+              </p>
+            </div>
+
+            {/* Video Highlights */}
+            <div style={{ marginTop: "1.5rem" }}>
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <span style={{ display: "inline-block", backgroundColor: "#dc2626", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>&#127909; Video Highlights</span>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Dokumentasi Video Perayaan 2023</h3>
+              </div>
+              <style>{`
+                .video-grid-2023 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+                @media (min-width: 640px) { .video-grid-2023 { grid-template-columns: repeat(2, 1fr); } }
+                .video-card-2023 video { width: 100%; display: block; background: #000; border-radius: 0.5rem 0.5rem 0 0; }
+              `}</style>
+              <div className="video-grid-2023">
+                {videos.map((video, idx) => (
+                  <motion.div
+                    key={idx}
+                    className="video-card-2023"
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 + idx * 0.1 }}
+                    style={{ backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)", overflow: "hidden" }}
+                  >
+                    <video
+                      controls
+                      preload="metadata"
+                      playsInline
+                      onPlay={handleVideoPlay}
+                      onPause={handleVideoPause}
+                      onEnded={handleVideoEnded}
+                    >
+                      <source src={video} type="video/mp4" />
+                    </video>
+                    <div style={{ padding: "clamp(0.5rem, 2vw, 0.75rem)" }}>
+                      <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.7rem)", color: "var(--sd-text-muted, #737373)", margin: 0, textAlign: "center" }}>Video {idx + 1}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Susunan Panitia Inti */}
+            <div style={{ marginTop: "1.5rem", padding: "clamp(1rem, 3vw, 1.5rem)", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <span style={{ display: "inline-block", backgroundColor: "#dc2626", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>Panitia Inti</span>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Susunan Pengurus Malam Tirakat &amp; HUT RI Ke-78 Tahun 2023</h3>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #dc2626, #b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Shield size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pembina</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Hairul</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #d97706, #b45309)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Crown size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Ketua Panitia</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Arief</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #059669, #047857)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><PenLine size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Sekretaris</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Yusuf</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #2563eb, #1d4ed8)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Users size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Anggota</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Seluruh Warga GG. Melimewah</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Poster Lomba 2023 */}
+            <div style={{ marginTop: "1.5rem" }}>
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <span style={{ display: "inline-block", backgroundColor: "#dc2626", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>&#127991; Poster Lomba</span>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Poster Perlombaan HUT RI Ke-78</h3>
+              </div>
+              <div style={{ display: "flex", justifyContent: "center" }}>
+                <img
+                  src="/laporan%202023/WhatsApp%20Image%202026-07-22%20at%2010.42.06%20PM.jpeg"
+                  alt="Poster Lomba HUT RI 78"
+                  style={{ width: "100%", maxWidth: "400px", height: "auto", borderRadius: "0.75rem", boxShadow: "0 4px 15px rgba(0,0,0,0.1)" }}
+                />
+              </div>
+            </div>
+
+            {/* Laporan Kegiatan 2023 */}
+            <div style={{ marginTop: "1.5rem", padding: "clamp(1rem, 3vw, 1.5rem)", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <span style={{ display: "inline-block", backgroundColor: "#2563eb", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>&#128196; Laporan Kegiatan</span>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Dokumen Transparansi Kegiatan 2023</h3>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "0.75rem" }}>
+                <motion.a
+                  href="/laporan%202023/Laporan_Keuangan_HUT78_Gang_Meli.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.4 }}
+                  style={{ backgroundColor: "var(--sd-bg-card, #fff)", border: "1px solid var(--sd-border, #e5e5e5)", borderRadius: "0.75rem", padding: "1rem", textDecoration: "none", display: "flex", flexDirection: "column", gap: "0.5rem", transition: "all 0.2s" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <div style={{ width: "2rem", height: "2rem", borderRadius: "0.5rem", background: "linear-gradient(135deg, #dc2626, #b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><FileText size={14} /></div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Laporan Keuangan HUT 78</div>
+                      <div style={{ fontSize: "0.55rem", color: "var(--sd-text-muted, #737373)" }}>PDF Document</div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: "0.6rem", color: "var(--sd-text-muted, #737373)", margin: 0, lineHeight: 1.4 }}>Laporan transparansi keuangan perayaan HUT RI Ke-78 Gang Melimewah</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: "#2563eb", fontSize: "0.6rem", fontWeight: 600, marginTop: "auto" }}>
+                    <Download size={12} /> <span>Buka Dokumen</span>
+                  </div>
+                </motion.a>
+
+                <motion.a
+                  href="/laporan%202023/Rekap_Bagan_Badminton_Lengkap.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.5 }}
+                  style={{ backgroundColor: "var(--sd-bg-card, #fff)", border: "1px solid var(--sd-border, #e5e5e5)", borderRadius: "0.75rem", padding: "1rem", textDecoration: "none", display: "flex", flexDirection: "column", gap: "0.5rem", transition: "all 0.2s" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <div style={{ width: "2rem", height: "2rem", borderRadius: "0.5rem", background: "linear-gradient(135deg, #059669, #047857)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><FileText size={14} /></div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Rekap Bagan Badminton</div>
+                      <div style={{ fontSize: "0.55rem", color: "var(--sd-text-muted, #737373)" }}>PDF Document</div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: "0.6rem", color: "var(--sd-text-muted, #737373)", margin: 0, lineHeight: 1.4 }}>Rekap bagan lengkap perlombaan badminton HUT RI Ke-78</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: "#059669", fontSize: "0.6rem", fontWeight: 600, marginTop: "auto" }}>
+                    <Download size={12} /> <span>Buka Dokumen</span>
+                  </div>
+                </motion.a>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      <PhotoLightbox
+        photos={photos}
+        currentIndex={currentIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
+    </div>
+  );
+}
+
+// ==================== DATABASE 2022 TAB ====================
+function Database2022Tab() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const { isPlaying, togglePlay } = useMusic();
+  const [musicWasPlaying, setMusicWasPlaying] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const handleVideoPlay = () => {
+    if (isPlaying) {
+      setMusicWasPlaying(true);
+      togglePlay();
+    }
+  };
+
+  const handleVideoPause = () => {
+    if (musicWasPlaying) {
+      togglePlay();
+      setMusicWasPlaying(false);
+    }
+  };
+
+  const handleVideoEnded = () => {
+    if (musicWasPlaying) {
+      togglePlay();
+      setMusicWasPlaying(false);
+    }
+  };
+
+  const photos = [
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.41%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.41%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.42%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.42%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.42%20AM%20(2).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.53%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.53%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.53%20AM%20(2).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.54%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.54%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.54%20AM%20(2).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.55%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.21.55%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.15%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.15%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.15%20AM%20(2).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.15%20AM%20(3).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.16%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.16%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.17%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.17%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.17%20AM%20(2).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.17%20AM%20(3).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.18%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.18%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.19%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.19%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.19%20AM%20(2).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.20%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.20%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.20%20AM%20(2).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.20%20AM%20(3).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.21%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.21%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.21%20AM%20(2).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.22%20AM.jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.22%20AM%20(1).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.22%20AM%20(2).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.22%20AM%20(3).jpeg",
+    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.23%20AM.jpeg",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % photos.length);
+        setIsTransitioning(false);
+      }, 1500);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [photos.length]);
+
+  return (
+    <div>
+      {/* Logo HUT RI 77 with animation */}
+      <div style={{ display: "flex", justifyContent: "center", padding: "2rem 1rem 1rem" }}>
+        <motion.img
+          src="/logohutri77.jpeg"
+          alt="Logo HUT RI Ke-77"
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{
+            scale: [1, 1.08, 1, 1.05, 1],
+            rotate: [0, 5, -5, 3, 0],
+            y: [0, -10, 0, -5, 0],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          style={{ width: "clamp(160px, 30vw, 260px)", height: "auto", borderRadius: "16px", filter: "drop-shadow(0 6px 20px rgba(220,38,38,0.4))" }}
+        />
+      </div>
+
+      {/* Hall of Fame 2022 */}
+      <div style={{ width: "100%", maxWidth: "56rem", margin: "0 auto", padding: "0 clamp(0.75rem, 3vw, 1.25rem)" }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
+          style={{ background: "var(--sd-bg-card, #fff)", borderRadius: "clamp(0.75rem, 2vw, 1.25rem)", border: "1px solid var(--sd-border, #e5e5e5)", boxShadow: "0 20px 40px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+
+          <div style={{ background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)", padding: "clamp(1rem, 3vw, 1.5rem) clamp(1rem, 3vw, 2rem)", textAlign: "center", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: "-2rem", right: "-2rem", width: "6rem", height: "6rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.1)" }} />
+            <div style={{ position: "absolute", bottom: "-1rem", left: "-1rem", width: "4rem", height: "4rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.08)" }} />
+            <div style={{ fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: "0.5rem" }}>&#127942;</div>
+            <h2 style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Hall of Fame 2022</h2>
+            <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>Malam Tirakat 16 Agustus &amp; HUT RI Ke-77 - 17 Agustus 2022</p>
+          </div>
+
+          <div style={{ padding: "clamp(1rem, 3vw, 2rem)" }}>
+            <div
+              style={{ position: "relative", width: "100%", maxHeight: "500px", borderRadius: "0.75rem", overflow: "hidden", backgroundColor: "#000", display: "flex", justifyContent: "center", alignItems: "center", cursor: "zoom-in" }}
+              onClick={() => setLightboxOpen(true)}
+            >
+              <img
+                src={photos[currentIndex]}
+                alt={`Hall of Fame 2022 - ${currentIndex + 1}`}
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "500px",
+                  objectFit: "contain",
+                  opacity: isTransitioning ? 0 : 1,
+                  transition: "opacity 1.5s ease-in-out",
+                }}
+              />
+              <div style={{ position: "absolute", bottom: "1rem", left: "50%", transform: "translateX(-50%)", backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", padding: "0.375rem 0.75rem", borderRadius: "9999px", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span style={{ color: "#fff", fontSize: "0.7rem", fontWeight: 600 }}>{currentIndex + 1} / {photos.length}</span>
+              </div>
+            </div>
+
+            <div style={{ marginTop: "1rem", textAlign: "center" }}>
+              <p style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)", color: "var(--sd-text-muted, #737373)", fontStyle: "italic" }}>
+                Momen-momen indah perayaan Malam Tirakat &amp; HUT RI Ke-77 bersama warga Melimewah
+              </p>
+            </div>
+
+            {/* Video Highlights */}
+            <div style={{ marginTop: "1.5rem" }}>
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <span style={{ display: "inline-block", backgroundColor: "#dc2626", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>&#127909; Video Highlights</span>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Dokumentasi Video Perayaan 2022</h3>
+              </div>
+              <style>{`
+                .video-grid-2022 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+                @media (min-width: 640px) { .video-grid-2022 { grid-template-columns: repeat(2, 1fr); } }
+                .video-card-2022 video { width: 100%; display: block; background: #000; border-radius: 0.5rem 0.5rem 0 0; }
+              `}</style>
+              <div className="video-grid-2022">
+                {[
+                  "/hall-of-fame%202022/WhatsApp%20Video%202026-07-23%20at%201.21.53%20AM.mp4",
+                  "/hall-of-fame%202022/WhatsApp%20Video%202026-07-23%20at%201.22.14%20AM.mp4",
+                  "/hall-of-fame%202022/WhatsApp%20Video%202026-07-23%20at%201.22.16%20AM.mp4",
+                  "/hall-of-fame%202022/WhatsApp%20Video%202026-07-23%20at%201.22.18%20AM.mp4",
+                ].map((video, idx) => (
+                  <motion.div
+                    key={idx}
+                    className="video-card-2022"
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 + idx * 0.1 }}
+                    style={{ backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)", overflow: "hidden" }}
+                  >
+                    <video
+                      controls
+                      preload="metadata"
+                      playsInline
+                      onPlay={handleVideoPlay}
+                      onPause={handleVideoPause}
+                      onEnded={handleVideoEnded}
+                    >
+                      <source src={video} type="video/mp4" />
+                    </video>
+                    <div style={{ padding: "clamp(0.5rem, 2vw, 0.75rem)" }}>
+                      <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.7rem)", color: "var(--sd-text-muted, #737373)", margin: 0, textAlign: "center" }}>Video {idx + 1}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Susunan Panitia Inti */}
+            <div style={{ marginTop: "1.5rem", padding: "clamp(1rem, 3vw, 1.5rem)", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <span style={{ display: "inline-block", backgroundColor: "#dc2626", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>Panitia Inti</span>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Susunan Pengurus Malam Tirakat &amp; HUT RI Ke-77 Tahun 2022</h3>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #dc2626, #b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Shield size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pembina</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Benny</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #d97706, #b45309)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Crown size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Ketua Panitia</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Arief</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #059669, #047857)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><PenLine size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Sekretaris</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Yusuf</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #2563eb, #1d4ed8)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Users size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Anggota</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Seluruh Warga GG. Melimewah</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Laporan Kegiatan 2022 */}
+            <div style={{ marginTop: "1.5rem", padding: "clamp(1rem, 3vw, 1.5rem)", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <span style={{ display: "inline-block", backgroundColor: "#2563eb", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>&#128196; Laporan Kegiatan</span>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Dokumen Transparansi Kegiatan 2022</h3>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "0.75rem" }}>
+                <motion.a
+                  href="/laporan%202022/Laporan_Pesta_Rakyat_Gang_Meli.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.4 }}
+                  style={{ backgroundColor: "var(--sd-bg-card, #fff)", border: "1px solid var(--sd-border, #e5e5e5)", borderRadius: "0.75rem", padding: "1rem", textDecoration: "none", display: "flex", flexDirection: "column", gap: "0.5rem", transition: "all 0.2s" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <div style={{ width: "2rem", height: "2rem", borderRadius: "0.5rem", background: "linear-gradient(135deg, #dc2626, #b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><FileText size={14} /></div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Laporan Pesta Rakyat</div>
+                      <div style={{ fontSize: "0.55rem", color: "var(--sd-text-muted, #737373)" }}>PDF Document</div>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: "0.6rem", color: "var(--sd-text-muted, #737373)", margin: 0, lineHeight: 1.4 }}>Laporan pesta rakyat perayaan HUT RI Ke-77 Gang Melimewah</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: "#2563eb", fontSize: "0.6rem", fontWeight: 600, marginTop: "auto" }}>
+                    <Download size={12} /> <span>Buka Dokumen</span>
+                  </div>
+                </motion.a>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      <PhotoLightbox
+        photos={photos}
+        currentIndex={currentIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
     </div>
   );
 }
@@ -1122,7 +2254,10 @@ export default function SemarakPage() {
   const tabs = [
     { id: "beranda", label: "Home", icon: <Home size={16} /> },
     { id: "tirakatan", label: "Tirakatan", icon: <Moon size={16} /> },
-    { id: "arsip", label: "Arsip", icon: <Camera size={16} /> },
+    { id: "arsip", label: "Database 2025", icon: <Camera size={16} /> },
+    { id: "database2024", label: "Database 2024", icon: <Camera size={16} /> },
+    { id: "database2023", label: "Database 2023", icon: <Camera size={16} /> },
+    { id: "database2022", label: "Database 2022", icon: <Camera size={16} /> },
     { id: "fitur", label: "Fitur", icon: <Sparkles size={16} /> },
     { id: "game", label: "Game", icon: <Gamepad2 size={16} /> },
     { id: "tentang", label: "Tentang", icon: <Info size={16} /> },
@@ -1306,6 +2441,9 @@ export default function SemarakPage() {
         )}
         {activeTab === "tirakatan" && <TirakatanTab />}
         {activeTab === "arsip" && <ArsipTab />}
+        {activeTab === "database2024" && <Database2024Tab />}
+        {activeTab === "database2023" && <Database2023Tab />}
+        {activeTab === "database2022" && <Database2022Tab />}
         {activeTab === "fitur" && <FiturTab />}
         {activeTab === "game" && <GameTab />}
         {activeTab === "tentang" && <TentangTab />}
