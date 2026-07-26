@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial Login - Website E-Meli</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.7; color: #333; background: #f5f5f5; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    .cover { background: linear-gradient(135deg, #c62828, #b71c1c); color: white; padding: 50px 40px; border-radius: 12px; text-align: center; margin-bottom: 40px; }
+    .cover h1 { font-size: 2.2em; margin-bottom: 8px; }
+    .cover p { font-size: 1.1em; opacity: 0.9; }
+    h1 { color: #c62828; font-size: 1.6em; margin: 35px 0 15px; border-bottom: 3px solid #c62828; padding-bottom: 8px; }
+    p { margin-bottom: 12px; }
+    .step { background: white; border-radius: 10px; padding: 25px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .step-number { display: inline-block; background: #c62828; color: white; width: 30px; height: 30px; border-radius: 50%; text-align: center; line-height: 30px; font-weight: bold; margin-right: 10px; }
+    .screenshot { width: 100%; border: 2px solid #e0e0e0; border-radius: 8px; margin: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .screenshot-caption { text-align: center; font-style: italic; color: #666; font-size: 0.9em; margin-top: -8px; margin-bottom: 15px; }
+    .tip { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 12px 16px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+    .tip::before { content: "Tips: "; font-weight: bold; color: #2e7d32; }
+    .warning { background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px 16px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+    .warning::before { content: "Perhatian: "; font-weight: bold; color: #e65100; }
+    .info { background: #e3f2fd; border-left: 4px solid #2196f3; padding: 12px 16px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+    .info::before { content: "Info: "; font-weight: bold; color: #1565c0; }
+    .footer { text-align: center; padding: 30px; color: #999; font-size: 0.9em; }
+    @media print { .cover { page-break-after: always; } .step { page-break-inside: avoid; } }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="cover">
+    <h1>Tutorial Login</h1>
+    <p>Website E-Meli - HUT RI Ke-81</p>
+    <p style="margin-top:12px;font-size:0.95em;opacity:0.8;">Panduan Lengkap Login untuk Pengguna Baru</p>
+  </div>
+
+  <!-- LANGKAH 1 -->
+  <h1>Langkah 1: Buka Halaman Login</h1>
+  <div class="step">
+    <p>Buka browser (Chrome, Edge, Firefox) di komputer atau HP, lalu kunjungi alamat website.</p>
+    <img src="tutorial-images/01-login.png" class="screenshot" alt="Halaman Login">
+    <p class="screenshot-caption">Tampilan halaman login saat pertama kali dibuka</p>
+    <div class="info">Anda akan langsung melihat halaman login tanpa perlu membuka halaman lain terlebih dahulu.</div>
+  </div>
+
+  <!-- LANGKAH 2 -->
+  <h1>Langkah 2: Isi Username</h1>
+  <div class="step">
+    <p>Klik kolom <strong>Username</strong>, lalu ketik username yang sudah didaftarkan oleh administrator.</p>
+    <img src="tutorial-images/01-login.png" class="screenshot" alt="Kolom Username">
+    <p class="screenshot-caption">Klik kolom Username dan ketik akun Anda</p>
+  </div>
+
+  <!-- LANGKAH 3 -->
+  <h1>Langkah 3: Isi Password</h1>
+  <div class="step">
+    <p>Klik kolom <strong>Password</strong>, lalu ketik sandi Anda.</p>
+    <img src="tutorial-images/02-login-filled.png" class="screenshot" alt="Form Terisi">
+    <p class="screenshot-caption">Username dan password sudah terisi</p>
+    <div class="tip">Klik tombol <strong>"Tampilkan"</strong> untuk melihat password yang sedang diketekan. Ini membantu memastikan tidak ada kesalahan ketik.</div>
+  </div>
+
+  <!-- LANGKAH 4 -->
+  <h1>Langkah 4: Klik Tombol Masuk</h1>
+  <div class="step">
+    <p>Setelah yakin username dan password sudah benar, klik tombol <strong>"Masuk"</strong>.</p>
+    <img src="tutorial-images/02-login-filled.png" class="screenshot" alt="Tombol Masuk">
+    <p class="screenshot-caption">Klik tombol Masuk untuk masuk ke website</p>
+  </div>
+
+  <!-- LANGKAH 5 -->
+  <h1>Langkah 5: Login Berhasil</h1>
+  <div class="step">
+    <p>Jika login berhasil, Anda akan diarahkan ke halaman utama <strong>Semarak 17 Agustus</strong>.</p>
+    <img src="tutorial-images/03-after-login.png" class="screenshot" alt="Login Berhasil">
+    <p class="screenshot-caption">Selamat! Anda berhasil login dan masuk ke halaman utama</p>
+    <div class="info">Dari sini Anda bisa menjelajahi semua konten: Uraian Lomba, Hall of Fame, Database, Game, dan lainnya.</div>
+  </div>
+
+  <!-- TROUBLESHOOTING -->
+  <h1>Penanganan Kesalahan</h1>
+
+  <div class="step">
+    <h2><span class="step-number">!</span> Login Gagal: Username atau Password Salah</h2>
+    <p>Pesan error muncul jika username atau password tidak cocok.</p>
+    <p><strong>Solusi:</strong></p>
+    <ul style="padding-left:25px;">
+      <li>Pastikan tidak ada kesalahan ketik (perhatikan huruf besar/kecil)</li>
+      <li>Klik tombol <strong>"Tampilkan"</strong> untuk memeriksa password</li>
+      <li>Hubungi administrator jika lupa password</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">!</span> Halaman Tidak Bisa Dibuka</h2>
+    <p><strong>Solusi:</strong></p>
+    <ul style="padding-left:25px;">
+      <li>Pastikan terhubung ke WiFi yang benar</li>
+      <li>Coba hapus cache browser (<code>Ctrl+Shift+Delete</code>)</li>
+      <li>Coba browser lain (Chrome, Edge, Firefox)</li>
+    </ul>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">!</span> Halaman Kosong Setelah Login</h2>
+    <p><strong>Solusi:</strong></p>
+    <ul style="padding-left:25px;">
+      <li>Tekan <code>F5</code> untuk refresh halaman</li>
+      <li>Pastikan JavaScript aktif di browser Anda</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    <p>Tutorial Login - Website E-Meli HUT RI Ke-81</p>
+  </div>
+
+</div>
+</body>
+</html>
