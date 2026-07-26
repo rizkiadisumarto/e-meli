@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
 import StatCard from '../components/UI/StatCard';
 import { 
   ArrowDownToLine, 
   ArrowUpFromLine, 
   Wallet, 
   Users,
-  AlertCircle
+  AlertCircle,
+  Home
 } from 'lucide-react';
 import {
   Chart as ChartJS,
@@ -134,8 +136,16 @@ const DashboardPage = () => {
   return (
     <div className="dashboard">
       <div className="dashboard-welcome">
-        <h2>Selamat datang kembali, {user?.full_name}! 👋</h2>
-        <p className="text-muted">Berikut adalah ringkasan keuangan kas saat ini.</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div>
+            <h2>Selamat datang kembali, {user?.full_name}! 👋</h2>
+            <p className="text-muted">Berikut adalah ringkasan keuangan kas saat ini.</p>
+          </div>
+          <Link to="/semarak" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', backgroundColor: 'var(--primary)', color: '#fff', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'none', transition: 'all 0.2s' }}>
+            <Home size={16} />
+            Kembali ke Beranda
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-4 gap-6 mb-6">

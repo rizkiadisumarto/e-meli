@@ -228,10 +228,6 @@ function FloatingElements({ active }) {
         0%, 100% { box-shadow: 0 0 5px rgba(220,38,38,0.3); }
         50% { box-shadow: 0 0 20px rgba(220,38,38,0.6); }
       }
-      @keyframes shimmer {
-        0% { background-position: -200% 0; }
-        100% { background-position: 200% 0; }
-      }
       @keyframes bounce-soft {
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-5px); }
@@ -262,10 +258,6 @@ function FloatingElements({ active }) {
           0%, 100% { box-shadow: 0 0 5px rgba(220,38,38,0.3); }
           50% { box-shadow: 0 0 20px rgba(220,38,38,0.6); }
         }
-        @keyframes shimmer {
-          0% { background-position: -200% 0; }
-          100% { background-position: 200% 0; }
-        }
         @keyframes bounce-soft {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-5px); }
@@ -277,10 +269,13 @@ function FloatingElements({ active }) {
 
 // ==================== WELCOME POPUP (sekali per sesi) ====================
 function WelcomePopup({ onClose }) {
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(() => {
+    return !localStorage.getItem('semarak_welcome_shown');
+  });
 
   const handleClose = () => {
     setShow(false);
+    localStorage.setItem('semarak_welcome_shown', 'true');
     if (onClose) onClose();
   };
 
@@ -365,6 +360,7 @@ function Countdown({ animationsStarted }) {
         initial={animationsStarted ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }}
         animate={{ opacity: 1, y: 0 }}
         transition={animationsStarted ? { duration: 0.6 } : { duration: 0 }}
+
         style={{ position: "relative", overflow: "hidden", borderRadius: "1rem", backgroundColor: "var(--sd-bg-card, #fff)", border: "1px solid var(--sd-border, #fee2e2)", padding: "1rem", textAlign: "center", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}>
         <div style={{ position: "absolute", top: 0, left: 0, width: "5rem", height: "5rem", backgroundColor: "rgba(239,68,68,0.05)", borderRadius: "0 0 100% 0", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: 0, right: 0, width: "5rem", height: "5rem", backgroundColor: "rgba(239,68,68,0.05)", borderRadius: "100% 0 0 0", pointerEvents: "none" }} />
@@ -415,6 +411,7 @@ function TeksProklamasi({ animationsStarted }) {
         initial={animationsStarted ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
         animate={{ opacity: 1, y: 0 }}
         transition={animationsStarted ? { duration: 0.6, delay: 0.2 } : { duration: 0 }}
+
         style={{ background: "var(--sd-bg-card, #fff)", borderRadius: "clamp(0.75rem, 2vw, 1.25rem)", border: "1px solid var(--sd-border, #e5e5e5)", boxShadow: "0 20px 40px rgba(0,0,0,0.08)", overflow: "hidden" }}>
 
         <div style={{ background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)", padding: "clamp(1rem, 3vw, 1.5rem) clamp(1rem, 3vw, 2rem)", textAlign: "center", position: "relative", overflow: "hidden" }}>
@@ -532,6 +529,11 @@ function VideoGrid() {
     { src: "/hall-of-fame/video 2.mp4", label: "Video 2" },
     { src: "/hall-of-fame/video 3.mp4", label: "Video 3" },
     { src: "/hall-of-fame/video 4.mp4", label: "Video 4" },
+    { src: "/hall-of-fame/WhatsApp Video 2026-07-27 at 1.33.03 AM.mp4", label: "Video 5" },
+    { src: "/hall-of-fame/WhatsApp Video 2026-07-27 at 1.33.04 AM.mp4", label: "Video 6" },
+    { src: "/hall-of-fame/WhatsApp Video 2026-07-27 at 1.33.04 AM (1).mp4", label: "Video 7" },
+    { src: "/hall-of-fame/WhatsApp Video 2026-07-27 at 1.33.04 AM (2).mp4", label: "Video 8" },
+    { src: "/hall-of-fame/WhatsApp Video 2026-07-27 at 1.33.05 AM.mp4", label: "Video 9" },
   ];
 
   const handlePlay = useCallback((idx) => {
@@ -546,7 +548,8 @@ function VideoGrid() {
 
   const handlePause = useCallback(() => {
     setPlayingIdx(null);
-  }, []);
+    if (!isPlaying) togglePlay();
+  }, [isPlaying, togglePlay]);
 
   return (
     <div className="semarak-video-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "0.75rem" }}>
@@ -559,6 +562,7 @@ function VideoGrid() {
             preload="metadata"
             onPlay={() => handlePlay(idx)}
             onPause={handlePause}
+            onEnded={handlePause}
             className="semarak-video"
             style={{ width: "100%", aspectRatio: "9/16", objectFit: "cover", display: "block" }}
           />
@@ -577,7 +581,173 @@ function HallOfFame() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  const photos = Array.from({ length: 65 }, (_, i) => `/hall-of-fame/photo-${String(i + 1).padStart(3, '0')}.jpeg`);
+  const photos = [
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at .jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.00.57 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.00.59 A.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.00.59 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.01.0.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.01.00 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.01.00.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.01.01 l.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.01.013.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.01.044.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.01.06.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.01.08.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.01.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.0144.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.50 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.51 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.51 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.51 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.51 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.52 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.52 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.52 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.53 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.53 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.53 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.53 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.54 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.54 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.54 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.54 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.55 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.55 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.55 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.19.55 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.00 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.01 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.01 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.01 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.01 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.02 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.02 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.02 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.02 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.03 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.03 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.03 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.03 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.04 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.04 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.04 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.05 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.05 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.05 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.22.05 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.15 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.16 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.16 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.16 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.16 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.17 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.17 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.17 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.17 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.18 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.18 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.18 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.19 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.19 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.19 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.19 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.20 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.20 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.20 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.20 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.21 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.21 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.21 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.21 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.22 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.22 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.22 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.23 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.23 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.23 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.23 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.24 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.24 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.24 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.24 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.25 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.25 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.24.25 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.27.58 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.27.59 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.27.59 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.27.59 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.00 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.01 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.02 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.03 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.04 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.05 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.06 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.07 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.08 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.08 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.09 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.09 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.09 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.10 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.10 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.10 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.10 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.11 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.11 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.11 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.12 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.12 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.12 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.12 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.13 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.13 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.13 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.14 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.14 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.14 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.28.14 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.29.57 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.29.57 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.29.57 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.29.58 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.29.58 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.29.58 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.29.58 AM (4).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.29.58 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.29.59 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.29.59 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.29.59 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.29.59 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.00 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.00 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.00 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.01 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.01 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.01 AM (3).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.01 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.02 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.02 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.02 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.03 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.03 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.03 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.04 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.04 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.04 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.05 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.30.05 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.33.05 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.33.05 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.33.05 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.33.06 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.33.07 AM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.33.07 AM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.33.07 AM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-27 at 12.jpeg",
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -600,7 +770,7 @@ function HallOfFame() {
           <div style={{ position: "absolute", bottom: "-1rem", left: "-1rem", width: "4rem", height: "4rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.08)" }} />
           <div style={{ fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: "0.5rem" }}>&#127942;</div>
           <h2 style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Hall of Fame</h2>
-          <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>Malam Tirakat 16 Agustus & HUT RI Ke-80 - 17 Agustus 2025</p>
+          <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>Momen-momen indah perayaan HUT RI Ke-80 - 17 Agustus 2025</p>
         </div>
 
         <div style={{ padding: "clamp(1rem, 3vw, 2rem)" }}>
@@ -800,9 +970,11 @@ function FiturTab() {
         <h2 style={{ fontSize: "clamp(1.125rem, 3vw, 1.5rem)", fontWeight: 900, color: "var(--sd-text)", margin: "0 0 0.375rem" }}>Fitur <span style={{ color: "#dc2626" }}>E-Meli</span></h2>
         <p style={{ color: "var(--sd-text-muted)", fontSize: "0.8rem", margin: 0 }}>Sistem manajemen keuangan komunitas yang transparan dan modern</p>
       </div>
+      <hr style={{ width: "100%", maxWidth: "36rem", margin: "2rem auto", border: "none", borderTop: "1px solid var(--sd-border)" }} />
       <div className="semarak-feature-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "0.75rem", maxWidth: "56rem", margin: "0 auto" }}>
         {features.map((f, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.08 }}
+    
             style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "0.75rem", padding: "1.25rem", transition: "all 0.2s" }}
             onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
@@ -819,8 +991,7 @@ function FiturTab() {
 // ==================== URAIAN LOMBA ====================
 function UraianLomba() {
   return (
-    <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "1rem", padding: "1.5rem", position: "relative", overflow: "hidden" }}>
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "4px", background: "linear-gradient(90deg, #dc2626, #fbbf24, #dc2626)", backgroundSize: "200% 100%", animation: "shimmer 3s linear infinite" }} />
+    <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "1rem", padding: "1.5rem", position: "relative" }}>
       <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
         <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>&#127941;</div>
         <h3 style={{ fontSize: "clamp(1rem, 2.5vw, 1.25rem)", fontWeight: 900, color: "var(--sd-text)", margin: "0 0 0.25rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Uraian Lomba-Lomba</h3>
@@ -1133,8 +1304,7 @@ function Database2024Tab() {
             </div>
 
             {/* Uraian Lomba-Lomba 2024 */}
-            <div style={{ marginTop: "1.5rem", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)", padding: "clamp(1rem, 3vw, 1.5rem)", position: "relative", overflow: "hidden" }}>
-              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "4px", background: "linear-gradient(90deg, #dc2626, #fbbf24, #dc2626)", backgroundSize: "200% 100%", animation: "shimmer 3s linear infinite" }} />
+            <div style={{ marginTop: "1.5rem", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)", padding: "clamp(1rem, 3vw, 1.5rem)", position: "relative" }}>
               <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
                 <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>&#127941;</div>
                 <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 900, color: "var(--sd-text, #262626)", margin: "0 0 0.25rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Uraian Lomba-Lomba</h3>
@@ -2219,6 +2389,8 @@ function TentangTab() {
         <p style={{ color: "var(--sd-text-muted)", fontSize: "0.8rem", margin: 0 }}>Mengenal lebih dekat GG. Melimewah</p>
       </div>
 
+      <hr style={{ width: "100%", maxWidth: "36rem", margin: "2rem auto", border: "none", borderTop: "1px solid var(--sd-border)" }} />
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "1rem" }}>
         {/* About Card */}
         <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "0.75rem", padding: "1.5rem", maxWidth: "56rem", margin: "0 auto" }}>
@@ -2283,6 +2455,7 @@ export default function SemarakPage() {
 
   return (
     <div style={{ ...vars, minHeight: "100vh", backgroundColor: "var(--sd-bg)", fontFamily: "ui-sans-serif, system-ui, sans-serif", display: "flex", flexDirection: "column", color: "var(--sd-text)", transition: "background-color 0.3s, color 0.3s" }}>
+      
       <WelcomePopup onClose={() => { setMusicStarted(true); setAnimationsStarted(true); }} />
       <FloatingElements active={animationsStarted} />
       {/* Festive ribbon */}
@@ -2295,7 +2468,7 @@ export default function SemarakPage() {
           <button onClick={() => setDark(!dark)} style={{ width: "1.75rem", height: "1.75rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", border: "none" }} title={dark ? "Mode Siang" : "Mode Malam"}>
             {dark ? <Sun style={{ width: "0.875rem", height: "0.875rem", color: "#fff" }} /> : <Moon style={{ width: "0.875rem", height: "0.875rem", color: "#fff" }} />}
           </button>
-          <Link to="/login" style={{ display: "none", alignItems: "center", gap: "0.375rem", backgroundColor: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", padding: "0.375rem 0.75rem", borderRadius: "9999px", fontSize: "0.6rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.05em", textDecoration: "none" }} className="semarak-hide-mobile">
+          <Link to="/app" style={{ display: "none", alignItems: "center", gap: "0.375rem", backgroundColor: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", padding: "0.375rem 0.75rem", borderRadius: "9999px", fontSize: "0.6rem", fontWeight: 900, textTransform: "uppercase", letterSpacing: "0.05em", textDecoration: "none" }} className="semarak-hide-mobile">
             Masuk Dashboard
           </Link>
         </div>
@@ -2333,7 +2506,7 @@ export default function SemarakPage() {
             initial={animationsStarted ? { opacity: 0, scale: 0.8 } : { opacity: 1, scale: 1 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={animationsStarted ? { delay: 0.7, type: "spring" } : { duration: 0 }}>
-            <Link to="/login" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", backgroundColor: "#fff", color: "#b91c1c", fontWeight: 900, padding: "0.625rem 1.5rem", borderRadius: "9999px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: "0.5rem", textDecoration: "none", transition: "all 0.3s" }}
+            <Link to="/app" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", backgroundColor: "#fff", color: "#b91c1c", fontWeight: 900, padding: "0.625rem 1.5rem", borderRadius: "9999px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: "0.5rem", textDecoration: "none", transition: "all 0.3s" }}
               onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.05)"; e.currentTarget.style.boxShadow = "0 15px 25px rgba(0,0,0,0.2)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 10px 15px -3px rgba(0,0,0,0.1)"; }}>
               Masuk ke Dashboard E-Meli
@@ -2383,7 +2556,7 @@ export default function SemarakPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={animationsStarted ? { delay: 0.8 } : { duration: 0 }}
         style={{ backgroundColor: "var(--sd-bg-card)", borderBottom: "1px solid var(--sd-border)", position: "sticky", top: 0, zIndex: 40, transition: "background-color 0.3s" }}>
-        <div className="semarak-tabs">
+        <div className="semarak-tabs" style={{ borderBottom: "2px solid var(--sd-border)" }}>
           {tabs.map((tab, i) => (
             <motion.button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className="semarak-tab-btn"
@@ -2408,14 +2581,16 @@ export default function SemarakPage() {
         {activeTab === "beranda" && (
           <>
             <Countdown animationsStarted={animationsStarted} />
+            <hr style={{ width: "100%", maxWidth: "36rem", margin: "2rem auto", border: "none", borderTop: "1px solid var(--sd-border)" }} />
             <TeksProklamasi animationsStarted={animationsStarted} />
+
+            <hr style={{ width: "100%", maxWidth: "36rem", margin: "2rem auto", border: "none", borderTop: "1px solid var(--sd-border)" }} />
 
             {/* Coming Soon: Hall of Fame & Susunan Panitia */}
             <div style={{ width: "100%", maxWidth: "56rem", margin: "0 auto", padding: "1.5rem clamp(0.75rem, 3vw, 1.25rem)" }}>
               <div className="semarak-coming-soon-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1rem" }}>
                 {/* Hall of Fame Coming Soon */}
-                <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "1rem", padding: "2rem 1.5rem", textAlign: "center", position: "relative", overflow: "hidden" }}>
-                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "4px", background: "linear-gradient(90deg, #dc2626, #d97706, #dc2626)", backgroundSize: "200% 100%", animation: "shimmer 3s linear infinite" }} />
+                <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "1rem", padding: "2rem 1.5rem", textAlign: "center", position: "relative" }}>
                   <div style={{ fontSize: "3rem", marginBottom: "0.75rem" }}>&#127942;</div>
                   <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--sd-text)", margin: "0 0 0.375rem" }}>Hall of Fame</h3>
                   <p style={{ fontSize: "0.75rem", color: "var(--sd-text-muted)", margin: "0 0 1rem" }}>Momen-momen perayaan HUT RI Ke-81</p>
@@ -2425,8 +2600,7 @@ export default function SemarakPage() {
                 </div>
 
                 {/* Susunan Panitia Coming Soon */}
-                <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "1rem", padding: "2rem 1.5rem", textAlign: "center", position: "relative", overflow: "hidden" }}>
-                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "4px", background: "linear-gradient(90deg, #d97706, #dc2626, #d97706)", backgroundSize: "200% 100%", animation: "shimmer 3s linear infinite" }} />
+                <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "1rem", padding: "2rem 1.5rem", textAlign: "center", position: "relative" }}>
                   <div style={{ fontSize: "3rem", marginBottom: "0.75rem" }}>&#129333;</div>
                   <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--sd-text)", margin: "0 0 0.375rem" }}>Susunan Panitia Inti</h3>
                   <p style={{ fontSize: "0.75rem", color: "var(--sd-text-muted)", margin: "0 0 1rem" }}>Pengurus HUT RI Ke-81 Tahun 2026</p>

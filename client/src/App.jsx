@@ -54,10 +54,8 @@ const AppRoutes = () => {
   return (
     <>
       <Routes>
-        <Route path="/login" element={user ? <Navigate to="/app" replace /> : <LoginPage />} />
-        <Route path="/semarak" element={<SemarakPage />} />
-        <Route path="/" element={<SemarakPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/" element={user ? <Navigate to="/semarak" replace /> : <LoginPage />} />
+        <Route path="/semarak" element={<ProtectedRoute><SemarakPage /></ProtectedRoute>} />
 
         <Route path="/app" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<DashboardPage />} />
@@ -79,6 +77,7 @@ const AppRoutes = () => {
             </ProtectedRoute>
           } />
         </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
   );
