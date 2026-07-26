@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial Website E-Meli - HUT RI Ke-81</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.7; color: #333; background: #f5f5f5; }
+    .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .cover { background: linear-gradient(135deg, #c62828, #b71c1c); color: white; padding: 60px 40px; border-radius: 12px; text-align: center; margin-bottom: 40px; }
+    .cover h1 { font-size: 2.5em; margin-bottom: 10px; }
+    .cover p { font-size: 1.2em; opacity: 0.9; }
+    h1 { color: #c62828; font-size: 1.8em; margin: 40px 0 20px; border-bottom: 3px solid #c62828; padding-bottom: 10px; }
+    h2 { color: #e53935; font-size: 1.3em; margin: 25px 0 15px; }
+    h3 { color: #333; font-size: 1.1em; margin: 20px 0 10px; }
+    p { margin-bottom: 12px; }
+    .step { background: white; border-radius: 10px; padding: 25px; margin: 25px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .step-number { display: inline-block; background: #c62828; color: white; width: 32px; height: 32px; border-radius: 50%; text-align: center; line-height: 32px; font-weight: bold; margin-right: 10px; }
+    .screenshot { width: 100%; border: 2px solid #e0e0e0; border-radius: 8px; margin: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .screenshot-caption { text-align: center; font-style: italic; color: #666; font-size: 0.9em; margin-top: -8px; margin-bottom: 15px; }
+    .tip { background: #e8f5e9; border-left: 4px solid #4caf50; padding: 12px 16px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+    .tip::before { content: "Tips: "; font-weight: bold; color: #2e7d32; }
+    .warning { background: #fff3e0; border-left: 4px solid #ff9800; padding: 12px 16px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+    .warning::before { content: "Perhatian: "; font-weight: bold; color: #e65100; }
+    .info { background: #e3f2fd; border-left: 4px solid #2196f3; padding: 12px 16px; margin: 15px 0; border-radius: 0 8px 8px 0; }
+    .info::before { content: "Info: "; font-weight: bold; color: #1565c0; }
+    code { background: #f5f5f5; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; color: #c62828; }
+    .toc { background: white; padding: 25px; border-radius: 10px; margin: 25px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .toc ul { list-style: none; padding-left: 0; }
+    .toc li { padding: 6px 0; }
+    .toc a { color: #c62828; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .toc ul ul { padding-left: 20px; }
+    .badge { display: inline-block; background: #c62828; color: white; padding: 2px 10px; border-radius: 12px; font-size: 0.8em; margin-left: 8px; }
+    table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background: #c62828; color: white; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    .footer { text-align: center; padding: 30px; color: #999; font-size: 0.9em; }
+    @media print { .cover { page-break-after: always; } h1 { page-break-before: always; } .step { page-break-inside: avoid; } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- COVER -->
+  <div class="cover">
+    <h1>Tutorial Website E-Meli</h1>
+    <p>HUT RI Ke-81 - Semarak Kemerdekaan</p>
+    <p style="margin-top:15px;font-size:1em;opacity:0.85;">Panduan Lengkap untuk Pengguna Baru</p>
+  </div>
+
+  <!-- DAFTAR ISI -->
+  <div class="toc">
+    <h2>Daftar Isi</h2>
+    <ul>
+      <li><a href="#login">1. Login ke Website</a></li>
+      <li><a href="#semarak">2. Halaman Utama (Semarak 17 Agustus)</a></li>
+      <li>
+        <a href="#tabs">3. Navigasi Tab</a>
+        <ul>
+          <li><a href="#tab-tirakatan">3.1 Tab Tirakatan & Uraian Lomba</a></li>
+          <li><a href="#tab-database">3.2 Tab Database 2025</a></li>
+          <li><a href="#tab-tentang">3.3 Tab Tentang (Hall of Fame)</a></li>
+          <li><a href="#tab-game">3.4 Tab Game</a></li>
+        </ul>
+      </li>
+      <li><a href="#countdown">4. Countdown & Musik Latar</a></li>
+      <li><a href="#darkmode">5. Mode Gelap / Mode Terang</a></li>
+      <li><a href="#database">6. Menggunakan Database (Tabel Data)</a></li>
+      <li><a href="#hall-of-fame">7. Hall of Fame (Galeri Foto & Video)</a></li>
+      <li><a href="#dashboard">8. Masuk ke Dashboard (Admin)</a></li>
+      <li><a href="#faq">9. Pertanyaan Umum (FAQ)</a></li>
+    </ul>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 1: LOGIN -->
+  <!-- ============================================ -->
+  <h1 id="login">1. Login ke Website</h1>
+
+  <div class="step">
+    <h2><span class="step-number">1</span> Buka Halaman Login</h2>
+    <p>Buka browser (Chrome, Edge, Firefox) dan kunjungi alamat website. Anda akan langsung melihat halaman login.</p>
+    <img src="01-login.png" class="screenshot" alt="Halaman Login">
+    <p class="screenshot-caption">Tampilan halaman login saat pertama kali dibuka</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">2</span> Masukkan Username & Password</h2>
+    <p>Isi kolom <strong>Username</strong> dan <strong>Password</strong> dengan akun yang sudah didaftarkan.</p>
+    <img src="02-login-filled.png" class="screenshot" alt="Form Login Terisi">
+    <p class="screenshot-caption">Form login sudah diisi dengan username dan password</p>
+    <div class="tip">Tombol <strong>"Tampilkan"</strong> berfungsi untuk melihat password yang sedang diketekan.</div>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">3</span> Klik Tombol Masuk</h2>
+    <p>Setelah mengisi username dan password, klik tombol <strong>"Masuk"</strong>. Jika berhasil, Anda akan diarahkan ke halaman utama Semarak 17 Agustus.</p>
+    <img src="03-after-login.png" class="screenshot" alt="Setelah Login Berhasil">
+    <p class="screenshot-caption">Setelah login berhasil, Anda langsung masuk ke halaman Semarak</p>
+    <div class="warning">Jika login gagal, pastikan username dan password sudah benar. Hubungi administrator jika lupa password.</div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 2: SEMARAK LANDING PAGE -->
+  <!-- ============================================ -->
+  <h1 id="semarak">2. Halaman Utama (Semarak 17 Agustus)</h1>
+
+  <div class="step">
+    <h2><span class="step-number">1</span> Hero Section</h2>
+    <p>Saat pertama masuk, Anda akan melihat bagian utama (hero section) dengan judul besar <strong>"Semarak 17 Agustus"</strong> dan pilihan tombol aksi.</p>
+    <img src="04-hero.png" class="screenshot" alt="Hero Section">
+    <p class="screenshot-caption">Tampilan bagian utama halaman Semarak</p>
+    <div class="info">Tombol <strong>"Lihat Uraian Lomba"</strong> akan langsung membawa Anda ke bagian daftar lomba.</div>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">2</span> Scroll ke Bawah untuk Countdown</h2>
+    <p>Gulir ke bawah untuk melihat <strong>Countdown Hari Kemerdekaan</strong> yang menampilkan waktu tersisa menuju 17 Agustus.</p>
+    <img src="05-countdown.png" class="screenshot" alt="Countdown Section">
+    <p class="screenshot-caption">Hitung mundur menuju Hari Kemerdekaan RI Ke-81</p>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 3: NAVIGASI TAB -->
+  <!-- ============================================ -->
+  <h1 id="tabs">3. Navigasi Tab</h1>
+
+  <div class="step">
+    <h2><span class="step-number">1</span> Tab Navigation</h2>
+    <p>Di bagian atas halaman terdapat tombol-tombol tab untuk berpindah antar bagian:</p>
+    <img src="06-tab-navigation.png" class="screenshot" alt="Tab Navigation">
+    <p class="screenshot-caption">Tombol tab navigasi di bagian atas halaman</p>
+
+    <table>
+      <tr>
+        <th>Nama Tab</th>
+        <th>Fungsi</th>
+      </tr>
+      <tr>
+        <td><strong>Tirakatan</strong></td>
+        <td>Uraian lomba dan informasi tirakatan</td>
+      </tr>
+      <tr>
+        <td><strong>Database 2025</strong></td>
+        <td>Tabel data peserta/pendaftaran</td>
+      </tr>
+      <tr>
+        <td><strong>Tentang</strong></td>
+        <td>Hall of Fame: galeri foto dan video</td>
+      </tr>
+      <tr>
+        <td><strong>Game</strong></td>
+        <td>Mini game interaktif</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Tab Tirakatan -->
+  <h2 id="tab-tirakatan">3.1 Tab Tirakatan & Uraian Lomba</h2>
+  <div class="step">
+    <p>Klik tab <strong>"Tirakatan"</strong> untuk melihat daftar uraian lomba yang akan diadakan.</p>
+    <img src="07-tirakatan.png" class="screenshot" alt="Tab Tirakatan">
+    <p class="screenshot-caption">Tab Tirakatan menampilkan uraian lomba</p>
+    <div class="tip">Anda bisa menggulir ke bawah untuk melihat semua jenis lomba yang tersedia.</div>
+  </div>
+
+  <!-- Tab Database -->
+  <h2 id="tab-database">3.2 Tab Database 2025</h2>
+  <div class="step">
+    <p>Klik tab <strong>"Database 2025"</strong> untuk melihat data peserta dalam format tabel.</p>
+    <img src="08-database-2025.png" class="screenshot" alt="Tab Database 2025">
+    <p class="screenshot-caption">Tab Database 2025 menampilkan data peserta</p>
+  </div>
+
+  <div class="step">
+    <p>Gulir ke bawah untuk melihat isi tabel data secara lengkap.</p>
+    <img src="09-database-table.png" class="screenshot" alt="Tabel Database">
+    <p class="screenshot-caption">Tabel data peserta dengan kolom informasi</p>
+  </div>
+
+  <!-- Tab Tentang / Hall of Fame -->
+  <h2 id="tab-tentang">3.3 Tab Tentang (Hall of Fame)</h2>
+  <div class="step">
+    <p>Klik tab <strong>"Tentang"</strong> untuk melihat Hall of Fame — galeri foto dan video kenangan kegiatan.</p>
+    <img src="10-tentang.png" class="screenshot" alt="Tab Tentang">
+    <p class="screenshot-caption">Tab Tentang menampilkan Hall of Fame</p>
+  </div>
+
+  <div class="step">
+    <p>Gulir ke bawah untuk melihat koleksi foto dalam format grid.</p>
+    <img src="11-hall-of-fame.png" class="screenshot" alt="Hall of Fame Galeri">
+    <p class="screenshot-caption">Galeri foto Hall of Fame dalam tampilan grid</p>
+  </div>
+
+  <div class="step">
+    <h3>Membuka Foto (Lightbox)</h3>
+    <p>Klik pada salah satu foto untuk membuka tampilan layar penuh (lightbox).</p>
+    <img src="12-lightbox.png" class="screenshot" alt="Lightbox Foto">
+    <p class="screenshot-caption">Tampilan foto dalam mode layar penuh (lightbox)</p>
+    <div class="tip">Klik tombol <strong>X</strong> atau tekan tombol <strong>Escape</strong> untuk menutup lightbox.</div>
+  </div>
+
+  <!-- Tab Game -->
+  <h2 id="tab-game">3.4 Tab Game</h2>
+  <div class="step">
+    <p>Klik tab <strong>"Game"</strong> untuk mencoba mini game yang tersedia.</p>
+    <img src="13-game.png" class="screenshot" alt="Tab Game">
+    <p class="screenshot-caption">Tab Game menampilkan mini game interaktif</p>
+  </div>
+
+  <div class="step">
+    <p>Gulir ke bawah untuk melihat detail permainan dan cara bermain.</p>
+    <img src="14-game-scroll.png" class="screenshot" alt="Game Detail">
+    <p class="screenshot-caption">Detail dan instruksi permainan</p>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 4: COUNTDOWN & MUSIK -->
+  <!-- ============================================ -->
+  <h1 id="countdown">4. Countdown & Musik Latar</h1>
+
+  <div class="step">
+    <h2><span class="step-number">1</span> Countdown Timer</h2>
+    <p>Di bagian tengah halaman terdapat timer hitung mundur yang menampilkan waktu tersisa dalam format hari, jam, menit, dan detik.</p>
+    <div class="info">Countdown akan otomatis berhenti di <strong>00:00:00:00</strong> ketika tanggal 17 Agustus tiba.</div>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">2</span> Musik Latar</h2>
+    <p>Di pojok kanan bawah terdapat tombol musik untuk menghidupkan atau mematikan lagu nasional/lagu kemerdekaan sebagai musik latar.</p>
+    <p><strong>Cara menggunakan:</strong></p>
+    <ul style="padding-left: 25px; margin-bottom: 12px;">
+      <li><strong>Klik tombol musik</strong> untuk memutar lagu</li>
+      <li><strong>Klik lagi</strong> untuk menjeda/mematikan</li>
+    </ul>
+    <div class="tip">Musik akan terus bermain meskipun Anda berpindah tab atau scroll ke bawah. Jika Anda membuka video di Hall of Fame, musik akan berhenti otomatis.</div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 5: DARK MODE -->
+  <!-- ============================================ -->
+  <h1 id="darkmode">5. Mode Gelap / Mode Terang</h1>
+
+  <div class="step">
+    <h2><span class="step-number">1</span> Mengubah Mode Tampilan</h2>
+    <p>Di pojok kanan atas terdapat tombol untuk berpindah antara Mode Terang (siang) dan Mode Gelap (malam).</p>
+    <img src="15-dark-mode.png" class="screenshot" alt="Mode Gelap">
+    <p class="screenshot-caption">Tampilan website dalam mode gelap</p>
+    <div class="info">Mode gelap membantu mengurangi kelelahan mata saat menggunakan website di malam hari.</div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 6: DATABASE -->
+  <!-- ============================================ -->
+  <h1 id="database">6. Menggunakan Database (Tabel Data)</h1>
+
+  <div class="step">
+    <h2><span class="step-number">1</span> Melihat Data</h2>
+    <p>Data ditampilkan dalam format tabel dengan kolom yang rapi. Untuk melihat data:</p>
+    <ol style="padding-left: 25px;">
+      <li>Buka tab <strong>"Database 2025"</strong></li>
+      <li>Gulir ke bawah untuk melihat isi tabel</li>
+      <li>Gunakan tombol panah atau scroll bar jika data banyak</li>
+    </ol>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">2</span> Mencari Data</h2>
+    <p>Di atas tabel terdapat kolom <strong>pencarian</strong>. Ketik nama atau kata kunci untuk memfilter data secara langsung.</p>
+    <div class="tip">Pencarian bersifat real-time — data akan langsung terfilter saat Anda mengetik.</div>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">3</span> Mengunduh Data</h2>
+    <p>Jika tersedia, klik tombol <strong>"Download CSV"</strong> atau <strong>"Download Excel"</strong> untuk mengunduh data ke komputer Anda.</p>
+    <div class="warning">File yang diunduh akan tersimpan di folder <strong>Downloads</strong> komputer Anda.</div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 7: HALL OF FAME -->
+  <!-- ============================================ -->
+  <h1 id="hall-of-fame">7. Hall of Fame (Galeri Foto & Video)</h1>
+
+  <div class="step">
+    <h2><span class="step-number">1</span> Melihat Galeri Foto</h2>
+    <p>Tab <strong>"Tentang"</strong> berisi galeri foto kegiatan dalam format grid. Klik pada foto untuk melihat ukuran penuh.</p>
+    <img src="11-hall-of-fame.png" class="screenshot" alt="Galeri Foto">
+    <p class="screenshot-caption">Koleksi foto dalam tampilan grid</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">2</span> Memutar Video</h2>
+    <p>Di bawah galeri foto, terdapat bagian video yang bisa diputar langsung di browser.</p>
+    <ul style="padding-left: 25px;">
+      <li>Klik tombol <strong>Play ▶</strong> untuk memulai video</li>
+      <li>Klik <strong>Pause ⏸</strong> untuk menjeda</li>
+      <li>Gunakan <strong>Fullscreen ⛶</strong> untuk tampilan layar penuh</li>
+    </ul>
+    <div class="tip">Saat video diputar, musik latar akan berhenti otomatis. Saat video dijeda atau selesai, musik akan kembali berputar.</div>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">3</span> Navigasi Foto (Lightbox)</h2>
+    <p>Setelah membuka foto dalam lightbox, Anda bisa:</p>
+    <ul style="padding-left: 25px;">
+      <li>Klik tombol <strong>←</strong> (kiri) untuk foto sebelumnya</li>
+      <li>Klik tombol <strong>→</strong> (kanan) untuk foto berikutnya</li>
+      <li>Klik tombol <strong>X</strong> atau tekan <strong>Escape</strong> untuk menutup</li>
+    </ul>
+    <img src="12-lightbox.png" class="screenshot" alt="Navigasi Lightbox">
+    <p class="screenshot-caption">Tampilan lightbox dengan tombol navigasi</p>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 8: DASHBOARD -->
+  <!-- ============================================ -->
+  <h1 id="dashboard">8. Masuk ke Dashboard (Admin)</h1>
+
+  <div class="step">
+    <h2><span class="step-number">1</span> Akses Dashboard</h2>
+    <p>Dari halaman utama, klik tombol <strong>"Masuk ke Dashboard E-Meli"</strong> untuk masuk ke panel admin.</p>
+    <img src="16-dashboard.png" class="screenshot" alt="Dashboard Admin">
+    <p class="screenshot-caption">Tampilan Dashboard admin</p>
+    <div class="warning">Dashboard hanya bisa diakses oleh admin yang sudah login. Jika tombol tidak muncul, pastikan Anda sudah login dengan akun admin.</div>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">2</span> Fitur Dashboard</h2>
+    <p>Di dashboard, admin dapat:</p>
+    <ul style="padding-left: 25px;">
+      <li>Mengelola data peserta dan pendaftaran</li>
+      <li>Mengupload foto dan video</li>
+      <li>Mengatur informasi lomba</li>
+      <li>Mengelola konten website</li>
+    </ul>
+    <img src="17-dashboard-scroll.png" class="screenshot" alt="Dashboard Detail">
+    <p class="screenshot-caption">Detail fitur di dalam Dashboard</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">3</span> Kembali ke Halaman Utama</h2>
+    <p>Klik tombol <strong>"Kembali ke Beranda"</strong> untuk kembali ke halaman Semarak 17 Agustus.</p>
+    <img src="18-back-semarak.png" class="screenshot" alt="Kembali ke Halaman Utama">
+    <p class="screenshot-caption">Tombol "Kembali ke Beranda" di pojok kiri atas dashboard</p>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SECTION 9: FAQ -->
+  <!-- ============================================ -->
+  <h1 id="faq">9. Pertanyaan Umum (FAQ)</h1>
+
+  <div class="step">
+    <h2><span class="step-number">Q</span> Bagaimana cara mengganti password?</h2>
+    <p>Hubungi administrator sistem untuk mengubah password akun Anda.</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">Q</span> Website tidak bisa dibuka?</h2>
+    <p>Pastikan Anda terhubung ke jaringan WiFi yang benar. Jika masih tidak bisa, coba hapus cache browser atau gunakan browser lain.</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">Q</span> Musik tidak berbunyi?</h2>
+    <p>Beberapa browser memblokir autoplay musik. Klik tombol musik di pojok kanan bawah untuk memulai pemutaran.</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">Q</span> Foto tidak bisa dibuka?</h2>
+    <p>Pastikan koneksi internet stabil. Jika foto masih tidak muncul, coba refresh halaman dengan menekan <code>F5</code>.</p>
+  </div>
+
+  <div class="step">
+    <h2><span class="step-number">Q</span> Countdown tidak muncul?</h2>
+    <p>Countdown hanya muncul sebelum tanggal 17 Agustus. Setelah hari H, countdown akan berhenti di 00:00:00:00.</p>
+  </div>
+
+  <div class="footer">
+    <p>Tutorial Website E-Meli - HUT RI Ke-81</p>
+    <p>Dibuat untuk memandu pengguna baru</p>
+  </div>
+
+</div>
+
+</body>
+</html>
