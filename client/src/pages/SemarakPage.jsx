@@ -2444,7 +2444,9 @@ function TentangTab() {
 export default function SemarakPage() {
   const [dark, setDark] = useDarkMode();
   const [musicStarted, setMusicStarted] = useState(false);
-  const [animationsStarted, setAnimationsStarted] = useState(false);
+  const [animationsStarted, setAnimationsStarted] = useState(() => {
+    return localStorage.getItem('semarak_welcome_shown') === 'true';
+  });
   const [activeTab, setActiveTab] = useState("beranda");
 
   const tabs = [
