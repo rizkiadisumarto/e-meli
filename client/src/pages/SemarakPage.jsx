@@ -5,7 +5,8 @@ import {
   Flag, Calendar, Heart, Volume2, Sun, Moon, X, Shield, Crown, PenLine, Users,
   Home, Sparkles, Camera, Info, ChevronRight, Wallet, CreditCard, BarChart3,
   FileText, MapPin, Phone, Mail, Clock, Gamepad2, Star, BookOpen, Coffee,
-  Download, FileDown, Trophy, Play, PlayCircle, ZoomIn, ZoomOut, ChevronLeft, ChevronRight as ChevronRightIcon
+  Download, FileDown, Trophy, Play, PlayCircle, ZoomIn, ZoomOut, ChevronLeft, ChevronRight as ChevronRightIcon,
+  UserCheck
 } from "lucide-react";
 import { useMusic } from "../context/MusicContext";
 import "./SemarakPage.css";
@@ -534,6 +535,7 @@ function VideoGrid() {
     { src: "/hall-of-fame/WhatsApp Video 2026-07-27 at 1.33.04 AM (1).mp4", label: "Video 7" },
     { src: "/hall-of-fame/WhatsApp Video 2026-07-27 at 1.33.04 AM (2).mp4", label: "Video 8" },
     { src: "/hall-of-fame/WhatsApp Video 2026-07-27 at 1.33.05 AM.mp4", label: "Video 9" },
+    { src: "/hall-of-fame/WhatsApp Video 2026-07-31 at 4.19.35 PM.mp4", label: "Video 10" },
   ];
 
   const handlePlay = useCallback((idx) => {
@@ -747,6 +749,13 @@ function HallOfFame() {
     "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.33.07 AM (2).jpeg",
     "/hall-of-fame/WhatsApp Image 2026-07-27 at 1.33.07 AM.jpeg",
     "/hall-of-fame/WhatsApp Image 2026-07-27 at 12.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-31 at 4.19.35 PM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-31 at 4.19.36 PM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-31 at 4.19.36 PM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-31 at 4.19.36 PM.jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-31 at 4.19.37 PM (1).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-31 at 4.19.37 PM (2).jpeg",
+    "/hall-of-fame/WhatsApp Image 2026-07-31 at 4.19.37 PM.jpeg",
   ];
 
   useEffect(() => {
@@ -837,21 +846,29 @@ function HallOfFame() {
                 </div>
               </div>
 
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #059669, #047857)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><PenLine size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Sekretaris</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Yusuf</div>
+                  </div>
+                </div>
+
               <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
-                <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #059669, #047857)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><PenLine size={18} /></div>
+                <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #0891b2, #0e7490)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><UserCheck size={18} /></div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Sekretaris</div>
-                  <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Yusuf</div>
+                  <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Koordinator</div>
+                  <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Benny</div>
                 </div>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
-                <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #2563eb, #1d4ed8)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Users size={18} /></div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Anggota</div>
-                  <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Seluruh Warga GG. Melimewah</div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #2563eb, #1d4ed8)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Users size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Anggota</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Seluruh Warga GG. Melimewah</div>
+                  </div>
                 </div>
-              </div>
             </div>
           </div>
         </div>
@@ -1691,6 +1708,14 @@ function Database2023Tab() {
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Ketua Panitia</div>
                     <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Arief</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #7c3aed, #6d28d9)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Trophy size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Ketua Pelaksana Perlombaan Badminton</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Sigit</div>
                   </div>
                 </div>
 

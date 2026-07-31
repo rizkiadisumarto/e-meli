@@ -1,11 +1,12 @@
 import { motion } from "motion/react";
-import { Users, Shield, Crown, FileText, Wallet } from "lucide-react";
+import { Users, Shield, Crown, FileText, Wallet, Trophy } from "lucide-react";
 
 const panitia = [
   { name: "Bapak Hairul", role: "Pembina", icon: <Shield className="w-5 h-5" />, color: "bg-red-50 text-red-600 border-red-200" },
   { name: "Bapak Arief", role: "Ketua Panitia", icon: <Crown className="w-5 h-5" />, color: "bg-amber-50 text-amber-600 border-amber-200" },
   { name: "Bapak Yusuf", role: "Sekretaris", icon: <FileText className="w-5 h-5" />, color: "bg-blue-50 text-blue-600 border-blue-200" },
   { name: "Bapak Ucup", role: "Bendahara", icon: <Wallet className="w-5 h-5" />, color: "bg-green-50 text-green-600 border-green-200" },
+  { name: "Bapak Sigit", role: "Ketua Pelaksana Perlombaan Badminton", icon: <Trophy className="w-5 h-5" />, color: "bg-purple-50 text-purple-600 border-purple-200" },
 ];
 
 export default function PanitiaInti() {
@@ -30,7 +31,7 @@ export default function PanitiaInti() {
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {panitia.map((person, index) => (
           <motion.div
             key={index}
