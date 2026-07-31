@@ -2427,8 +2427,7 @@ function TentangTab() {
             </div>
           </div>
           <p style={{ fontSize: "0.8rem", color: "var(--sd-text-muted)", lineHeight: 1.7, margin: 0 }}>
-            Komunitas warga GG. Melimewah yang selalu menjaga semangat kekeluargaan dan gotong royong.
-            Dengan sistem E-Meli, seluruh transaksi keuangan komunitas menjadi transparan dan dapat diakses oleh semua anggota.
+            Komunitas warga GG. Melimewah yang selalu menjaga API semangat kekeluargaan dan gotong royong. Terkadang Angin yang kencang dalam bentuk lelah, salah pengertiaan, belum saling mengenal, dan bentuk lainnya selalu mencoba memadamkan API kekeluargaan gang yang kita cinta ini. Tapi kita semua yakin dan percaya bahwa dimanapun kita berada kita akan selalu berhadapan dengan Angin, Angin ingin meminta maaf tapi Angin tidak bisa berbicara, Angin yang kencang dapat di jadikan salah satu faktor penting untuk menjadi bahan bakar untuk semangat API menjadi semakin besar di keluarga paling kita cintai ini. Semoga Keluarga ini di berikan kecukupan dan kesehatan selalu, Adapun yang sedang sakit semoga lekas di beri kesembuhan dan dapat beraktivitas kembali. Dengan sistem E-Meli, seluruh transaksi keuangan komunitas menjadi transparan dan dapat diakses oleh semua anggota.
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem", marginTop: "1rem" }}>
             {["Transparan", "Gotong Royong", "Modern"].map((tag, i) => (
