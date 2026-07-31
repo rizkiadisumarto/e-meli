@@ -298,7 +298,7 @@ function WelcomePopup({ onClose }) {
           Gemah Ripah Loh Jinawi
         </p>
         <p style={{ fontSize: "0.75rem", color: "var(--sd-text-muted, #737373)", lineHeight: 1.6, marginBottom: "1rem", fontStyle: "italic" }}>
-          "Alhamdulillahi rabbil 'alamin. Tiada kata yang paling pantas untuk diucapkan selain puji dan syukur ke hadirat Allah SWT, karena atas izin dan kasih sayang-Nya, langkah perjuangan kita membuahkan hasil manis yang membanggakan."
+          "Alhamdulillahi rabbil 'alamin. Tiada kata yang paling pantas untuk diucapkan selain puji dan syukur ke hadirat Allah SWT, kemudian penting untuk di ketahui terimakasih untuk semua Donatur dan semua Panitia yang menjadikan semua event Kemerdekaan Gang Melimewah ini dapat berjalan dengan baik dan hikmat."
         </p>
         <button onClick={handleClose} style={{ background: "#dc2626", color: "#fff", border: "none", borderRadius: "0.5rem", padding: "0.5rem 2rem", fontSize: "0.875rem", fontWeight: 600, cursor: "pointer" }}>
           MERDEKA!
