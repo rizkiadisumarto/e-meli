@@ -1,5 +1,17 @@
 /* SemarakPage Responsive Styles */
 
+/* Video grid default */
+.semarak-video-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+/* Special video spans full width */
+.semarak-video-special {
+  grid-column: span 2;
+}
+
 /* Tab navigation */
 .semarak-tabs {
   display: flex;
@@ -93,6 +105,9 @@
   .semarak-video-grid {
     grid-template-columns: 1fr !important;
     gap: 0.6rem !important;
+  }
+  .semarak-video-special {
+    grid-column: span 1 !important;
   }
   .semarak-video {
     aspect-ratio: 16/9 !important;
