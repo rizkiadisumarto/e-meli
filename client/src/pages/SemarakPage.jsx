@@ -834,15 +834,15 @@ function HallOfFame() {
                 <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #dc2626, #b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Shield size={18} /></div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pembina</div>
-                  <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Hairul</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Hairul</div>
+                  </div>
                 </div>
-              </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
-                <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #d97706, #b45309)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Crown size={18} /></div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Ketua Panitia</div>
-                  <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Arief</div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #d97706, #b45309)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Crown size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Ketua Panitia</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Arief</div>
                 </div>
               </div>
 
@@ -1290,7 +1290,7 @@ function Database2024Tab() {
                   <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #dc2626, #b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Shield size={18} /></div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pembina</div>
-                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Hairul</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Interregnum(Masa Transisi)</div>
                   </div>
                 </div>
 
@@ -1699,7 +1699,7 @@ function Database2023Tab() {
                   <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #dc2626, #b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Shield size={18} /></div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pembina</div>
-                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Hairul</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Danu</div>
                   </div>
                 </div>
 
@@ -2427,7 +2427,7 @@ function TentangTab() {
             </div>
           </div>
           <p style={{ fontSize: "0.8rem", color: "var(--sd-text-muted)", lineHeight: 1.7, margin: 0 }}>
-            Komunitas warga GG. Melimewah yang selalu menjaga API semangat kekeluargaan dan gotong royong. Terkadang Angin yang kencang dalam bentuk lelah, salah pengertiaan, belum saling mengenal, dan bentuk lainnya selalu mencoba memadamkan API kekeluargaan gang yang kita cinta ini. Tapi kita semua yakin dan percaya bahwa dimanapun kita berada kita akan selalu berhadapan dengan Angin, Angin ingin meminta maaf tapi Angin tidak bisa berbicara, Angin yang kencang dapat di jadikan salah satu faktor penting untuk menjadi bahan bakar untuk semangat API menjadi semakin besar di keluarga paling kita cintai ini. Semoga Keluarga ini di berikan kecukupan dan kesehatan selalu, Adapun yang sedang sakit semoga lekas di beri kesembuhan dan dapat beraktivitas kembali. Dengan sistem E-Meli, seluruh transaksi keuangan komunitas menjadi transparan dan dapat diakses oleh semua anggota.
+            Komunitas warga GG. Melimewah yang selalu menjaga Api semangat kekeluargaan dan gotong royong. Terkadang Angin yang kencang dalam bentuk salah pengertiaan, belum bertemunya kata mufakat, dan bentuk lainnya selalu mencoba memadamkan Api kekeluargaan gang yang kita cinta ini. Tapi kita semua yakin dan percaya bahwa dimanapun kita berada kita akan selalu berhadapan dengan Angin, Angin yang kencang dapat di jadikan salah satu faktor penting untuk menjadi bahan bakar untuk semangat Api menjadi semakin besar di keluarga paling kita cintai ini. Semoga Keluarga ini di berikan kecukupan dan kesehatan selalu, Adapun yang sedang sakit semoga lekas di beri kesembuhan dan dapat beraktivitas kembali. Dengan sistem E-Meli, seluruh transaksi keuangan komunitas menjadi transparan dan dapat diakses oleh semua anggota. Website ini di buat serta di dedikasikan untuk di akses semua keluarga melimewah. 100% GRATISSSSSS
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "0.375rem", marginTop: "1rem" }}>
             {["Transparan", "Gotong Royong", "Modern"].map((tag, i) => (
