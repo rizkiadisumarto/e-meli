@@ -536,7 +536,7 @@ function VideoGrid() {
     { src: "/hall-of-fame/WhatsApp Video 2026-07-27 at 1.33.04 AM (2).mp4", label: "Video 8" },
     { src: "/hall-of-fame/WhatsApp Video 2026-07-27 at 1.33.05 AM.mp4", label: "Video 9" },
     { src: "/hall-of-fame/WhatsApp Video 2026-07-31 at 4.19.35 PM.mp4", label: "Video 10" },
-    { src: "/hall-of-fame/VID_20260801_065250_1.mp4", label: "Video 11", special: "Short Movie perayaan HUT RI Ke-80 - 17 Agustus 2025" },
+    { src: "/hall-of-fame/Vid 20260801 065250 1(1).mp4", label: "Video 11", special: "Short Movie perayaan HUT RI Ke-80 - 17 Agustus 2025" },
   ];
 
   const handlePlay = useCallback((idx) => {
@@ -557,10 +557,10 @@ function VideoGrid() {
   return (
     <div className="semarak-video-grid">
       {videos.map((video, idx) => (
-        <div key={idx} className="semarak-video-card" style={{ borderRadius: "0.75rem", overflow: "hidden", border: video.special ? "3px solid #dc2626" : "1px solid var(--sd-border, #e5e5e5)", backgroundColor: "#000", transition: "transform 0.2s, box-shadow 0.2s", transform: playingIdx === idx ? "scale(1.02)" : "scale(1)", boxShadow: playingIdx === idx ? "0 8px 24px rgba(220,38,38,0.3)" : "none" }}>
+        <div key={idx} className={`semarak-video-card ${video.special ? 'semarak-video-special' : ''}`} style={{ borderRadius: "0.75rem", overflow: "hidden", border: video.special ? "3px solid #dc2626" : "1px solid var(--sd-border, #e5e5e5)", backgroundColor: "#000", transition: "transform 0.2s, box-shadow 0.2s", transform: playingIdx === idx ? "scale(1.02)" : "scale(1)", boxShadow: playingIdx === idx ? "0 8px 24px rgba(220,38,38,0.3)" : video.special ? "0 4px 16px rgba(220,38,38,0.2)" : "none" }}>
           {video.special && (
-            <div style={{ background: "linear-gradient(135deg, #dc2626, #b91c1c)", padding: "0.5rem 0.75rem", textAlign: "center" }}>
-              <span style={{ fontSize: "0.75rem", fontWeight: 800, color: "#fff", letterSpacing: "0.05em" }}>{video.special}</span>
+            <div style={{ background: "linear-gradient(135deg, #dc2626, #b91c1c)", padding: "0.6rem 1rem", textAlign: "center" }}>
+              <span style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)", fontWeight: 800, color: "#fff", letterSpacing: "0.05em" }}>{video.special}</span>
             </div>
           )}
           <video
