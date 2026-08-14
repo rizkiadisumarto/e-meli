@@ -567,7 +567,8 @@ function VideoGrid() {
             ref={el => videoRefs.current[idx] = el}
             src={video.src}
             controls
-            preload="metadata"
+            preload="none"
+            loading="lazy"
             onPlay={() => handlePlay(idx)}
             onPause={handlePause}
             onEnded={handlePause}
@@ -797,6 +798,8 @@ function HallOfFame() {
             <img
               src={photos[currentIndex]}
               alt={`Hall of Fame ${currentIndex + 1}`}
+              loading="lazy"
+              decoding="async"
               style={{
                 position: "absolute",
                 top: 0,
