@@ -585,9 +585,9 @@ const EventDetailPage = () => {
         </h3>
         {event.location_lat && event.location_lng ? (
           <div style={{ height: '300px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-            <MapContainer center={[event.location_lat, event.location_lng]} zoom={15} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false}>
+            <MapContainer center={[Number(event.location_lat), Number(event.location_lng)]} zoom={15} style={{ height: '100%', width: '100%' }} scrollWheelZoom={false}>
               <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <Marker position={[event.location_lat, event.location_lng]}>
+              <Marker position={[Number(event.location_lat), Number(event.location_lng)]}>
                 <Popup><strong>{event.location_name}</strong><br/>{event.location_address}</Popup>
               </Marker>
             </MapContainer>

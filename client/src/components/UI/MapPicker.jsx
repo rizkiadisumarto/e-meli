@@ -68,7 +68,7 @@ const MapPicker = ({ lat, lng, onLocationChange, height = '350px' }) => {
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [gettingLocation, setGettingLocation] = useState(false);
-  const position = lat && lng ? [lat, lng] : null;
+  const position = lat && lng ? [Number(lat), Number(lng)] : null;
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -119,7 +119,7 @@ const MapPicker = ({ lat, lng, onLocationChange, height = '350px' }) => {
     setSearchResults([]);
   };
 
-  const formatCoord = (v) => v ? v.toFixed(6) : '-';
+  const formatCoord = (v) => v ? Number(v).toFixed(6) : '-';
 
   return (
     <div style={{ position: 'relative' }}>
