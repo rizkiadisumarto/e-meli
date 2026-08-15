@@ -392,7 +392,14 @@ router.get('/:id/transactions', authenticateToken, async (req, res) => {
 });
 
 // POST /api/events/:id/transactions - Create a transaction linked to event
-router.post('/:id/transactions', authenticateToken, requireAdminOrCommittee, upload.single('proof_image'), async (req, res) => {
+router.post('/:id/transactions', authenticateToken, requireAdminOrCommittee, (req, res, next) => {
+  const contentType = req.headers['content-type'] || '';
+  if (contentType.includes('multipart/form-data')) {
+    upload.single('proof_image')(req, res, next);
+  } else {
+    next();
+  }
+}, async (req, res) => {
   try {
     const { type, category_id, amount, description, date, member_id } = req.body;
     let proof_image = null;
@@ -400,22 +407,30 @@ router.post('/:id/transactions', authenticateToken, requireAdminOrCommittee, upl
       proof_image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
     }
 
+    const parsedAmount = typeof amount === 'string' ? parseFloat(amount) : Number(amount);
+    const parsedCategoryId = category_id ? (typeof category_id === 'string' ? parseInt(category_id) : Number(category_id)) : null;
+    const parsedMemberId = member_id ? (typeof member_id === 'string' ? parseInt(member_id) : Number(member_id)) : null;
+
+    if (!type || !parsedAmount) {
+      return res.status(400).json({ error: 'Tipe dan nominal harus diisi' });
+    }
+
     // Create the transaction
     const txResult = await queryRunAsync(
       'INSERT INTO transactions (type, category_id, amount, description, date, member_id, created_by, proof_image) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id',
-      [type, category_id || null, amount, description, date, member_id || null, req.user.id, proof_image]
+      [type, parsedCategoryId, parsedAmount, description || '', date, parsedMemberId, req.user.id, proof_image]
     );
 
     // Link to event
     await queryRunAsync('INSERT INTO event_transactions (event_id, transaction_id) VALUES ($1, $2)', [req.params.id, txResult.lastInsertRowid]);
     
     // If this is a participant payment, update their amount_paid
-    if (member_id && type === 'income') {
-      const participant = await queryGetAsync('SELECT * FROM event_participants WHERE event_id = $1 AND member_id = $2', [req.params.id, member_id]);
+    if (parsedMemberId && type === 'income') {
+      const participant = await queryGetAsync('SELECT * FROM event_participants WHERE event_id = $1 AND member_id = $2', [req.params.id, parsedMemberId]);
       if (participant) {
-        const newPaid = participant.amount_paid + amount;
+        const newPaid = Number(participant.amount_paid) + parsedAmount;
         const event = await queryGetAsync('SELECT target_per_person FROM events WHERE id = $1', [req.params.id]);
-        const payStatus = newPaid >= event.target_per_person ? 'paid' : 'partial';
+        const payStatus = newPaid >= Number(event.target_per_person) ? 'paid' : 'partial';
         await queryRunAsync('UPDATE event_participants SET amount_paid = $1, status = $2 WHERE id = $3', [newPaid, payStatus, participant.id]);
       }
     }
@@ -423,6 +438,7 @@ router.post('/:id/transactions', authenticateToken, requireAdminOrCommittee, upl
     const transaction = await queryGetAsync('SELECT * FROM transactions WHERE id = $1', [txResult.lastInsertRowid]);
     res.status(201).json(transaction);
   } catch (err) {
+    console.error('Error creating event transaction:', err);
     res.status(500).json({ error: err.message });
   }
 });

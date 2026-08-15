@@ -15,22 +15,50 @@ export const exportToExcel = (data, filename, sheetName = 'Data') => {
   XLSX.writeFile(wb, `${filename}.xlsx`);
 };
 
-// Export transactions to Excel
+// Export transactions to Excel (separated by type)
 export const exportTransactions = (transactions, filename = 'Transaksi') => {
-  const data = transactions.map((tx, i) => ({
-    'No': i + 1,
-    'Tanggal': tx.date,
-    'Tipe': tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
-    'Kategori': tx.category_name || '-',
-    'Keterangan': tx.description || '-',
-    'Anggota': tx.member_name || '-',
-    'Nominal': tx.amount
-  }));
+  const wb = XLSX.utils.book_new();
 
-  exportToExcel(data, filename, 'Transaksi');
+  const income = transactions.filter(tx => tx.type === 'income');
+  const expense = transactions.filter(tx => tx.type === 'expense');
+
+  if (income.length > 0) {
+    const incomeData = income.map((tx, i) => ({
+      'No': i + 1,
+      'Tanggal': tx.date,
+      'Kategori': tx.category_name || '-',
+      'Keterangan': tx.description || '-',
+      'Anggota': tx.member_name || '-',
+      'Nominal': tx.amount
+    }));
+    const wsIncome = XLSX.utils.json_to_sheet(incomeData);
+    wsIncome['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 15 }];
+    XLSX.utils.book_append_sheet(wb, wsIncome, 'Pemasukan');
+  }
+
+  if (expense.length > 0) {
+    const expenseData = expense.map((tx, i) => ({
+      'No': i + 1,
+      'Tanggal': tx.date,
+      'Kategori': tx.category_name || '-',
+      'Keterangan': tx.description || '-',
+      'Anggota': tx.member_name || '-',
+      'Nominal': tx.amount
+    }));
+    const wsExpense = XLSX.utils.json_to_sheet(expenseData);
+    wsExpense['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 15 }];
+    XLSX.utils.book_append_sheet(wb, wsExpense, 'Pengeluaran');
+  }
+
+  if (income.length === 0 && expense.length === 0) {
+    const wsEmpty = XLSX.utils.json_to_sheet([{ 'Keterangan': 'Tidak ada transaksi' }]);
+    XLSX.utils.book_append_sheet(wb, wsEmpty, 'Kosong');
+  }
+
+  XLSX.writeFile(wb, `${filename}.xlsx`);
 };
 
-// Export monthly report to Excel
+// Export monthly report to Excel (separated by type)
 export const exportMonthlyReport = (transactions, summary, month, year, filename = 'Laporan Bulanan') => {
   const wb = XLSX.utils.book_new();
 
@@ -46,19 +74,38 @@ export const exportMonthlyReport = (transactions, summary, month, year, filename
   wsSummary['!cols'] = [{ wch: 20 }, { wch: 25 }];
   XLSX.utils.book_append_sheet(wb, wsSummary, 'Ringkasan');
 
-  // Transactions sheet
-  const txData = transactions.map((tx, i) => ({
-    'No': i + 1,
-    'Tanggal': tx.date,
-    'Tipe': tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
-    'Kategori': tx.category_name || '-',
-    'Keterangan': tx.description || '-',
-    'Anggota': tx.member_name || '-',
-    'Nominal': tx.amount
-  }));
-  const wsTx = XLSX.utils.json_to_sheet(txData);
-  wsTx['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 12 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 15 }];
-  XLSX.utils.book_append_sheet(wb, wsTx, 'Transaksi');
+  const income = transactions.filter(tx => tx.type === 'income');
+  const expense = transactions.filter(tx => tx.type === 'expense');
+
+  // Income sheet
+  if (income.length > 0) {
+    const incomeData = income.map((tx, i) => ({
+      'No': i + 1,
+      'Tanggal': tx.date,
+      'Kategori': tx.category_name || '-',
+      'Keterangan': tx.description || '-',
+      'Anggota': tx.member_name || '-',
+      'Nominal': tx.amount
+    }));
+    const wsIncome = XLSX.utils.json_to_sheet(incomeData);
+    wsIncome['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 15 }];
+    XLSX.utils.book_append_sheet(wb, wsIncome, 'Pemasukan');
+  }
+
+  // Expense sheet
+  if (expense.length > 0) {
+    const expenseData = expense.map((tx, i) => ({
+      'No': i + 1,
+      'Tanggal': tx.date,
+      'Kategori': tx.category_name || '-',
+      'Keterangan': tx.description || '-',
+      'Anggota': tx.member_name || '-',
+      'Nominal': tx.amount
+    }));
+    const wsExpense = XLSX.utils.json_to_sheet(expenseData);
+    wsExpense['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 15 }];
+    XLSX.utils.book_append_sheet(wb, wsExpense, 'Pengeluaran');
+  }
 
   XLSX.writeFile(wb, `${filename}.xlsx`);
 };
@@ -95,19 +142,36 @@ export const exportEventData = (event, participants, transactions, budget, filen
     XLSX.utils.book_append_sheet(wb, wsPart, 'Peserta');
   }
 
-  // Transactions sheet
+  // Transactions - split into Pemasukan & Pengeluaran
   if (transactions.length > 0) {
-    const txData = transactions.map((tx, i) => ({
-      'No': i + 1,
-      'Tanggal': tx.date,
-      'Tipe': tx.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
-      'Kategori': tx.category_name || '-',
-      'Keterangan': tx.description || '-',
-      'Nominal': tx.amount
-    }));
-    const wsTx = XLSX.utils.json_to_sheet(txData);
-    wsTx['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 12 }, { wch: 15 }, { wch: 30 }, { wch: 15 }];
-    XLSX.utils.book_append_sheet(wb, wsTx, 'Transaksi');
+    const income = transactions.filter(tx => tx.type === 'income');
+    const expense = transactions.filter(tx => tx.type === 'expense');
+
+    if (income.length > 0) {
+      const incomeData = income.map((tx, i) => ({
+        'No': i + 1,
+        'Tanggal': tx.date,
+        'Kategori': tx.category_name || '-',
+        'Keterangan': tx.description || '-',
+        'Nominal': tx.amount
+      }));
+      const wsIncome = XLSX.utils.json_to_sheet(incomeData);
+      wsIncome['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 15 }];
+      XLSX.utils.book_append_sheet(wb, wsIncome, 'Pemasukan');
+    }
+
+    if (expense.length > 0) {
+      const expenseData = expense.map((tx, i) => ({
+        'No': i + 1,
+        'Tanggal': tx.date,
+        'Kategori': tx.category_name || '-',
+        'Keterangan': tx.description || '-',
+        'Nominal': tx.amount
+      }));
+      const wsExpense = XLSX.utils.json_to_sheet(expenseData);
+      wsExpense['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 15 }];
+      XLSX.utils.book_append_sheet(wb, wsExpense, 'Pengeluaran');
+    }
   }
 
   // Budget sheet

@@ -28,6 +28,15 @@ async function initializeDb() {
     await client.query(schema);
     console.log('✅ PostgreSQL schema initialized');
 
+    // Fix sequences to prevent duplicate key errors
+    const tables = ['transactions', 'event_transactions', 'categories', 'members', 'events', 'users', 'event_participants', 'event_rundown', 'event_tasks', 'event_budget', 'dues_settings', 'dues_payments'];
+    for (const table of tables) {
+      try {
+        await client.query(`SELECT setval('${table}_id_seq', COALESCE((SELECT MAX(id) FROM ${table}), 1))`);
+      } catch (e) { /* skip */ }
+    }
+    console.log('✅ PostgreSQL sequences synced');
+
     client.release();
     return db;
   } else {

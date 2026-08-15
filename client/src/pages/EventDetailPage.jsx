@@ -377,43 +377,61 @@ const EventDetailPage = () => {
 
   // --- Transactions ---
   const saveTransaction = async () => {
-    const formDataSubmit = new FormData();
-    formDataSubmit.append('type', txForm.type);
-    formDataSubmit.append('category_id', txForm.category_id);
-    formDataSubmit.append('amount', parseNumberInput(txForm.amount));
-    formDataSubmit.append('description', txForm.description);
-    formDataSubmit.append('date', txForm.date);
-    formDataSubmit.append('member_id', txForm.member_id);
-    if (txProofFile) formDataSubmit.append('proof_image', txProofFile);
+    try {
+      const formDataSubmit = new FormData();
+      formDataSubmit.append('type', txForm.type);
+      formDataSubmit.append('category_id', txForm.category_id || '');
+      formDataSubmit.append('amount', String(parseNumberInput(txForm.amount)));
+      formDataSubmit.append('description', txForm.description || '');
+      formDataSubmit.append('date', txForm.date);
+      formDataSubmit.append('member_id', txForm.member_id || '');
+      if (txProofFile) formDataSubmit.append('proof_image', txProofFile);
 
-    if (editingTx) {
-      // Edit existing transaction
-      await fetch(`/api/events/${id}/transactions/${editingTx.id}`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token()}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: txForm.type,
-          category_id: txForm.category_id,
-          amount: parseNumberInput(txForm.amount),
-          description: txForm.description,
-          date: txForm.date,
-          member_id: txForm.member_id
-        })
-      });
-    } else {
-      // Create new transaction
-      await fetch(`/api/events/${id}/transactions`, {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token()}` },
-        body: formDataSubmit
-      });
+      let res;
+      const jsonData = {
+        type: txForm.type,
+        category_id: txForm.category_id ? Number(txForm.category_id) : null,
+        amount: parseNumberInput(txForm.amount),
+        description: txForm.description || '',
+        date: txForm.date,
+        member_id: txForm.member_id ? Number(txForm.member_id) : null
+      };
+
+      if (editingTx) {
+        res = await fetch(`/api/events/${id}/transactions/${editingTx.id}`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${token()}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(jsonData)
+        });
+      } else if (txProofFile) {
+        res = await fetch(`/api/events/${id}/transactions`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token()}` },
+          body: formDataSubmit
+        });
+      } else {
+        res = await fetch(`/api/events/${id}/transactions`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token()}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(jsonData)
+        });
+      }
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Terjadi kesalahan' }));
+        alert('Gagal menyimpan transaksi: ' + (err.error || res.statusText));
+        return;
+      }
+
+      setShowTxModal(false);
+      setEditingTx(null);
+      setTxProofFile(null);
+      setTxForm({ type: 'expense', category_id: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], member_id: '' });
+      fetchEventData();
+    } catch (error) {
+      console.error('Error saving transaction:', error);
+      alert('Terjadi kesalahan saat menyimpan transaksi: ' + error.message);
     }
-
-    setShowTxModal(false);
-    setEditingTx(null);
-    setTxProofFile(null);
-    setTxForm({ type: 'expense', category_id: '', amount: '', description: '', date: new Date().toISOString().split('T')[0], member_id: '' });
-    fetchEventData();
   };
 
   const openEditTx = (tx) => {
