@@ -29,10 +29,11 @@ export const exportTransactions = (transactions, filename = 'Transaksi') => {
       'Kategori': tx.category_name || '-',
       'Keterangan': tx.description || '-',
       'Anggota': tx.member_name || '-',
+      'Keluarga': tx.member_address || '-',
       'Nominal': tx.amount
     }));
     const wsIncome = XLSX.utils.json_to_sheet(incomeData);
-    wsIncome['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 15 }];
+    wsIncome['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 15 }];
     XLSX.utils.book_append_sheet(wb, wsIncome, 'Pemasukan');
   }
 
@@ -43,10 +44,11 @@ export const exportTransactions = (transactions, filename = 'Transaksi') => {
       'Kategori': tx.category_name || '-',
       'Keterangan': tx.description || '-',
       'Anggota': tx.member_name || '-',
+      'Keluarga': tx.member_address || '-',
       'Nominal': tx.amount
     }));
     const wsExpense = XLSX.utils.json_to_sheet(expenseData);
-    wsExpense['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 15 }];
+    wsExpense['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 15 }];
     XLSX.utils.book_append_sheet(wb, wsExpense, 'Pengeluaran');
   }
 
@@ -85,10 +87,11 @@ export const exportMonthlyReport = (transactions, summary, month, year, filename
       'Kategori': tx.category_name || '-',
       'Keterangan': tx.description || '-',
       'Anggota': tx.member_name || '-',
+      'Keluarga': tx.member_address || '-',
       'Nominal': tx.amount
     }));
     const wsIncome = XLSX.utils.json_to_sheet(incomeData);
-    wsIncome['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 15 }];
+    wsIncome['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 15 }];
     XLSX.utils.book_append_sheet(wb, wsIncome, 'Pemasukan');
   }
 
@@ -100,10 +103,11 @@ export const exportMonthlyReport = (transactions, summary, month, year, filename
       'Kategori': tx.category_name || '-',
       'Keterangan': tx.description || '-',
       'Anggota': tx.member_name || '-',
+      'Keluarga': tx.member_address || '-',
       'Nominal': tx.amount
     }));
     const wsExpense = XLSX.utils.json_to_sheet(expenseData);
-    wsExpense['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 15 }];
+    wsExpense['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 15 }];
     XLSX.utils.book_append_sheet(wb, wsExpense, 'Pengeluaran');
   }
 
@@ -132,13 +136,14 @@ export const exportEventData = (event, participants, transactions, budget, filen
     const partData = participants.map((p, i) => ({
       'No': i + 1,
       'Nama': p.name,
+      'Keluarga': p.address || '-',
       'Absensi': p.attendance === 'present' ? 'Hadir' : 'Absen',
       'Target': p.target,
       'Terbayar': p.amount_paid,
       'Status': p.status === 'paid' ? 'Lunas' : p.status === 'partial' ? 'Sebagian' : 'Belum'
     }));
     const wsPart = XLSX.utils.json_to_sheet(partData);
-    wsPart['!cols'] = [{ wch: 5 }, { wch: 25 }, { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 10 }];
+    wsPart['!cols'] = [{ wch: 5 }, { wch: 25 }, { wch: 20 }, { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 10 }];
     XLSX.utils.book_append_sheet(wb, wsPart, 'Peserta');
   }
 
@@ -153,10 +158,12 @@ export const exportEventData = (event, participants, transactions, budget, filen
         'Tanggal': tx.date,
         'Kategori': tx.category_name || '-',
         'Keterangan': tx.description || '-',
+        'Anggota': tx.member_name || '-',
+        'Keluarga': tx.member_address || '-',
         'Nominal': tx.amount
       }));
       const wsIncome = XLSX.utils.json_to_sheet(incomeData);
-      wsIncome['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 15 }];
+      wsIncome['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 15 }];
       XLSX.utils.book_append_sheet(wb, wsIncome, 'Pemasukan');
     }
 
@@ -166,10 +173,12 @@ export const exportEventData = (event, participants, transactions, budget, filen
         'Tanggal': tx.date,
         'Kategori': tx.category_name || '-',
         'Keterangan': tx.description || '-',
+        'Anggota': tx.member_name || '-',
+        'Keluarga': tx.member_address || '-',
         'Nominal': tx.amount
       }));
       const wsExpense = XLSX.utils.json_to_sheet(expenseData);
-      wsExpense['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 15 }];
+      wsExpense['!cols'] = [{ wch: 5 }, { wch: 15 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 15 }];
       XLSX.utils.book_append_sheet(wb, wsExpense, 'Pengeluaran');
     }
   }

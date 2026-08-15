@@ -101,7 +101,7 @@ router.get('/recent-transactions', authenticateToken, async (req, res) => {
   try {
     const { limit = 10 } = req.query;
     const transactions = await queryAllAsync(`
-      SELECT t.*, c.name as category_name, m.name as member_name
+      SELECT t.*, c.name as category_name, m.name as member_name, m.address as member_address
       FROM transactions t
       LEFT JOIN categories c ON t.category_id = c.id
       LEFT JOIN members m ON t.member_id = m.id

@@ -23,7 +23,7 @@ router.get('/', authenticateToken, async (req, res) => {
     const { type, category_id, start_date, end_date, search, limit = 50, offset = 0 } = req.query;
     
     let query = `
-      SELECT t.*, c.name as category_name, m.name as member_name, u.full_name as created_by_name
+      SELECT t.*, c.name as category_name, m.name as member_name, m.address as member_address, u.full_name as created_by_name
       FROM transactions t
       LEFT JOIN categories c ON t.category_id = c.id
       LEFT JOIN members m ON t.member_id = m.id
@@ -66,7 +66,7 @@ router.get('/', authenticateToken, async (req, res) => {
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
     const transaction = await queryGetAsync(`
-      SELECT t.*, c.name as category_name, m.name as member_name
+      SELECT t.*, c.name as category_name, m.name as member_name, m.address as member_address
       FROM transactions t
       LEFT JOIN categories c ON t.category_id = c.id
       LEFT JOIN members m ON t.member_id = m.id

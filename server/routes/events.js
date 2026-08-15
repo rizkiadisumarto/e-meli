@@ -377,7 +377,7 @@ router.delete('/:id/budget/:budgetId', authenticateToken, requireAdminOrCommitte
 router.get('/:id/transactions', authenticateToken, async (req, res) => {
   try {
     const transactions = await queryAllAsync(`
-      SELECT t.*, c.name as category_name, m.name as member_name
+      SELECT t.*, c.name as category_name, m.name as member_name, m.address as member_address
       FROM event_transactions et
       JOIN transactions t ON et.transaction_id = t.id
       LEFT JOIN categories c ON t.category_id = c.id
