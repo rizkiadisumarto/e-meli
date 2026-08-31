@@ -1264,7 +1264,7 @@ function Database2026Tab() {
             <div style={{ position: "absolute", bottom: "-1rem", left: "-1rem", width: "4rem", height: "4rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.08)" }} />
             <div style={{ fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: "0.5rem" }}>&#127942;</div>
             <h2 style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Hall of Fame 2026</h2>
-            <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>Malam Tirakat 16 Agustus &amp; HUT RI Ke-81 - 17 Agustus 2026</p>
+            <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>Malam Ke Akraban &amp; HUT RI Ke-81 - 17 Agustus 2026 &amp; Malam Ke Akraban 24 Agustus 2026</p>
           </div>
 
           <div style={{ padding: "clamp(1rem, 3vw, 2rem)" }}>
@@ -1284,7 +1284,7 @@ function Database2026Tab() {
 
             <div style={{ marginTop: "1rem", textAlign: "center" }}>
               <p style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)", color: "var(--sd-text-muted, #737373)", fontStyle: "italic" }}>
-                Momen-momen indah perayaan Malam Tirakat &amp; HUT RI Ke-81 bersama warga Melimewah
+                Momen-momen indah perayaan Malam Ke Akraban &amp; HUT RI Ke-81 bersama warga Melimewah
               </p>
             </div>
 
@@ -1292,7 +1292,7 @@ function Database2026Tab() {
             <div style={{ marginTop: "1.5rem", padding: "clamp(1rem, 3vw, 1.5rem)", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
               <div style={{ textAlign: "center", marginBottom: "1rem" }}>
                 <span style={{ display: "inline-block", backgroundColor: "#dc2626", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>Panitia Inti</span>
-                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Susunan Pengurus Malam Tirakat &amp; HUT RI Ke-81 Tahun 2026</h3>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Susunan Pengurus Malam Ke Akraban &amp; HUT RI Ke-81 Tahun 2026</h3>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
