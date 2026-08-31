@@ -33,6 +33,7 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const UsersPage = lazy(() => import('./pages/UsersPage'));
 const ImportBackupPage = lazy(() => import('./pages/ImportBackupPage'));
 const SemarakPage = lazy(() => import('./pages/SemarakPage'));
+const IndexPage = lazy(() => import('./pages/IndexPage'));
 
 const PageLoader = () => (
   <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'var(--bg-main, #fafafa)' }}>
@@ -58,7 +59,8 @@ const AppRoutes = () => {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route path="/" element={user ? <Navigate to="/semarak" replace /> : <LoginPage />} />
+        <Route path="/" element={<IndexPage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/semarak" element={<ProtectedRoute><SemarakPage /></ProtectedRoute>} />
         <Route path="/app" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<DashboardPage />} />
