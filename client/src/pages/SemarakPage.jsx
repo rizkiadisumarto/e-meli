@@ -1325,6 +1325,67 @@ function Database2026Tab() {
               </div>
             </div>
 
+            {/* Poster & Jadwal Lomba */}
+            <div style={{ marginTop: "1.5rem", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)", padding: "clamp(1rem, 3vw, 1.5rem)", position: "relative" }}>
+              <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
+                <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>&#127941;</div>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 900, color: "var(--sd-text, #262626)", margin: "0 0 0.25rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>Susunan Acara &amp; Jadwal Lomba</h3>
+                <p style={{ fontSize: "0.65rem", color: "var(--sd-text-muted, #737373)", margin: 0 }}>Semarak Kemerdekaan Gang Meli Mewah 2026</p>
+              </div>
+
+              {/* Poster Image */}
+              <div style={{ marginBottom: "1.5rem", textAlign: "center" }}>
+                <img
+                  src="/poster%202026%201.jpeg"
+                  alt="Poster 17 Agustus 2026"
+                  style={{ maxWidth: "100%", maxHeight: "500px", borderRadius: "0.75rem", border: "2px solid var(--sd-border, #e5e5e5)", cursor: "zoom-in" }}
+                  onClick={() => window.open("/poster%202026%201.jpeg", "_blank")}
+                />
+                <p style={{ fontSize: "0.6rem", color: "var(--sd-text-muted, #737373)", marginTop: "0.5rem", fontStyle: "italic" }}>Klik untuk memperbesar</p>
+              </div>
+
+              {/* Jadwal Table */}
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.65rem" }}>
+                  <thead>
+                    <tr style={{ backgroundColor: "#dc2626", color: "#fff" }}>
+                      <th style={{ padding: "0.5rem", textAlign: "center", fontWeight: 700, borderRadius: "0.5rem 0 0 0" }}>Waktu</th>
+                      <th style={{ padding: "0.5rem", textAlign: "left", fontWeight: 700, borderRadius: "0 0.5rem 0 0" }}>Acara</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { time: "07.00 - 07.10", acara: "Peserta berkumpul & registrasi", icon: "\u{1F465}", highlight: false },
+                      { time: "07.10 - 07.15", acara: "Pembukaan oleh MC", icon: "\u{1F3A4}", highlight: false },
+                      { time: "07.15 - 07.20", acara: "Doa", icon: "\u{1F64F}", highlight: false },
+                      { time: "07.20 - 07.25", acara: "Sambutan Ketua Panitia", icon: "\u{1F4DE}", highlight: false },
+                      { time: "07.25 - 07.30", acara: "Penjelasan teknis & aturan lomba, Lomba mewarnai", icon: "\u{1F3A8}", highlight: false },
+                      { time: "07.30 - 08.00", acara: "Lomba Balap Kelereng", icon: "\u{1F3AF}", highlight: true },
+                      { time: "08.00 - 08.30", acara: "Lomba Memindahkan Bendera", icon: "\u{1F6A9}", highlight: true },
+                      { time: "08.30 - 09.00", acara: "Lomba Makan Kerupuk", icon: "\u{1F95F}", highlight: true },
+                      { time: "09.00 - 09.30", acara: "Lomba Memasukkan Paku ke Botol", icon: "\u{1F4A1}", highlight: true },
+                      { time: "09.30 - 10.00", acara: "Lomba Meniup Gelas Plastik", icon: "\u{1F4A7}", highlight: true },
+                      { time: "10.00 - 11.00", acara: "Persiapan, bersih-bersih & persiapan ramah tamah", icon: "\u{1F9F9}", highlight: false },
+                      { time: "11.00 - 13.00", acara: "RAMAH TAMAH & MAKAN BERSAMA", icon: "\u{1F37D}", highlight: false, special: true },
+                      { time: "13.00 - 13.20", acara: "Lomba memasukan paku ke botol (Bapak-Ibu)", icon: "\u{2642}\u{FE0F}", highlight: true },
+                      { time: "13.20 - 13.40", acara: "Lomba Memasukkan/Memukul Paku (Bapak/Ibu)", icon: "\u{2642}\u{FE0F}", highlight: true },
+                      { time: "13.40 - 14.00", acara: "Lomba Estafet (Bapak/Ibu)", icon: "\u{1F3C3}", highlight: true },
+                      { time: "14.00 - 14.15", acara: "Rekapitulasi hasil lomba", icon: "\u{1F4CB}", highlight: false },
+                      { time: "14.15 - 14.45", acara: "Pengumuman pemenang & Penutupan", icon: "\u{1F3C6}", highlight: false },
+                    ].map((item, i) => (
+                      <tr key={i} style={{ backgroundColor: item.special ? "#fef2f2" : i % 2 === 0 ? "var(--sd-bg-card, #fff)" : "var(--sd-bg-secondary, #fafafa)" }}>
+                        <td style={{ padding: "0.4rem 0.5rem", textAlign: "center", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: 700, color: item.highlight ? "#dc2626" : item.special ? "#dc2626" : "var(--sd-text, #262626)", whiteSpace: "nowrap" }}>{item.time}</td>
+                        <td style={{ padding: "0.4rem 0.5rem", borderBottom: "1px solid var(--sd-border, #e5e5e5)", fontWeight: item.highlight ? 700 : item.special ? 800 : 400, color: item.highlight ? "var(--sd-text, #262626)" : item.special ? "#dc2626" : "var(--sd-text, #262626)" }}>
+                          <span style={{ marginRight: "0.35rem" }}>{item.icon}</span>
+                          {item.acara}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             {/* Laporan Kegiatan 2026 */}
             <div style={{ marginTop: "1.5rem", padding: "clamp(1rem, 3vw, 1.5rem)", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
               <div style={{ textAlign: "center", marginBottom: "1rem" }}>
