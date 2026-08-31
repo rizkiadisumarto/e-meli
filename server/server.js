@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 const path = require('path');
 const { initializeDb } = require('./db/database');
 
@@ -17,7 +18,8 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(compression());
+app.use(express.json({ limit: '5mb' }));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -29,10 +31,10 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/settings', settingsRoutes);
 
 // Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), { maxAge: '7d' }));
 
 // Serve static files from client build (production)
-app.use(express.static(path.join(__dirname, '../client/dist')));
+app.use(express.static(path.join(__dirname, '../client/dist'), { maxAge: '1y', etag: true }));
 app.get('*', (req, res) => {
   if (!req.path.startsWith('/api')) {
     res.sendFile(path.join(__dirname, '../client/dist/index.html'));

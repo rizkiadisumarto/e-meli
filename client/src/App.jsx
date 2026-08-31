@@ -2,9 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { MusicProvider } from './context/MusicContext';
 import Layout from './components/Layout/Layout';
-import { useState, useEffect, Component } from 'react';
+import { useState, useEffect, Component, Suspense, lazy } from 'react';
 
-// Error Boundary
 class ErrorBoundary extends Component {
   constructor(props) { super(props); this.state = { hasError: false, error: null }; }
   static getDerivedStateFromError(error) { return { hasError: true, error }; }
@@ -22,41 +21,45 @@ class ErrorBoundary extends Component {
   }
 }
 
-// Pages
-import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
-import TransactionsPage from './pages/TransactionsPage';
-import MembersPage from './pages/MembersPage';
-import DuesPage from './pages/DuesPage';
-import EventsPage from './pages/EventsPage';
-import EventDetailPage from './pages/EventDetailPage';
-import ReportsPage from './pages/ReportsPage';
-import SettingsPage from './pages/SettingsPage';
-import UsersPage from './pages/UsersPage';
-import ImportBackupPage from './pages/ImportBackupPage';
-import SemarakPage from './pages/SemarakPage';
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const TransactionsPage = lazy(() => import('./pages/TransactionsPage'));
+const MembersPage = lazy(() => import('./pages/MembersPage'));
+const DuesPage = lazy(() => import('./pages/DuesPage'));
+const EventsPage = lazy(() => import('./pages/EventsPage'));
+const EventDetailPage = lazy(() => import('./pages/EventDetailPage'));
+const ReportsPage = lazy(() => import('./pages/ReportsPage'));
+const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const UsersPage = lazy(() => import('./pages/UsersPage'));
+const ImportBackupPage = lazy(() => import('./pages/ImportBackupPage'));
+const SemarakPage = lazy(() => import('./pages/SemarakPage'));
+
+const PageLoader = () => (
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'var(--bg-main, #fafafa)' }}>
+    <div style={{ textAlign: 'center' }}>
+      <div style={{ width: 40, height: 40, border: '3px solid #e5e5e5', borderTopColor: '#dc2626', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 1rem' }} />
+      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted, #737373)' }}>Memuat...</p>
+    </div>
+  </div>
+);
 
 const ProtectedRoute = ({ children, requireAdmin }) => {
   const { user, loading, isAdmin } = useAuth();
-  
-  if (loading) return <div className="flex justify-center items-center h-full">Loading...</div>;
+  if (loading) return <PageLoader />;
   if (!user) return <Navigate to="/login" replace />;
   if (requireAdmin && !isAdmin) return <Navigate to="/app" replace />;
-  
   return children;
 };
 
 const AppRoutes = () => {
   const { user, loading } = useAuth();
-
-  if (loading) return <div className="flex justify-center items-center h-screen bg-main">Loading...</div>;
+  if (loading) return <PageLoader />;
 
   return (
-    <>
+    <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/" element={user ? <Navigate to="/semarak" replace /> : <LoginPage />} />
         <Route path="/semarak" element={<ProtectedRoute><SemarakPage /></ProtectedRoute>} />
-
         <Route path="/app" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<DashboardPage />} />
           <Route path="transactions" element={<TransactionsPage />} />
@@ -79,7 +82,7 @@ const AppRoutes = () => {
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </>
+    </Suspense>
   );
 };
 
