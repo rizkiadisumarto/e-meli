@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
+import { Volume2, VolumeX, Play, Pause, SkipForward, SkipBack } from 'lucide-react';
 import { useMusic } from '../../context/MusicContext';
 
 const MusicPlayer = () => {
-  const { isPlaying, isMuted, playbackRate, togglePlay, toggleMute, changeSpeed } = useMusic();
+  const { isPlaying, isMuted, playbackRate, togglePlay, toggleMute, changeSpeed, nextTrack, prevTrack, currentTitle } = useMusic();
   const [showTooltip, setShowTooltip] = useState(false);
   const [showSpeed, setShowSpeed] = useState(false);
 
@@ -34,7 +34,7 @@ const MusicPlayer = () => {
           boxShadow: 'var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1))',
           animation: 'fade-in 0.2s ease'
         }}>
-          Hari Merdeka
+          {currentTitle}
         </div>
       )}
 
@@ -71,9 +71,13 @@ const MusicPlayer = () => {
         padding: '0.4rem 0.5rem',
         boxShadow: 'var(--shadow-md)'
       }}>
+        <button onClick={prevTrack} title="Previous" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted, #737373)', cursor: 'pointer', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease' }}>
+          <SkipBack size={14} />
+        </button>
+
         <button
           onClick={togglePlay}
-          title={isPlaying ? 'Pause' : 'Play Hari Merdeka'}
+          title={isPlaying ? 'Pause' : 'Play'}
           style={{
             background: isPlaying ? '#dc2626' : 'transparent',
             border: 'none',
@@ -89,6 +93,10 @@ const MusicPlayer = () => {
           }}
         >
           {isPlaying ? <Pause size={16} /> : <Play size={16} style={{ marginLeft: '2px' }} />}
+        </button>
+
+        <button onClick={nextTrack} title="Next" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted, #737373)', cursor: 'pointer', borderRadius: '50%', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s ease' }}>
+          <SkipForward size={14} />
         </button>
 
         <button

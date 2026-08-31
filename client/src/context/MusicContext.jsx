@@ -1,6 +1,14 @@
-import { createContext, useContext, useRef, useState, useEffect } from 'react';
+import { createContext, useContext, useRef, useState, useEffect, useCallback } from 'react';
 
 const MusicContext = createContext(null);
+
+const PLAYLIST = [
+  { title: 'Hari Merdeka', src: '/hari-merdeka-full.mp3' },
+  { title: 'Indonesia Raya', src: '/indonesia-raya.mp3' },
+  { title: 'Dance Tonight - BCL feat. Jflow', src: '/Dance Tonight - Bunga Citra Lestari feat. Jflow.mp3' },
+  { title: 'Bright As The Sun - Asian Games 2018', src: '/Energy18 - Bright As The Sun - Official Song Asian Games 2018.mp3' },
+  { title: 'Song of Victory - Asian Para Games 2018', src: '/Song of Victory (Indonesian Version) - Official Song Asian Para Games 2018.mp3' },
+];
 
 export function MusicProvider({ children }) {
   const audioRef = useRef(null);
@@ -8,18 +16,34 @@ export function MusicProvider({ children }) {
   const [isMuted, setIsMuted] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
   const [started, setStarted] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(0);
+  const [currentTitle, setCurrentTitle] = useState(PLAYLIST[0].title);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-
     const handleEnded = () => {
-      audio.currentTime = 0;
-      audio.play().catch(() => {});
+      setCurrentTrack(prev => {
+        const next = (prev + 1) % PLAYLIST.length;
+        setCurrentTitle(PLAYLIST[next].title);
+        return next;
+      });
     };
     audio.addEventListener('ended', handleEnded);
     return () => audio.removeEventListener('ended', handleEnded);
   }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !started) return;
+    const wasPlaying = isPlaying;
+    audio.src = PLAYLIST[currentTrack].src;
+    audio.load();
+    if (wasPlaying) {
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    }
+  }, [currentTrack]);
 
   const playMusic = () => {
     const audio = audioRef.current;
@@ -57,6 +81,14 @@ export function MusicProvider({ children }) {
     }
   };
 
+  const nextTrack = useCallback(() => {
+    setCurrentTrack(prev => (prev + 1) % PLAYLIST.length);
+  }, []);
+
+  const prevTrack = useCallback(() => {
+    setCurrentTrack(prev => (prev - 1 + PLAYLIST.length) % PLAYLIST.length);
+  }, []);
+
   const toggleMute = () => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -72,8 +104,8 @@ export function MusicProvider({ children }) {
   };
 
   return (
-    <MusicContext.Provider value={{ audioRef, isPlaying, isMuted, playbackRate, playMusic, togglePlay, toggleMute, changeSpeed }}>
-      <audio ref={audioRef} src="/hari-merdeka-full.mp3" preload="auto" loop />
+    <MusicContext.Provider value={{ audioRef, isPlaying, isMuted, playbackRate, playMusic, togglePlay, toggleMute, changeSpeed, nextTrack, prevTrack, currentTitle, playlist: PLAYLIST }}>
+      <audio ref={audioRef} src={PLAYLIST[0].src} preload="auto" />
       {children}
     </MusicContext.Provider>
   );
