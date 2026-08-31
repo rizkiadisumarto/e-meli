@@ -1149,6 +1149,240 @@ function ArsipTab() {
   );
 }
 
+// ==================== DATABASE 2026 TAB ====================
+function Database2026Tab() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const { isPlaying, togglePlay } = useMusic();
+  const [musicWasPlaying, setMusicWasPlaying] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+
+  const handleVideoPlay = () => {
+    if (isPlaying) { setMusicWasPlaying(true); togglePlay(); }
+  };
+  const handleVideoPause = () => {
+    if (musicWasPlaying) { togglePlay(); setMusicWasPlaying(false); }
+  };
+  const handleVideoEnded = () => {
+    if (musicWasPlaying) { togglePlay(); setMusicWasPlaying(false); }
+  };
+
+  const photos = [
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.12%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.22%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.25%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.25%20PM%20(2).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.25%20PM%20(3).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.25%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.26%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.26%20PM%20(2).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.26%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.27%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.27%20PM%20(2).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.27%20PM%20(3).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.27%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.36.28%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.05%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.06%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.06%20PM%20(2).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.06%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.07%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.07%20PM%20(2).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.07%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.08%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.08%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.09%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.09%20PM%20(2).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.09%20PM%20(3).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.09%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.10%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.10%20PM%20(2).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.10%20PM%20(3).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.10%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.11%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.11%20PM%20(2).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.11%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.12%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.12%20PM%20(2).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.12%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.13%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.13%20PM%20(2).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.13%20PM%20(3).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.13%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.14%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.14%20PM%20(2).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.45.14%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.46.12%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.46.13%20PM%20(1).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.46.13%20PM%20(2).jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.46.13%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.46.16%20PM.jpeg",
+    "/hall-of-fame%202026/WhatsApp%20Image%202026-08-31%20at%2010.46.18%20PM.jpeg",
+  ];
+
+  const videos = [
+    { src: "/hall-of-fame%202026/WhatsApp%20Video%202026-08-31%20at%2010.36.23%20PM.mp4", label: "Video 1" },
+    { src: "/hall-of-fame%202026/WhatsApp%20Video%202026-08-31%20at%2010.45.04%20PM.mp4", label: "Video 2" },
+    { src: "/hall-of-fame%202026/WhatsApp%20Video%202026-08-31%20at%2010.45.04%20PM1.mp4", label: "Video 3" },
+    { src: "/hall-of-fame%202026/WhatsApp%20Video%202026-08-31%20at%2010.45.04%20PM2.mp4", label: "Video 4" },
+    { src: "/hall-of-fame%202026/WhatsApp%20Video%202026-08-31%20at%2010.45.05%20PM.mp4", label: "Video 5" },
+    { src: "/hall-of-fame%202026/WhatsApp%20Video%202026-08-31%20at%2010.45.05%20PM3.mp4", label: "Video 6" },
+    { src: "/hall-of-fame%202026/WhatsApp%20Video%202026-08-31%20at%2010.46.18%20PM.mp4", label: "Video 7" },
+    { src: "/hall-of-fame%202026/WhatsApp%20Video%202026-08-31%20at%2010.52.46%20PM.mp4", label: "Video 8" },
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % photos.length);
+        setIsTransitioning(false);
+      }, 1500);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [photos.length]);
+
+  return (
+    <div>
+      <div style={{ display: "flex", justifyContent: "center", padding: "2rem 1rem 1rem" }}>
+        <motion.img
+          src="/logohutri81.png"
+          alt="Logo HUT RI Ke-81"
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: [1, 1.08, 1, 1.05, 1], rotate: [0, 5, -5, 3, 0], y: [0, -10, 0, -5, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          style={{ width: "clamp(160px, 30vw, 260px)", height: "auto", borderRadius: "16px", filter: "drop-shadow(0 6px 20px rgba(220,38,38,0.4))" }}
+        />
+      </div>
+
+      <div style={{ width: "100%", maxWidth: "56rem", margin: "0 auto", padding: "0 clamp(0.75rem, 3vw, 1.25rem)" }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
+          style={{ background: "var(--sd-bg-card, #fff)", borderRadius: "clamp(0.75rem, 2vw, 1.25rem)", border: "1px solid var(--sd-border, #e5e5e5)", boxShadow: "0 20px 40px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+
+          <div style={{ background: "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)", padding: "clamp(1rem, 3vw, 1.5rem) clamp(1rem, 3vw, 2rem)", textAlign: "center", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: "-2rem", right: "-2rem", width: "6rem", height: "6rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.1)" }} />
+            <div style={{ position: "absolute", bottom: "-1rem", left: "-1rem", width: "4rem", height: "4rem", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.08)" }} />
+            <div style={{ fontSize: "clamp(2rem, 5vw, 3rem)", marginBottom: "0.5rem" }}>&#127942;</div>
+            <h2 style={{ fontSize: "clamp(1rem, 3vw, 1.5rem)", fontWeight: 900, color: "#fff", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Hall of Fame 2026</h2>
+            <p style={{ fontSize: "clamp(0.6rem, 1.5vw, 0.75rem)", color: "rgba(255,255,255,0.8)", marginTop: "0.25rem" }}>Malam Tirakat 16 Agustus &amp; HUT RI Ke-81 - 17 Agustus 2026</p>
+          </div>
+
+          <div style={{ padding: "clamp(1rem, 3vw, 2rem)" }}>
+            <div
+              style={{ position: "relative", width: "100%", aspectRatio: "16/9", borderRadius: "0.75rem", overflow: "hidden", backgroundColor: "var(--sd-bg-secondary, #f5f5f5)", animation: "glowPulse 3s ease-in-out infinite", cursor: "zoom-in" }}
+              onClick={() => setLightboxOpen(true)}
+            >
+              <img
+                src={photos[currentIndex]}
+                alt={`Hall of Fame 2026 - ${currentIndex + 1}`}
+                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", opacity: isTransitioning ? 0 : 1, transition: "opacity 1.5s ease-in-out" }}
+              />
+              <div style={{ position: "absolute", bottom: "1rem", left: "50%", transform: "translateX(-50%)", backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", padding: "0.375rem 0.75rem", borderRadius: "9999px", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <span style={{ color: "#fff", fontSize: "0.7rem", fontWeight: 600 }}>{currentIndex + 1} / {photos.length}</span>
+              </div>
+            </div>
+
+            <div style={{ marginTop: "1rem", textAlign: "center" }}>
+              <p style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)", color: "var(--sd-text-muted, #737373)", fontStyle: "italic" }}>
+                Momen-momen indah perayaan Malam Tirakat &amp; HUT RI Ke-81 bersama warga Melimewah
+              </p>
+            </div>
+
+            {/* Video Highlights */}
+            <div style={{ marginTop: "1.5rem" }}>
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <span style={{ display: "inline-block", backgroundColor: "#dc2626", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>&#127909; Video Highlights</span>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Dokumentasi Video Perayaan 2026</h3>
+              </div>
+              <style>{`
+                .video-grid-2026 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+                @media (min-width: 640px) { .video-grid-2026 { grid-template-columns: repeat(2, 1fr); } }
+                .video-card-2026 video { width: 100%; display: block; background: #000; border-radius: 0.5rem 0.5rem 0 0; }
+              `}</style>
+              <div className="video-grid-2026">
+                {videos.map((video, idx) => (
+                  <motion.div
+                    key={idx}
+                    className="video-card-2026"
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.3 + idx * 0.1 }}
+                    style={{ backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)", overflow: "hidden" }}
+                  >
+                    <video
+                      src={video.src}
+                      controls
+                      preload="none"
+                      onPlay={handleVideoPlay}
+                      onPause={handleVideoPause}
+                      onEnded={handleVideoEnded}
+                    />
+                    <div style={{ padding: "0.5rem 0.75rem", textAlign: "center" }}>
+                      <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--sd-text, #262626)" }}>{video.label}</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Laporan Kegiatan 2026 */}
+            <div style={{ marginTop: "1.5rem", padding: "clamp(1rem, 3vw, 1.5rem)", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <span style={{ display: "inline-block", backgroundColor: "#2563eb", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>&#128196; Laporan Kegiatan</span>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Dokumen Transparansi Kegiatan 2026</h3>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "0.75rem" }}>
+                {[
+                  { href: "/laporan%202026/Semarak%2017%20Agustus%20%E2%80%94%20GG%20MELIMEWAH%20(1).pdf", title: "Laporan 17 Agustus 2026", desc: "Laporan lengkap kegiatan 17 Agustus 2026", color: "#dc2626" },
+                  ...[1,2,3,4,5,6].map(n => ({
+                    href: `/laporan%202026/WhatsApp%20Image%202026-08-31%20at%2011.05.${n < 3 ? '20' : '21'}%20PM${n > 1 ? n < 3 ? '' : `%20(${n-2})` : ''}.jpeg`,
+                    title: `Dokumentasi ${n}`,
+                    desc: `Foto kegiatan 17 Agustus 2026`,
+                    color: "#059669"
+                  }))
+                ].map((item, idx) => (
+                  <motion.a
+                    key={idx}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.2 + idx * 0.1 }}
+                    style={{ backgroundColor: "var(--sd-bg-card, #fff)", border: "1px solid var(--sd-border, #e5e5e5)", borderRadius: "0.75rem", padding: "1rem", textDecoration: "none", display: "flex", flexDirection: "column", gap: "0.5rem", transition: "all 0.2s" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 20px rgba(0,0,0,0.08)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <div style={{ width: "2rem", height: "2rem", borderRadius: "0.5rem", background: `linear-gradient(135deg, ${item.color}, ${item.color}dd)`, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><FileText size={14} /></div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--sd-text, #262626)" }}>{item.title}</div>
+                        <div style={{ fontSize: "0.55rem", color: "var(--sd-text-muted, #737373)" }}>{item.href.endsWith('.pdf') ? 'PDF Document' : 'Image'}</div>
+                      </div>
+                    </div>
+                    <p style={{ fontSize: "0.6rem", color: "var(--sd-text-muted, #737373)", margin: 0, lineHeight: 1.4 }}>{item.desc}</p>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.25rem", color: item.color, fontSize: "0.6rem", fontWeight: 600, marginTop: "auto" }}>
+                      <Download size={12} /> <span>Buka Dokumen</span>
+                    </div>
+                  </motion.a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
+      <PhotoLightbox
+        photos={photos}
+        currentIndex={currentIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
+    </div>
+  );
+}
+
 // ==================== DATABASE 2024 TAB ====================
 function Database2024Tab() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -2461,6 +2695,7 @@ export default function SemarakPage() {
   const tabs = [
     { id: "beranda", label: "Home", icon: <Home size={16} /> },
     { id: "tirakatan", label: "Tirakatan", icon: <Moon size={16} /> },
+    { id: "database2026", label: "Database 2026", icon: <Camera size={16} /> },
     { id: "arsip", label: "Database 2025", icon: <Camera size={16} /> },
     { id: "database2024", label: "Database 2024", icon: <Camera size={16} /> },
     { id: "database2023", label: "Database 2023", icon: <Camera size={16} /> },
@@ -2613,6 +2848,7 @@ export default function SemarakPage() {
 
       {/* Main sections */}
       <main style={{ flex: 1, paddingBottom: "3rem" }}>
+        {activeTab === "database2026" && <Database2026Tab />}
         {activeTab === "beranda" && (
           <>
             <Countdown animationsStarted={animationsStarted} />
