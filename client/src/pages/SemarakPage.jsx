@@ -1246,7 +1246,7 @@ function Database2026Tab() {
     <div>
       <div style={{ display: "flex", justifyContent: "center", padding: "2rem 1rem 1rem" }}>
         <motion.img
-          src="/logohutri81.png"
+          src="/logo-hut-ri81.jpeg"
           alt="Logo HUT RI Ke-81"
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: [1, 1.08, 1, 1.05, 1], rotate: [0, 5, -5, 3, 0], y: [0, -10, 0, -5, 0] }}
@@ -1286,6 +1286,48 @@ function Database2026Tab() {
               <p style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.8rem)", color: "var(--sd-text-muted, #737373)", fontStyle: "italic" }}>
                 Momen-momen indah perayaan Malam Tirakat &amp; HUT RI Ke-81 bersama warga Melimewah
               </p>
+            </div>
+
+            {/* Susunan Panitia Inti */}
+            <div style={{ marginTop: "1.5rem", padding: "clamp(1rem, 3vw, 1.5rem)", backgroundColor: "var(--sd-bg-secondary, #fafafa)", borderRadius: "0.75rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+              <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                <span style={{ display: "inline-block", backgroundColor: "#dc2626", color: "#fff", fontSize: "0.6rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginBottom: "0.5rem" }}>Panitia Inti</span>
+                <h3 style={{ fontSize: "clamp(0.9rem, 2.5vw, 1.15rem)", fontWeight: 800, color: "var(--sd-text, #262626)", margin: "0.5rem 0 0" }}>Susunan Pengurus Malam Tirakat &amp; HUT RI Ke-81 Tahun 2026</h3>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #dc2626, #b91c1c)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Shield size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pembina</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Hairul</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #d97706, #b45309)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Crown size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Ketua Panitia</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Nurali</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #059669, #047857)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><PenLine size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Sekretaris</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Bapak Sigit</div>
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", padding: "0.75rem 1rem", backgroundColor: "var(--sd-bg-card, #fff)", borderRadius: "0.5rem", border: "1px solid var(--sd-border, #e5e5e5)" }}>
+                  <div style={{ width: "2.5rem", height: "2.5rem", borderRadius: "50%", background: "linear-gradient(135deg, #2563eb, #1d4ed8)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", flexShrink: 0 }}><Users size={18} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "0.6rem", fontWeight: 600, color: "var(--sd-text-muted, #737373)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Anggota</div>
+                    <div style={{ fontSize: "clamp(0.8rem, 2vw, 0.95rem)", fontWeight: 700, color: "var(--sd-text, #262626)" }}>Seluruh Warga GG. Melimewah</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Video Highlights */}
