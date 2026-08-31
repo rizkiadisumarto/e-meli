@@ -2958,34 +2958,6 @@ export default function SemarakPage() {
             <Countdown animationsStarted={animationsStarted} />
             <hr style={{ width: "100%", maxWidth: "36rem", margin: "2rem auto", border: "none", borderTop: "1px solid var(--sd-border)" }} />
             <TeksProklamasi animationsStarted={animationsStarted} />
-
-            <hr style={{ width: "100%", maxWidth: "36rem", margin: "2rem auto", border: "none", borderTop: "1px solid var(--sd-border)" }} />
-
-            {/* Coming Soon: Hall of Fame & Susunan Panitia */}
-            <div style={{ width: "100%", maxWidth: "56rem", margin: "0 auto", padding: "1.5rem clamp(0.75rem, 3vw, 1.25rem)" }}>
-              <div className="semarak-coming-soon-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "1rem" }}>
-                {/* Hall of Fame Coming Soon */}
-                <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "1rem", padding: "2rem 1.5rem", textAlign: "center", position: "relative" }}>
-                  <div style={{ fontSize: "3rem", marginBottom: "0.75rem" }}>&#127942;</div>
-                  <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--sd-text)", margin: "0 0 0.375rem" }}>Hall of Fame</h3>
-                  <p style={{ fontSize: "0.75rem", color: "var(--sd-text-muted)", margin: "0 0 1rem" }}>Momen-momen perayaan HUT RI Ke-81</p>
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 1rem", borderRadius: "9999px", backgroundColor: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.2)", color: "#dc2626", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.05em" }}>
-                    <span style={{ animation: "pulse 2s infinite" }}>&#128337;</span> COMING SOON
-                  </div>
-                </div>
-
-                {/* Susunan Panitia Coming Soon */}
-                <div style={{ backgroundColor: "var(--sd-bg-card)", border: "1px solid var(--sd-border)", borderRadius: "1rem", padding: "2rem 1.5rem", textAlign: "center", position: "relative" }}>
-                  <div style={{ fontSize: "3rem", marginBottom: "0.75rem" }}>&#129333;</div>
-                  <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "var(--sd-text)", margin: "0 0 0.375rem" }}>Susunan Panitia Inti</h3>
-                  <p style={{ fontSize: "0.75rem", color: "var(--sd-text-muted)", margin: "0 0 1rem" }}>Pengurus HUT RI Ke-81 Tahun 2026</p>
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: "0.375rem", padding: "0.375rem 1rem", borderRadius: "9999px", backgroundColor: "rgba(217,119,6,0.1)", border: "1px solid rgba(217,119,6,0.2)", color: "#d97706", fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.05em" }}>
-                    <span style={{ animation: "pulse 2s infinite" }}>&#128337;</span> COMING SOON
-                  </div>
-                </div>
-
-              </div>
-            </div>
           </>
         )}
         {activeTab === "tirakatan" && <TirakatanTab />}
