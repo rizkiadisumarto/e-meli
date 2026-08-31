@@ -1437,6 +1437,7 @@ function Database2026Tab() {
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "0.75rem" }}>
                 {[
+                  { href: "/laporan%202026/Laporan%20Event%20-%20Malam%20Keakraban%20Gang%20Melimewah%20Agustus%202026.pdf", title: "Laporan Malam Keakraban 2026", desc: "Laporan lengkap kegiatan Malam Keakraban Agustus 2026", color: "#7c3aed" },
                   { href: "/laporan%202026/Semarak%2017%20Agustus%20%E2%80%94%20GG%20MELIMEWAH%20(1).pdf", title: "Laporan 17 Agustus 2026", desc: "Laporan lengkap kegiatan 17 Agustus 2026", color: "#dc2626" },
                   ...[1,2,3,4,5,6].map(n => ({
                     href: `/laporan%202026/WhatsApp%20Image%202026-08-31%20at%2011.05.${n < 3 ? '20' : '21'}%20PM${n > 1 ? n < 3 ? '' : `%20(${n-2})` : ''}.jpeg`,
