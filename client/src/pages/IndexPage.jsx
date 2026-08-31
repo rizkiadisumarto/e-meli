@@ -138,7 +138,7 @@ const IndexPage = () => {
 
         {/* Music Player Card */}
         <motion.a
-          href="https://melimusic.vercel.app"
+          href="http://localhost:3000"
           target="_blank"
           rel="noopener noreferrer"
           initial={{ opacity: 0, y: 30 }}
