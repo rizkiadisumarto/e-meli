@@ -3,11 +3,9 @@ import { createContext, useContext, useRef, useState, useEffect, useCallback } f
 const MusicContext = createContext(null);
 
 const PLAYLIST = [
-  { title: 'Hari Merdeka', src: '/hari-merdeka-full.mp3' },
-  { title: 'Indonesia Raya', src: '/indonesia-raya.mp3' },
   { title: 'Dance Tonight - BCL feat. Jflow', src: '/Dance Tonight - Bunga Citra Lestari feat. Jflow.mp3' },
   { title: 'Bright As The Sun - Asian Games 2018', src: '/Energy18 - Bright As The Sun - Official Song Asian Games 2018.mp3' },
-  { title: 'Song of Victory - Asian Para Games 2018', src: '/Song of Victory (Indonesian Version) - Official Song Asian Para Games 2018.mp3' },
+  { title: 'Song of Victory - Indonesian Version', src: '/Song of Victory (Indonesian Version) - Official Song Asian Para Games 2018.mp3' },
 ];
 
 export function MusicProvider({ children }) {
