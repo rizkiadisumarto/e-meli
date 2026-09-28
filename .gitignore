@@ -6,6 +6,11 @@ dist/
 *.db-wal
 server/uploads/
 .mimocode/
+server/backups/
+server/logs/
+backups/
+logs/
+local/
 hut ri80/
 logo hut ri81.jpeg
 logohutri80.jpg
