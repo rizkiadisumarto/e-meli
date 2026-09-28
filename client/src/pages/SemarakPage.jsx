@@ -536,7 +536,6 @@ function VideoGrid() {
     { src: "/hall-of-fame/WhatsApp Video 2026-07-27 at 1.33.04 AM (2).mp4", label: "Video 8" },
     { src: "/hall-of-fame/WhatsApp Video 2026-07-27 at 1.33.05 AM.mp4", label: "Video 9" },
     { src: "/hall-of-fame/WhatsApp Video 2026-07-31 at 4.19.35 PM.mp4", label: "Video 10" },
-    { src: "/hall-of-fame/Vid 20260801 065250 1(1).mp4", label: "Video 11", special: "Short Movie perayaan HUT RI Ke-80 - 17 Agustus 2025" },
   ];
 
   const handlePlay = useCallback((idx) => {
@@ -2240,7 +2239,6 @@ function Database2022Tab() {
     "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.22%20AM%20(1).jpeg",
     "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.22%20AM%20(2).jpeg",
     "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.22%20AM%20(3).jpeg",
-    "/hall-of-fame%202022/WhatsApp%20Image%202026-07-23%20at%201.22.23%20AM.jpeg",
   ];
 
   useEffect(() => {
