@@ -1,0 +1,60 @@
+name: Supabase Keep-Alive
+
+# Mencegah project Supabase Free di-pause (7 hari tanpa aktivitas database).
+# Supabase menghitung "user database activity" — jadi ping harus benar-benar
+# mengeksekusi query, bukan sekadar cek endpoint health.
+#
+# Wajib isi 3 repository secret (Settings > Secrets and variables > Actions):
+#   SUPABASE_URL           https://<project-ref>.supabase.co
+#   SUPABASE_ANON_KEY      anon public key (Dashboard > Settings > API)
+#   SUPABASE_DATABASE_URL  connection string (pooler, port 6543)
+#
+# ⚠️ GitHub mematikan scheduled workflow setelah 60 hari tanpa aktivitas repo.
+#    Kalau 60 hari tidak ada commit, workflow ini berhenti diam-diam.
+#    Cek di tab Actions, atau jalankan manual lewat "Run workflow".
+
+on:
+  schedule:
+    - cron: '0 2,14 * * *' # 09.00 & 21.00 WIB (UTC+7)
+  workflow_dispatch: # tombol manual di tab Actions
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: false
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install dependencies
+        working-directory: server
+        run: npm ci --no-audit --no-fund
+
+      - name: Ping database Supabase
+        working-directory: server
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
+        run: node keep-alive.js
+
+      - name: Gagal = merah (agar tidak senyap)
+        if: failure()
+        run: |
+          echo "::error::Keep-alive Supabase GAGAL — project berisiko pause dalam 7 hari."
+          echo "Cek: secret kosong / password sudah di-rotate / project sudah pause."
+          exit 1
