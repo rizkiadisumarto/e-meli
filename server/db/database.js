@@ -42,7 +42,13 @@ async function initializeDb() {
       // Batasi waktu tunggu: kalau DB tak terjangkau, gagal cepat
       // daripada menggantung sehingga aplikasi tidak pernah membuka port.
       connectionTimeoutMillis: 10000,
-      idleTimeoutMillis: 30000,
+      // Koneksi idle dipertahankan 5 menit (bukan 30 detik) supaya request
+      // pertama setelah sepi tidak membayar handshake TLS + auth lagi
+      // (terukur ±960 ms vs ±350 ms saat koneksi masih hangat).
+      idleTimeoutMillis: 300000,
+      // TCP keepalive agar koneksi mati-senyap langsung terdeteksi
+      keepAlive: true,
+      keepAliveInitialDelayMillis: 30000,
       max: 10,
     });
 
