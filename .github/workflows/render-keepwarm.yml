@@ -1,0 +1,46 @@
+name: Render Keep-Warm
+
+# Render Free mematikan service setelah 15 menit tanpa request.
+# Bangun lagi butuh 30-60 detik — itulah sebab halaman "SERVICE WAKING UP".
+# Ping tiap 10 menit menjaga service tetap hidup, dan karena targetnya
+# /api/health (yang mengecek database), satu ping sekaligus mengirim
+# aktivitas database ke Supabase — anti-pause ikut terjaga.
+#
+# Catatan: service yang nyala 24/7 memakai ±744 jam/bulan dari
+# kuota 750 jam free Render.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *' # tiap 10 menit (sebelum ambang sleep 15 menit)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: render-keepwarm
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Bangunkan Render dan cek database
+        run: |
+          set -u
+          URL="https://e-meli.onrender.com/api/health"
+          code="000"
+          for attempt in 1 2; do
+            echo "--- percobaan $attempt: $URL"
+            code=$(curl -sS -o /tmp/health.json -w '%{http_code}' \
+                    --max-time 120 -H 'Accept-Encoding: gzip' "$URL" || echo 000)
+            echo "HTTP $code"
+            cat /tmp/health.json 2>/dev/null || true
+            echo
+            [ "$code" = "200" ] && exit 0
+            echo "belum 200, tunggu 30 detik..."
+            sleep 30
+          done
+          echo "::error::Render /api/health gagal (HTTP $code) — service mungkin down atau database tidak terhubung."
+          exit 1

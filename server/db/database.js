@@ -4,6 +4,29 @@ const fs = require('fs');
 let db = null;
 let isPostgres = false;
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Koneksi ke database dengan retry untuk error transient
+ * (pooler baru bangun, jeda jaringan, DNS). Error autentifikasi TIDAK diretry
+ * karena tidak akan membaik sendiri — lebih baik gagal cepat dan jelas.
+ */
+async function connectWithRetry(pool, tries = 4) {
+  let lastErr;
+  for (let i = 1; i <= tries; i++) {
+    try {
+      return await pool.connect();
+    } catch (err) {
+      lastErr = err;
+      const authFailed = err.code === '28P01' || err.code === '28000' || /password authentication failed/i.test(err.message || '');
+      console.error(`⚠️  Koneksi database gagal (${i}/${tries})${authFailed ? ' — AUTENTIKASI' : ''}: ${err.message}`);
+      if (authFailed) break; // password salah / user tidak ada → stop, jangan buang waktu
+      if (i < tries) await sleep(i * 2000);
+    }
+  }
+  throw lastErr;
+}
+
 async function initializeDb() {
   if (db) return db;
 
@@ -15,11 +38,16 @@ async function initializeDb() {
     const { Pool } = require('pg');
     db = new Pool({
       connectionString: DATABASE_URL,
-      ssl: { rejectUnauthorized: false }
+      ssl: { rejectUnauthorized: false },
+      // Batasi waktu tunggu: kalau DB tak terjangkau, gagal cepat
+      // daripada menggantung sehingga aplikasi tidak pernah membuka port.
+      connectionTimeoutMillis: 10000,
+      idleTimeoutMillis: 30000,
+      max: 10,
     });
 
     // Test connection
-    const client = await db.connect();
+    const client = await connectWithRetry(db);
     console.log('✅ PostgreSQL connected successfully');
 
     // Run schema
